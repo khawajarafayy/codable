@@ -1,0 +1,46 @@
+codable-frontend/
+│── index.html
+│── package.json
+│── vite.config.js
+│── postcss.config.js
+│── tailwind.config.js
+│
+└── src/
+    │── main.jsx           # Entry point
+    │── App.jsx            # Root app layout
+    │── index.css          # Global styles (Tailwind imports)
+    │
+    ├── assets/            # Images, logos, static assets
+    │    └── logo.png
+    │
+    ├── components/        # Reusable small UI components
+    │    ├── Button.jsx
+    │    ├── Card.jsx
+    │    ├── Navbar.jsx
+    │    └── Sidebar.jsx
+    │
+    ├── layouts/           # Reusable page layouts
+    │    ├── DashboardLayout.jsx
+    │    └── AuthLayout.jsx
+    │
+    ├── pages/             # Each page of app
+    │    ├── Dashboard/    # Welcome dashboard
+    │    │   └── welcomeDashboard.jsx
+    │    ├── Auth/         # Login / Signup pages
+    │    │   ├── Login.jsx
+    │    │   └── Signup.jsx
+    │    ├── Student/      # Student-specific pages
+    │    ├── Mentor/       # Mentor-specific pages
+    │    └── Workspace/    # Online IDE/workspace pages
+    │
+    ├── hooks/             # Custom React hooks
+    │    └── useAuth.js
+    │
+    ├── context/           # React Context API (global state)
+    │    └── AuthContext.jsx
+    │
+    ├── utils/             # Helper functions
+    │    └── api.js
+    │
+    └── services/          # API calls / integrations (future)
+         └── authService.js 

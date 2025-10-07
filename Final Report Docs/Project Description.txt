@@ -1,0 +1,82 @@
+Project Title: Codable - Coding & Code Learning Platform
+Detailed Description:
+Currently building for Java language only.
+
+What does our project do?
+It will have two main models: one for independent users and another for instructors with classes containing students.
+
+➤ First Model (Self Learners)
+A new user signs up and is presented with three options:
+
+1. Start learning coding as a beginner
+
+2. Improve your coding skills
+
+3. Use the code editor
+
+If the user chooses Option 1: Start learning coding as a beginner →
+They will be provided with documentation or interactive learning like any visualizations to start learning from scratch. at the time of learning topics or performing visualizations tasks, an LLM will be analyzing them at the same time, after that each topic, they will be given a short quiz, and their progress will be saved. They can also practice logic problems on their own after each topic (similar to W3Schools, where you can practice HTML, CSS, etc.). We will keep it interactive learning. It will be somehow gamified as it will have levels that will be opened after completing previous levels and gaining enough XP points. An assistant like Chatbot will be there whole time analyzing the learning and practicing of topics as user should not go back to documentations, instead he can ask chatbot.
+
+
+If the user chooses Option 2: Improve your coding skills →
+The user will be asked to select the level at which they want to improve their coding skills. They will then be tested according to the level they selected. Upon passing the test, they will be able to choose the specific topic they want to improve in (e.g., a user selects "intermediate level" and passes the test, then chooses to improve their understanding of polymorphism in Java).
+
+The user will then be given a set of coding questions to solve using the best possible logic.
+
+An LLM model will evaluate the code step-by-step, checking for syntax errors and assessing the logic applied.
+
+It will analyze whether the applied logic is optimal in terms of time complexity.
+
+If not, another LLM (or a custom ML model) will provide suggestions and offer a new question that encourages better logic application.
+
+Each topic will include 10–15 coding questions.
+
+If the user writes correct and optimized code, they move forward.
+
+If the code has errors or weak logic, the question will reappear with variations until the user masters the concept.
+
+All progress will be saved in the user's profile.
+
+If the user chooses Option 3: Use the code editor →
+This will function similarly to a sandbox or VS Code.
+The user can:
+
+Write code
+
+Run it
+
+See the output
+
+Additionally, we plan to integrate GitHub Copilot or a similar AI assistant for real-time help, just like in VS Code.
+
+Note:
+If a returning user logs in, they will be redirected to where they left off. Their progress in each mode (learning, skill improvement, or using the editor) will be saved under the same profile but tracked separately.
+
+➤ Second Model (Instructor with Class - Dependent Users)
+An instructor signs up and has the option to create a class.
+They can assign different privileges to students.
+
+Use Case Example:
+An instructor is conducting a Java lab using our platform. They:
+
+Create a class with 50 students
+
+Share a link or join code for students to access the class
+
+The students don’t just run code and submit it; the instructor adds the topic being taught in the lab.
+An LLM generates tasks for students based on the topic.
+
+After each task, the LLM evaluates the student’s code
+
+The student's detailed progress is not shown to them directly
+
+Feedback and suggestions are provided to help them improve
+
+The instructor receives detailed reports and can grade students based on their performance and logic application
+
+
+Code Analysis (LLM): CodeBERT or CodeT5+
+
+Adaptive Question Suggestion: Initially using fine-tuned CodeT5+. If not effective, we’ll develop a custom ML recommendation model using a tagged database of coding problems.
+
+Code Editor: Monaco Editor (Open-source version of the VS Code editor)

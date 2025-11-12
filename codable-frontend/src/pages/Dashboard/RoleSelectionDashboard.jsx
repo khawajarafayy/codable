@@ -5,13 +5,25 @@ import {FaUser} from "react-icons/fa";
 import {GiTeacher} from "react-icons/gi";
 import {BiCodeBlock} from "react-icons/bi";
 import {useState} from 'react';
-import colors from "../../config/colors";
+import { useNavigate } from "react-router-dom";
 
 function RoleSelectionDashboard() {
   const [selectedCard, setSelectedCard] = useState(null);
+  const navigate = useNavigate();
 
   const handleCardClick = (title) => {
     setSelectedCard(title === selectedCard ? null : title);
+  }
+
+  const handeGetStarted = () => {
+    if(!selectedCard){
+      alert("Please select a role first!");
+      return;
+    }
+
+    if(selectedCard === "Student") navigate("/student");
+    if(selectedCard === "Mentor") navigate("/mentor");
+    if(selectedCard === "Workspace") navigate("/workspace");
   }
 
   const cards = [
@@ -49,15 +61,14 @@ function RoleSelectionDashboard() {
 
   return (
     <div className="relative flex flex-col min-h-screen">
-      {/* Background gradients */}
       <div className="fixed inset-0 z-0" aria-hidden="true">
-        <div className={`absolute inset-0 bg-gradient-to-b from-[${colors.backgroundGradient.from}] via-[${colors.backgroundGradient.via}] to-[${colors.backgroundGradient.to}] opacity-100`} />
-        <div className={`absolute top-1/4 left-1/4 w-96 h-96 bg-[${colors.glowEffects.blue}] rounded-full filter blur-[128px] animate-pulse` }/>
-        <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 bg-[${colors.glowEffects.purple}] rounded-full filter blur-[128px] animate-pulse` }/>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A1428] via-[#0F1B2D] to-[#040B1D] opacity-100" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full filter blur-[128px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full filter blur-[128px] animate-pulse" />
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        <Navbar title="Codable" profileImg="..." />
+        <Navbar title="Codable"  />
 
         <main className="flex-grow flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl w-full text-center">
@@ -88,7 +99,7 @@ function RoleSelectionDashboard() {
               </div>
             </div>
 
-            <Button text="Get Started" onClick={() => alert("Get Started")} />
+            <Button text="Get Started" onClick={handeGetStarted} />
           </div>
         </main>
       </div>

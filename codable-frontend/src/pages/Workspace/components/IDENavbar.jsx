@@ -9,7 +9,13 @@ const IDENavbar = () => {
     <header className="flex items-center justify-between px-6 py-3 bg-[#141622] border-b border-gray-800 backdrop-blur-sm">
       {/* Left - Back Button */}
       <button
-        onClick={() => navigate("/")}
+        onClick={() => {
+          if(window.history.length > 1){
+            navigate(-1);
+          }else{
+            navigate("/");
+          }
+        }}
         className="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg transition-all duration-200"
       >
         <ArrowLeft size={20} />

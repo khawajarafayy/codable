@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogIn, Github } from "lucide-react";
 import CodableLogo from "../../assets/codable-logo.png";
+import { api } from "../../services/apiClient";
+
 
 const TYPING_MESSAGES = [
   "Learn. Practice. Master - all in one place.",
@@ -48,15 +50,24 @@ function Login() {
   const handleGoogleSignIn = () => alert("Google sign-in coming soon");
   const handleGithubSignIn = () => alert("GitHub sign-in coming soon");
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    setTimeout(() => {
+
+    try{
+      const data = await api.login(email, password);
+
+      if(data?.token){
+        localStorage.setItem("token", data.token);
+      }
+      navigate("/student");
+    } catch(err){
+      setError(err.payload?.message || err.message || "Login Failed");
+    } finally {
       setLoading(false);
-      navigate("/");
-    }, 800);
-  };
+    }
+  }
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">

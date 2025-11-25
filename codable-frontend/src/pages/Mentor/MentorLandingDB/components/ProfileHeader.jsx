@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Badge } from "./ui/badge";
+import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
+import { Badge } from "../../../../components/ui/badge";
 import { Calendar, Mail, MapPin, Award } from "lucide-react";
 
 export function ProfileHeader() {

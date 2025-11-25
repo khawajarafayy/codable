@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserPlus, Github } from "lucide-react";
 import CodableLogo from "../../assets/codable-logo.png";
+import { api } from "../../services/apiClient";
 
 const TYPING_MESSAGES = [
   "Join thousands of developers learning to code.",
@@ -56,9 +57,10 @@ function Signup() {
   const handleGoogleSignUp = () => alert("Google sign-up coming soon");
   const handleGithubSignUp = () => alert("GitHub sign-up coming soon");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
@@ -70,11 +72,14 @@ function Signup() {
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await api.signup(formData.fullName, formData.email, formData.password);
+      navigate("/login");
+    } catch (err) {
+      setError(err?.message || err?.payload?.message || "Signup Failed");
+    } finally{
       setLoading(false);
-      navigate("/");
-    }, 800);
+    }
   };
 
   return (

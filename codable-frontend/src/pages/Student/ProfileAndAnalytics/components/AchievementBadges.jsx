@@ -96,7 +96,7 @@ const getRarityBadge = (rarity) => {
 
 export function AchievementBadges() {
   return (
-    <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+    <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-white mb-1">Achievement Badges</h3>

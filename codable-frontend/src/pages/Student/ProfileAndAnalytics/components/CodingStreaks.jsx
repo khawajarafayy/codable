@@ -22,7 +22,7 @@ export function CodingStreaks() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Streak Stats */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <div className="flex items-center gap-2 mb-6">
           <Flame className="h-5 w-5 text-orange-400" />
           <h3 className="text-white">Coding Streaks</h3>
@@ -38,7 +38,7 @@ export function CodingStreaks() {
             <p className="text-xs text-muted-foreground mt-1">🔥 Keep it going!</p>
           </div>
           
-          <div className="p-4 rounded-lg bg-accent/20 border border-border/30">
+          <div className="p-4 rounded-lg bg-accent/20 border-1">
             <p className="text-sm text-muted-foreground mb-1">Longest Streak</p>
             <div className="flex items-baseline gap-1">
               <p className="text-3xl text-white">{streakData.longest}</p>
@@ -47,7 +47,7 @@ export function CodingStreaks() {
             <p className="text-xs text-green-400 mt-1">Personal Best</p>
           </div>
           
-          <div className="p-4 rounded-lg bg-accent/20 border border-border/30">
+          <div className="p-4 rounded-lg bg-accent/20 border-1">
             <p className="text-sm text-muted-foreground mb-1">Total Days</p>
             <div className="flex items-baseline gap-1">
               <p className="text-3xl text-white">{streakData.total}</p>
@@ -68,7 +68,7 @@ export function CodingStreaks() {
       </Card>
 
       {/* Weekly Activity */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <div className="flex items-center gap-2 mb-6">
           <Calendar className="h-5 w-5 text-blue-400" />
           <h3 className="text-white">This Week's Activity</h3>

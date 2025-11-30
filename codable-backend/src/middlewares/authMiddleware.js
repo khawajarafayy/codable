@@ -48,7 +48,7 @@ const userAuth = async (req, res, next) => {
   }
 
   try {
-    const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
+    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded token: ", tokenDecode);
 
     if (tokenDecode.userId) {

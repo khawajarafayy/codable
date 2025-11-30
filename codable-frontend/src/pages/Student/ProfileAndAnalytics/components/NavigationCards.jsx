@@ -39,7 +39,7 @@ export function NavigationCards() {
       {navigationItems.map((item, index) => (
         <Card
           key={index}
-          className="bg-card/50 backdrop-blur-xl border-border/50 p-6 hover:bg-card/60 transition-all group cursor-pointer"
+          className="bg-black/40 backdrop-blur-xl border-0 p-6 hover:bg-card/60 transition-all group cursor-pointer"
         >
           <div className="space-y-4">
             <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center group-hover:scale-110 transition-transform`}>

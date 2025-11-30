@@ -117,7 +117,7 @@ const getStatusText = (status) => {
 
 export function TopicProgress() {
 	return (
-		<Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+		<Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
 			<div className="mb-6">
 				<h3 className="text-white mb-2">Topic-wise Progress</h3>
 				<p className="text-sm text-muted-foreground">

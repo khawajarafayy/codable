@@ -5,7 +5,7 @@ import { Calendar, Mail, MapPin, Award } from "lucide-react";
 export function ProfileHeader() {
   return (
     <div className="flex flex-col md:flex-row gap-6 items-start md:items-center mb-8">
-      <Avatar className="h-24 w-24 border-4 border-border/50">
+      <Avatar className="h-24 w-24 border-0">
         <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-3xl">
           R
         </AvatarFallback>

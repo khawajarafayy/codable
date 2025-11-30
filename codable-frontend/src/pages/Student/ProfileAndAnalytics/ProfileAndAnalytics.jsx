@@ -31,11 +31,18 @@ export default function ProfileAndAnalytics() {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="analytics" className="w-full">
-          <TabsList className="mb-8 bg-card/50 backdrop-blur-xl border border-border/50">
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="profile">Profile Info</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="weak-areas">Weak Areas</TabsTrigger>
+          <TabsList className="mb-8 bg-black/50 backdrop-blur-xl border-0">
+            <TabsTrigger value="analytics"
+            className="data-[state=active]:bg-gray-700/80 data-[state=active]:text-white rounded-xl transition-all">Analytics</TabsTrigger>
+            <TabsTrigger value="profile"
+            className="data-[state=active]:bg-gray-700/80 data-[state=active]:text-white rounded-xl transition-all"
+            >Profile Info</TabsTrigger>
+            <TabsTrigger value="performance"
+            className="data-[state=active]:bg-gray-700/80 data-[state=active]:text-white rounded-xl transition-all"
+            >Performance</TabsTrigger>
+            <TabsTrigger value="weak-areas"
+            className="data-[state=active]:bg-gray-700/80 data-[state=active]:text-white rounded-xl transition-all"
+            >Weak Areas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics" className="space-y-6">

@@ -1,57 +1,98 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Explorer from "./components/Explorer";
 import CodeEditor from "./components/CodeEditor";
 import AiSuggestions from "./components/AiSuggestions";
 import OutputConsole from "./components/OutputConsole";
 import IDENavbar from "./components/IDENavbar";
-import { api } from "../../services/apiClient.js";
+
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
 
 const Workspace = () => {
   const [code, setCode] = useState(`// Write your Java code here...
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello");
+        System.out.println("Hello, World!");
     }
 }`);
   const [output, setOutput] = useState("");
   const [selectedFile, setSelectedFile] = useState("Main.java");
+  const [isRunning, setIsRunning] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const wsRef = useRef(null);
 
-  // Stores user's typed inputs (accumulated stdin)
-  const [stdinLines, setStdinLines] = useState([]);
+  // Cleanup WebSocket on unmount
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
 
-  const appendInput = (line) => {
-    setStdinLines((prev) => [...prev, line]);
+  const handleRun = () => {
+    setOutput('Connecting to compiler...\n');
+    setIsRunning(true);
+
+    const ws = new WebSocket(WS_URL);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setOutput('Compiling and running...\n');
+      ws.send(JSON.stringify({ type: 'run', code }));
+    };
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === 'output') {
+        setOutput((prev) => prev + msg.data);
+      }
+
+      if (msg.type === 'error') {
+        setOutput((prev) => prev + `[ERROR] ${msg.data}`);
+      }
+
+      if (msg.type === 'exit') {
+        setOutput((prev) => prev + `\n[Process exited with code ${msg.code}]`);
+        setIsRunning(false);
+        ws.close();
+      }
+    };
+
+    ws.onerror = () => {
+      setOutput((prev) => prev + '\n[ERROR] WebSocket connection failed. Ensure backend is running.');
+      setIsRunning(false);
+    };
+
+    ws.onclose = () => {
+      setIsRunning(false);
+    };
+  };
+
+  const handleStop = () => {
+    if (wsRef.current) {
+      wsRef.current.send(JSON.stringify({ type: 'stop' }));
+      wsRef.current.close();
+    }
+    setOutput((prev) => prev + '\n[Execution stopped by user]');
+    setIsRunning(false);
+  };
+
+  const handleInput = (input) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'input', data: input }));
+      setOutput((prev) => prev + input + '\n');
+    }
   };
 
   const resetTerminal = () => {
     setOutput("");
-    setStdinLines([]);
-  };
-
-  const handleRun = async () => {
-    setOutput("Running code...\n");
-
-    try {
-      // Join all stdin lines with newline
-      const stdin = stdinLines.join("\n");
-
-      const response = await api.runCode(code, stdin);
-      
-      setOutput(
-        response.run?.stdout ||
-        response.run?.stderr ||
-        response.compile?.stderr ||
-        response.compile?.output ||
-        "No output"
-      );
-    } catch (error) {
-      setOutput("Error: " + (error.message || error.payload?.message || "Unknown error"));
-    }
   };
 
   const handleSave = () => {
     console.log("File saved:", selectedFile);
+    // TODO: Implement actual save functionality
   };
 
   return (
@@ -72,16 +113,19 @@ public class Main {
                 code={code}
                 setCode={setCode}
                 handleRun={handleRun}
+                handleStop={handleStop}
                 handleSave={handleSave}
                 selectedFile={selectedFile}
+                isRunning={isRunning}
               />
             </div>
             <div className="h-48 flex-shrink-0">
               <OutputConsole
                 output={output}
                 setOutput={setOutput}
-                appendInput={appendInput}
+                onInput={handleInput}
                 resetTerminal={resetTerminal}
+                isRunning={isRunning}
               />
             </div>
           </div>

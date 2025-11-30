@@ -1,30 +1,187 @@
-import { Play, Send, Code2, Terminal } from 'lucide-react';
+import { Play, Send, Code2, Terminal, Square, AlertCircle } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import Editor from '@monaco-editor/react';
+import { parse } from 'java-parser';
 
-export function PracticeEditor({ code, onChange, onRun, onSubmit, question }) {
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
+
+export function PracticeEditor({ code, onChange, onSubmit, question }) {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [syntaxErrors, setSyntaxErrors] = useState([]);
+  const wsRef = useRef(null);
+  const outputRef = useRef(null);
+  const editorRef = useRef(null);
+  const monacoRef = useRef(null);
+
+  // Auto-scroll output
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [output]);
+
+  // Cleanup WebSocket on unmount
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
+
+  // Real-time Java syntax validation
+  useEffect(() => {
+    if (!editorRef.current || !monacoRef.current) return;
+
+    const validateJava = () => {
+      try {
+        // Try to parse the Java code
+        parse(code);
+        
+        // No errors - clear all markers
+        monacoRef.current.editor.setModelMarkers(
+          editorRef.current.getModel(),
+          'java-syntax',
+          []
+        );
+        setSyntaxErrors([]);
+      } catch (err) {
+        console.log('Parse error:', err); // Debug log
+        
+        const markers = [];
+        
+        // Handle java-parser error format
+        if (err.name === 'MismatchedTokenException' || err.name === 'NoViableAltException') {
+          const line = err.token?.startLine || 1;
+          const column = err.token?.startColumn || 1;
+          const endLine = err.token?.endLine || line;
+          const endColumn = err.token?.endColumn || column + 1;
+          
+          markers.push({
+            severity: monacoRef.current.MarkerSeverity.Error,
+            message: err.message || 'Syntax error',
+            startLineNumber: line,
+            startColumn: column,
+            endLineNumber: endLine,
+            endColumn: endColumn,
+          });
+        } else if (err.previousToken) {
+          // Handle other parse errors
+          const line = err.previousToken.endLine || 1;
+          const column = err.previousToken.endColumn || 1;
+          
+          markers.push({
+            severity: monacoRef.current.MarkerSeverity.Error,
+            message: err.message || 'Unexpected token',
+            startLineNumber: line,
+            startColumn: column,
+            endLineNumber: line,
+            endColumn: column + 10,
+          });
+        } else {
+          // Fallback for unknown error format
+          markers.push({
+            severity: monacoRef.current.MarkerSeverity.Error,
+            message: err.message || 'Syntax error detected',
+            startLineNumber: 1,
+            startColumn: 1,
+            endLineNumber: 1,
+            endColumn: 10,
+          });
+        }
+
+        monacoRef.current.editor.setModelMarkers(
+          editorRef.current.getModel(),
+          'java-syntax',
+          markers
+        );
+        setSyntaxErrors(markers);
+      }
+    };
+
+    // Debounce validation (wait 300ms after user stops typing)
+    const timeoutId = setTimeout(validateJava, 300);
+    return () => clearTimeout(timeoutId);
+  }, [code]);
+
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+    
+    // Initial validation
+    setTimeout(() => {
+      if (code) {
+        const event = new Event('input');
+        editor.getModel().onDidChangeContent(() => {});
+      }
+    }, 100);
+  };
 
   const handleRun = () => {
+    if (syntaxErrors.length > 0) {
+      setOutput('[ERROR] Please fix syntax errors before running code:\n' + 
+                syntaxErrors.map(e => `Line ${e.startLineNumber}: ${e.message}`).join('\n'));
+      return;
+    }
+
+    setOutput('Connecting to compiler...\n');
     setIsRunning(true);
-    setOutput('Compiling...\n');
 
-    // Simulate compilation and execution
-    setTimeout(() => {
-      setOutput(prev => prev + 'Compilation successful!\n');
-      setTimeout(() => {
-        setOutput(prev => prev + 'Running...\n');
-        setTimeout(() => {
-          // Simulate output
-          setOutput(prev => prev + '\n--- Output ---\n');
-          setOutput(prev => prev + 'Your Name\n'); // Mock output
-          setIsRunning(false);
-        }, 500);
-      }, 300);
-    }, 500);
+    const ws = new WebSocket(WS_URL);
+    wsRef.current = ws;
 
-    onRun();
+    ws.onopen = () => {
+      setOutput('Compiling and running...\n');
+      ws.send(JSON.stringify({ type: 'run', code }));
+    };
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === 'output') {
+        setOutput((prev) => prev + msg.data);
+      }
+
+      if (msg.type === 'error') {
+        setOutput((prev) => prev + `[ERROR] ${msg.data}`);
+      }
+
+      if (msg.type === 'exit') {
+        setOutput((prev) => prev + `\n[Process exited with code ${msg.code}]`);
+        setIsRunning(false);
+        ws.close();
+      }
+    };
+
+    ws.onerror = () => {
+      setOutput((prev) => prev + '\n[ERROR] WebSocket connection failed. Ensure backend is running.');
+      setIsRunning(false);
+    };
+
+    ws.onclose = () => {
+      setIsRunning(false);
+    };
+  };
+
+  const handleStop = () => {
+    if (wsRef.current) {
+      wsRef.current.send(JSON.stringify({ type: 'stop' }));
+      wsRef.current.close();
+    }
+    setOutput((prev) => prev + '\n[Execution stopped by user]');
+    setIsRunning(false);
+  };
+
+  const handleInput = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim() || !isRunning || !wsRef.current) return;
+
+    wsRef.current.send(JSON.stringify({ type: 'input', data: inputValue }));
+    setOutput((prev) => prev + inputValue + '\n');
+    setInputValue('');
   };
 
   return (
@@ -38,6 +195,12 @@ export function PracticeEditor({ code, onChange, onRun, onSubmit, question }) {
             <p className="text-gray-400 text-sm">{question.description}</p>
           </div>
         </div>
+        {syntaxErrors.length > 0 && (
+          <div className="flex items-center gap-2 text-red-400 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            <span>{syntaxErrors.length} syntax error{syntaxErrors.length > 1 ? 's' : ''}</span>
+          </div>
+        )}
       </div>
 
       {/* Code Editor */}
@@ -52,15 +215,26 @@ export function PracticeEditor({ code, onChange, onRun, onSubmit, question }) {
               <span className="ml-3 text-gray-400">Solution.java</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={handleRun}
-                disabled={isRunning}
-                className="bg-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/30 border border-[#22D3EE]/30 h-8"
-              >
-                <Play className="w-3.5 h-3.5 mr-1.5" />
-                Run Code
-              </Button>
+              {isRunning ? (
+                <Button
+                  size="sm"
+                  onClick={handleStop}
+                  className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 h-8"
+                >
+                  <Square className="w-3.5 h-3.5 mr-1.5" />
+                  Stop
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleRun}
+                  disabled={syntaxErrors.length > 0}
+                  className="bg-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/30 border border-[#22D3EE]/30 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Play className="w-3.5 h-3.5 mr-1.5" />
+                  Run Code
+                </Button>
+              )}
               <Button
                 size="sm"
                 onClick={onSubmit}
@@ -72,19 +246,26 @@ export function PracticeEditor({ code, onChange, onRun, onSubmit, question }) {
             </div>
           </div>
 
-          {/* Code Textarea */}
+          {/* Monaco Editor with LSP */}
           <div className="absolute inset-0 top-[42px]">
-            <textarea
+            <Editor
+              height="100%"
+              language="java"
+              theme="vs-dark"
               value={code}
-              onChange={(e) => onChange(e.target.value)}
-              className="w-full h-full bg-[#0B0B1A] text-gray-300 font-mono p-6 resize-none focus:outline-none"
-              style={{
-                lineHeight: '1.6',
-                tabSize: 4,
+              onChange={(value) => onChange(value || '')}
+              onMount={handleEditorDidMount}
+              options={{
+                fontSize: 14,
                 fontFamily: 'JetBrains Mono, Consolas, Monaco, monospace',
-                fontSize: '14px'
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                automaticLayout: true,
+                tabSize: 4,
+                quickSuggestions: true,
+                suggestOnTriggerCharacters: true,
               }}
-              spellCheck={false}
             />
           </div>
         </div>
@@ -95,11 +276,32 @@ export function PracticeEditor({ code, onChange, onRun, onSubmit, question }) {
             <Terminal className="w-4 h-4 text-green-400" />
             <span className="text-gray-300">Console Output</span>
           </div>
-          <div className="flex-1 overflow-auto">
+          <div ref={outputRef} className="flex-1 overflow-auto">
             <pre className="p-4 text-gray-300 font-mono text-sm whitespace-pre-wrap">
               {output || 'Click "Run Code" to see output...'}
             </pre>
           </div>
+
+          {/* Input Field (only show when running) */}
+          {isRunning && (
+            <form onSubmit={handleInput} className="border-t border-gray-800/30 bg-[#13132B] p-2 flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type input and press Enter..."
+                className="flex-1 bg-[#0B0B1A] text-gray-300 font-mono px-3 py-2 rounded border border-gray-700 focus:outline-none focus:border-[#6C63FF]"
+                autoFocus
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="bg-[#6C63FF] hover:bg-[#5B52EE] text-white"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </div>

@@ -24,12 +24,12 @@ export function InstructorSidebar({ activeTab, onTabChange }) {
   return (
     <aside
       className={cn(
-        "h-screen sticky top-0 bg-card/50 backdrop-blur-xl border-r border-border/50 transition-all duration-300 flex flex-col",
+        "h-screen sticky top-0 bg-black/40 backdrop-blur-xl border-r border-gray-500 transition-all duration-300 flex flex-col",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo Section */}
-      <div className="p-4 border-b border-border/50">
+      <div className="p-4 border-b border-gray-500">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
             <Coffee className="h-5 w-5 text-white" />
@@ -70,7 +70,7 @@ export function InstructorSidebar({ activeTab, onTabChange }) {
       </nav>
 
       {/* Collapse Toggle */}
-      <div className="p-3 border-t border-border/50">
+      <div className="p-3 border-t border-gray-500">
         <Button
           variant="ghost"
           onClick={() => setCollapsed(!collapsed)}

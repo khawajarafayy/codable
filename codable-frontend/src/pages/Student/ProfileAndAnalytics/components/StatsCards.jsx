@@ -31,7 +31,7 @@ export function StatsCards() {
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className="bg-card/50 backdrop-blur-xl border-border/50 p-6 hover:bg-card/60 transition-all"
+          className="bg-black/40 backdrop-blur-xl border-0 p-6 hover:bg-card/60 transition-all"
         >
           <div className="flex items-start justify-between">
             <div className="space-y-2">

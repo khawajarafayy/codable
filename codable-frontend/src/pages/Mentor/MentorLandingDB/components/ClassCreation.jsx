@@ -104,7 +104,7 @@ export function ClassCreation() {
     <div className="space-y-6">
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">Active Classes</p>
@@ -114,7 +114,7 @@ export function ClassCreation() {
           </div>
         </Card>
         
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">Total Students</p>
@@ -124,7 +124,7 @@ export function ClassCreation() {
           </div>
         </Card>
         
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground mb-1">Pending Reviews</p>
@@ -139,7 +139,7 @@ export function ClassCreation() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Class Details */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+          <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
             <h3 className="text-white mb-6">Create New Class</h3>
             
             <div className="space-y-5">
@@ -234,7 +234,7 @@ export function ClassCreation() {
           </Card>
 
           {/* Action Buttons */}
-          <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+          <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
             <h3 className="text-white mb-4">Class Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Button
@@ -246,7 +246,7 @@ export function ClassCreation() {
               
               <Button
                 variant="outline"
-                className="bg-card/50 border-border/50 hover:bg-accent/50"
+                className="bg-black/40 border-0 hover:bg-accent/50"
               >
                 <FileText className="h-4 w-4 mr-2" />
                 View Submissions
@@ -254,7 +254,7 @@ export function ClassCreation() {
               
               <Button
                 variant="outline"
-                className="bg-card/50 border-border/50 hover:bg-accent/50"
+                className="bg-black/40 border-0 hover:bg-accent/50"
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Generate Report
@@ -265,7 +265,7 @@ export function ClassCreation() {
 
         {/* Right Column - Students */}
         <div className="space-y-6">
-          <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+          <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white">Assign Students</h3>
               <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
@@ -336,7 +336,7 @@ export function ClassCreation() {
       </Card>
 
       {/* Existing Classes */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-white">Your Classes</h3>
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white">

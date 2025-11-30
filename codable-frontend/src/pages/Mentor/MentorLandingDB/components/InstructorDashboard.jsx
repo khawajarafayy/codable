@@ -107,7 +107,7 @@ export function InstructorDashboard() {
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
               <BookOpen className="h-5 w-5 text-blue-400" />
@@ -120,7 +120,7 @@ export function InstructorDashboard() {
           <p className="text-sm text-muted-foreground">Active Classes</p>
         </Card>
 
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-lg bg-green-500/20 flex items-center justify-center">
               <Users className="h-5 w-5 text-green-400" />
@@ -131,7 +131,7 @@ export function InstructorDashboard() {
           <p className="text-sm text-muted-foreground">Total Students</p>
         </Card>
 
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
               <Clock className="h-5 w-5 text-orange-400" />
@@ -144,7 +144,7 @@ export function InstructorDashboard() {
           <p className="text-sm text-muted-foreground">Pending Reviews</p>
         </Card>
 
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-5">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
               <Target className="h-5 w-5 text-purple-400" />
@@ -159,7 +159,7 @@ export function InstructorDashboard() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Performance Trends */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-white mb-1">Performance Trends</h3>
@@ -211,7 +211,7 @@ export function InstructorDashboard() {
         </Card>
 
         {/* Student Distribution */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
           <div className="mb-6">
             <h3 className="text-white mb-1">Student Distribution</h3>
             <p className="text-sm text-muted-foreground">Performance categories across all classes</p>
@@ -264,7 +264,7 @@ export function InstructorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Classes List */}
         <div className="lg:col-span-2">
-          <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+          <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-white mb-1">Your Classes</h3>
@@ -279,7 +279,7 @@ export function InstructorDashboard() {
               {classes.map((classItem) => (
                 <div
                   key={classItem.id}
-                  className="p-5 rounded-xl bg-accent/10 border border-border/30 hover:bg-accent/20 transition-colors"
+                  className="p-5 rounded-xl bg-accent/10 border border-gray-800 hover:bg-accent/20 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -322,15 +322,15 @@ export function InstructorDashboard() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="bg-card/50 border-border/50 flex-1">
+                    <Button size="sm" variant="outline" className="bg-black/40 border-gray-800 flex-1">
                       <Send className="h-3 w-3 mr-2" />
                       Assign Task
                     </Button>
-                    <Button size="sm" variant="outline" className="bg-card/50 border-border/50 flex-1">
+                    <Button size="sm" variant="outline" className="bg-black/40 border-gray-800 flex-1">
                       <FileText className="h-3 w-3 mr-2" />
                       View Details
                     </Button>
-                    <Button size="sm" variant="outline" className="bg-card/50 border-border/50 flex-1">
+                    <Button size="sm" variant="outline" className="bg-black/40 border-gray-800 flex-1">
                       <BarChart3 className="h-3 w-3 mr-2" />
                       Report
                     </Button>
@@ -343,7 +343,7 @@ export function InstructorDashboard() {
 
         {/* Recent Submissions */}
         <div>
-          <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+          <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
             <div className="flex items-center gap-2 mb-6">
               <Bell className="h-5 w-5 text-orange-400" />
               <div>
@@ -356,7 +356,7 @@ export function InstructorDashboard() {
               {recentSubmissions.map((submission) => (
                 <div
                   key={submission.id}
-                  className="p-3 rounded-lg bg-accent/10 border border-border/30 hover:bg-accent/20 transition-colors"
+                  className="p-3 rounded-lg bg-accent/10 border border-gray-800 hover:bg-accent/20 transition-colors"
                 >
                   <div className="flex items-start gap-3 mb-2">
                     <Avatar className="h-8 w-8 flex-shrink-0">
@@ -392,7 +392,7 @@ export function InstructorDashboard() {
       {/* Bottom Row: Topic Performance & Top Performers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Topic Performance */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
           <div className="mb-6">
             <h3 className="text-white mb-1">Topic Performance</h3>
             <p className="text-sm text-muted-foreground">Average scores across Java topics</p>
@@ -428,7 +428,7 @@ export function InstructorDashboard() {
         </Card>
 
         {/* Top Performers */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-gray-800 p-6">
           <div className="flex items-center gap-2 mb-6">
             <Trophy className="h-5 w-5 text-yellow-400" />
             <div>
@@ -441,7 +441,7 @@ export function InstructorDashboard() {
             {topPerformers.map((student, index) => (
               <div
                 key={student.name}
-                className="p-4 rounded-lg bg-accent/10 border border-border/30 hover:bg-accent/20 transition-colors"
+                className="p-4 rounded-lg bg-accent/10 border border-gray-800 hover:bg-accent/20 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-yellow-500 to-orange-600 text-white flex-shrink-0">

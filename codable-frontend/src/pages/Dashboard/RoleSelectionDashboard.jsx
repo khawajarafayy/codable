@@ -6,6 +6,7 @@ import {GiTeacher} from "react-icons/gi";
 import {BiCodeBlock} from "react-icons/bi";
 import {useState} from 'react';
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function RoleSelectionDashboard() {
   const [selectedCard, setSelectedCard] = useState(null);
@@ -21,9 +22,20 @@ function RoleSelectionDashboard() {
       return;
     }
 
+    if(selectedCard === "Workspace"){
+      navigate("/workspace");
+      return;
+    }
+    
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userToken = localStorage.getItem('userToken');
+
+    if(!isLoggedIn || !userToken){
+      navigate("/login");
+      return;
+    }
     if(selectedCard === "Student") navigate("/student");
     if(selectedCard === "Mentor") navigate("/mentor");
-    if(selectedCard === "Workspace") navigate("/workspace");
   }
 
   const cards = [

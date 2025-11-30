@@ -13,7 +13,7 @@ const data = [
 
 export function ProgressChart() {
   return (
-    <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6 mb-8">
+    <Card className="bg-black/40 backdrop-blur-xl border-0 p-6 hover:bg-card/60 transition-all">
       <div className="space-y-4">
         <div>
           <h3 className="text-white mb-1">Weekly Progress</h3>

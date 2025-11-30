@@ -169,7 +169,7 @@ export function IdentifiedWeakAreas() {
 	}, [onScroll, updatePercentFromScroll]);
 
 	return (
-		<Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6 flex flex-col">
+		<Card className="bg-black/40 backdrop-blur-xl border-0 p-6 flex flex-col">
 			{/* Header */}
 			<div className="flex items-center gap-2 mb-6">
 				<AlertTriangle className="h-5 w-5 text-orange-400" />

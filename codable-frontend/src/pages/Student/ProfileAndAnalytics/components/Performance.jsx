@@ -47,7 +47,7 @@ export function Performance() {
   return (
     <div className="space-y-6">
       {/* Skills Radar Chart */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <h3 className="text-white mb-6">Java Skills Overview</h3>
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -76,7 +76,7 @@ export function Performance() {
 
       {/* Category Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
           <h3 className="text-white mb-6">Category Completion</h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -106,7 +106,7 @@ export function Performance() {
           </div>
         </Card>
 
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
           <h3 className="text-white mb-6">Score Progress</h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -146,19 +146,19 @@ export function Performance() {
 
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
           <p className="text-sm text-muted-foreground mb-2">Problem Solving Speed</p>
           <p className="text-2xl text-white mb-1">12.5 min</p>
           <p className="text-xs text-green-400">↓ 15% faster than average</p>
         </Card>
         
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
           <p className="text-sm text-muted-foreground mb-2">First Attempt Success</p>
           <p className="text-2xl text-white mb-1">68%</p>
           <p className="text-xs text-green-400">↑ 8% from last month</p>
         </Card>
         
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+        <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
           <p className="text-sm text-muted-foreground mb-2">Code Efficiency Rating</p>
           <p className="text-2xl text-white mb-1">8.4/10</p>
           <p className="text-xs text-yellow-400">→ Consistent with average</p>

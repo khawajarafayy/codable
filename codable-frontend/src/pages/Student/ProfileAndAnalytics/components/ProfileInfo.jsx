@@ -21,7 +21,7 @@ export function ProfileInfo() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Personal Information */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-white">Personal Information</h3>
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white">
@@ -66,7 +66,7 @@ export function ProfileInfo() {
       </Card>
 
       {/* Java Skills Proficiency */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <h3 className="text-white mb-6">Java Skills Proficiency</h3>
         <div className="space-y-5">
           {languages.map((lang, index) => (
@@ -82,7 +82,7 @@ export function ProfileInfo() {
       </Card>
 
       {/* Achievements */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6 lg:col-span-2">
+      <Card className="bg-black/40 backdrop-blur-xl border-0  p-6 lg:col-span-2">
         <h3 className="text-white mb-6">Achievements</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {achievements.map((achievement, index) => (

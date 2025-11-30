@@ -5,13 +5,17 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
-import pistonRoute from "./routes/pistonRoute.js";
+import studentRoute from "./routes/studentRoute.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
+import { startWebSocketServer } from "./websocket/codeRunner.js";
+import http from 'http';
+
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 
 const app = express();
+const server = http.createServer(app);
 
 // ------------------------
 // CORS 
@@ -43,8 +47,7 @@ app.use(express.json());
 // ROUTES
 // ------------------------
 app.use("/auth", authRoute);
-app.use("/piston", pistonRoute);
-
+app.use("/student", studentRoute);
 // ------------------------
 // ERROR HANDLING
 // ------------------------
@@ -55,8 +58,10 @@ app.use(errorMiddleware);
 // ------------------------
 app.get("/test", (req, res) => res.json({ ok: true }));
 
+startWebSocketServer(server);
+
 connectDB().then(() => {
-  app.listen(PORT, () =>
+  server.listen(PORT, () =>
     console.log(`Server running at http://localhost:${PORT}`)
   );
 });

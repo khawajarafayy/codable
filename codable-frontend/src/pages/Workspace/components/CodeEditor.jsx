@@ -1,8 +1,8 @@
 import React from "react";
 import Editor from "@monaco-editor/react";
-import { Play, Save } from "lucide-react";
+import { Play, Save, Square } from "lucide-react";
 
-const CodeEditor = ({ code, setCode, handleRun, handleSave, selectedFile }) => {
+const CodeEditor = ({ code, setCode, handleRun, handleStop, handleSave, selectedFile, isRunning }) => {
   return (
     <div className="h-full bg-[#0f1117] rounded-lg border border-gray-800 overflow-hidden flex flex-col">
       {/* Header */}
@@ -18,13 +18,23 @@ const CodeEditor = ({ code, setCode, handleRun, handleSave, selectedFile }) => {
             <Save size={14} />
             Save
           </button>
-          <button
-            onClick={handleRun}
-            className="flex items-center gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
-          >
-            <Play size={14} />
-            Run
-          </button>
+          {isRunning ? (
+            <button
+              onClick={handleStop}
+              className="flex items-center gap-1 px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+            >
+              <Square size={14} />
+              Stop
+            </button>
+          ) : (
+            <button
+              onClick={handleRun}
+              className="flex items-center gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
+            >
+              <Play size={14} />
+              Run
+            </button>
+          )}
         </div>
       </div>
 
@@ -38,8 +48,12 @@ const CodeEditor = ({ code, setCode, handleRun, handleSave, selectedFile }) => {
           onChange={(value) => setCode(value || "")}
           options={{
             fontSize: 14,
+            fontFamily: 'JetBrains Mono, Consolas, Monaco, monospace',
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
+            lineNumbers: 'on',
+            automaticLayout: true,
+            tabSize: 4,
           }}
         />
       </div>

@@ -63,7 +63,7 @@ export function WeakAreas() {
   return (
     <div className="space-y-6">
       {/* Performance Gap Analysis */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingDown className="h-5 w-5 text-orange-400" />
           <h3 className="text-white">Performance Gap Analysis</h3>
@@ -105,7 +105,7 @@ export function WeakAreas() {
       </Card>
 
       {/* Detailed Weak Topics */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <h3 className="text-white mb-6">Topics Needing Attention</h3>
         <div className="space-y-4">
           {weakTopics.map((topic, index) => (
@@ -132,7 +132,7 @@ export function WeakAreas() {
       </Card>
 
       {/* Personalized Recommendations */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <h3 className="text-white mb-6">Personalized Recommendations</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recommendations.map((rec, index) => (

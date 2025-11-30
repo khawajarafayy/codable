@@ -54,7 +54,7 @@ export function TimeMetrics() {
         {timeStats.map((stat, index) => (
           <Card
             key={index}
-            className="bg-card/50 backdrop-blur-xl border-border/50 p-6 hover:bg-card/60 transition-all"
+            className="bg-black/40 backdrop-blur-xl border-0 p-6 hover:bg-card/60 transition-all"
           >
             <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
               <stat.icon className="h-6 w-6 text-white" />
@@ -72,7 +72,7 @@ export function TimeMetrics() {
       </div>
 
       {/* Time Breakdown */}
-      <Card className="bg-card/50 backdrop-blur-xl border-border/50 p-6">
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
         <h3 className="text-white mb-6">Time Breakdown by Difficulty</h3>
         <div className="space-y-4">
           {timeBreakdown.map((item, index) => (

@@ -1,4 +1,5 @@
 import userModel from "../models/User.js";
+import StudentProfile from "../models/StudentProfile.js";
 
 const registerUser = async (req, res) => {
     try {
@@ -17,6 +18,16 @@ const registerUser = async (req, res) => {
             const userData = { name, email, password };
             const newUser = new userModel(userData);
             await newUser.save();
+
+            // Automatically create a student profile for the new user
+            try {
+                await StudentProfile.createForUser(newUser._id, { name, email });
+                console.log("Student profile created for user:", newUser._id);
+            } catch (profileError) {
+                console.error("Error creating student profile:", profileError);
+                // Continue even if profile creation fails - user can still login
+            }
+
             res.status(200).json({
                 success: true, 
                 message: "User added successfully.",

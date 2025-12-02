@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { ProfileStats } from "./components/ProfileStats";
@@ -11,8 +12,34 @@ import { IdentifiedWeakAreas } from "./components/IdentifiedWeakAreas";
 import { TimeMetrics } from "./components/TimeMetrics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Navbar } from "../LandingDashboard/components/Navbar";
+import { api } from "../../../services/apiClient";
 
 export default function ProfileAndAnalytics() {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.getStudentProfile();
+      if (response.success) {
+        setProfileData(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfileUpdate = (updatedData) => {
+    setProfileData((prev) => ({ ...prev, ...updatedData }));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
       {/* Background Pattern */}
@@ -24,7 +51,7 @@ export default function ProfileAndAnalytics() {
       <div className="relative max-w-7xl mx-auto p-6 lg:p-8">
         
         {/* Profile Header */}
-        <ProfileHeader />
+        <ProfileHeader profileData={profileData} />
 
         {/* Profile Stats */}
         <ProfileStats />
@@ -63,7 +90,11 @@ export default function ProfileAndAnalytics() {
           </TabsContent>
 
           <TabsContent value="profile">
-            <ProfileInfo />
+            <ProfileInfo 
+              profileData={profileData} 
+              loading={loading}
+              onProfileUpdate={handleProfileUpdate}
+            />
           </TabsContent>
 
           <TabsContent value="performance">

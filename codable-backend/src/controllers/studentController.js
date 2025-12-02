@@ -7,14 +7,30 @@ const getStudentProfile = async (req, res) => {
     const userId = req.userId; // from auth middleware
 
     // Find profile and populate user data
-    const profile = await StudentProfile.findOne({ userId })
+    let profile = await StudentProfile.findOne({ userId })
       .populate('userId', 'email createdAt role');
 
+    // If profile doesn't exist, create one automatically
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Student profile not found"
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+
+      // Create a new profile for this user
+      profile = await StudentProfile.createForUser(userId, { 
+        name: user.name, 
+        email: user.email 
       });
+
+      // Populate the userId field
+      profile = await StudentProfile.findById(profile._id)
+        .populate('userId', 'email createdAt role');
+
+      console.log("Auto-created profile for user:", userId);
     }
 
     res.status(200).json({

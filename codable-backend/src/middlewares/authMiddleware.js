@@ -41,7 +41,16 @@ const validate = (schema) => async (req, res, next) => {
 };
 
 const userAuth = async (req, res, next) => {
-  const { token } = req.headers;
+  // Support both 'token' header and 'Authorization: Bearer <token>' header
+  let token = req.headers.token;
+  
+  if (!token && req.headers.authorization) {
+    // Extract token from 'Authorization: Bearer <token>'
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
 
   if (!token) {
     return res.json({ success: false, message: "Token not found. Login again" });

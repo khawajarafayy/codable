@@ -42,4 +42,34 @@ export const api = {
     signup: (name, email, password) => request('/auth/signup', { method: 'POST', body: { name, email, password }, credentials: 'omit' }),
     me: () => request('/me'),
     runCode: (source_code, stdin) => request('/piston/run', { method: 'POST', body: { source_code, stdin }, credentials: 'omit' }),
+    
+    // Student Profile APIs
+    getStudentProfile: () => {
+        const token = localStorage.getItem('token');
+        return request('/student/profile', { 
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+    
+    updateStudentProfile: (profileData) => {
+        const token = localStorage.getItem('token');
+        return request('/student/profile', {
+            method: 'PUT',
+            body: profileData,
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+    
+    createStudentProfile: (profileData) => {
+        const token = localStorage.getItem('token');
+        return request('/student/profile', {
+            method: 'POST',
+            body: profileData,
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    }
 };

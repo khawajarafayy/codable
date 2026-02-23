@@ -1,0 +1,244 @@
+================================================================================
+                        CODABLE PROJECT SUMMARY
+================================================================================
+
+CODABLE is a comprehensive Java learning platform that combines an online 
+code IDE with interactive learning features. The project consists of two 
+main parts: a React frontend and an Express.js backend.
+
+================================================================================
+                        CODABLE BACKEND (codable-backend)
+================================================================================
+
+TECHNOLOGY STACK:
+- Node.js with Express.js
+- MongoDB with Mongoose ODM
+- JWT for authentication
+- WebSocket for real-time code execution
+- bcryptjs for password hashing
+
+KEY FEATURES:
+
+1. USER AUTHENTICATION
+   - User registration (name, email, password)
+   - User login with JWT token generation
+   - Password hashing with bcrypt
+   - Role-based access (student, instructor)
+   - Token-based authentication middleware
+
+2. STUDENT PROFILE MANAGEMENT
+   - Create, read, update, delete student profiles
+   - Profile fields: fullName, avatar, bio, location, socialLinks
+   - Auto-creation of profile on user registration
+   - Membership tiers: free, pro, premium
+   - Membership upgrade functionality
+
+3. CODE EXECUTION (via WebSocket)
+   - Real-time Java code compilation and execution
+   - WebSocket server at /ws/code path
+   - Uses local javac and java commands
+   - Creates temporary directories for each session
+   - Handles stdin/stdout/stderr
+   - Supports stopping execution
+   - Automatic cleanup of temporary files
+
+4. API ENDPOINTS:
+   - POST /auth/signup - Register new user
+   - POST /auth/login - Login user
+   - GET /student/profile - Get student profile
+   - POST /student/profile - Create profile
+   - PUT /student/profile - Update profile
+   - DELETE /student/profile - Delete profile
+   - PUT /student/membership/upgrade - Upgrade membership
+   - GET /test - Test endpoint
+
+5. MIDDLEWARE:
+   - Auth middleware for JWT verification
+   - Validation middleware for request validation
+   - Error handling middleware
+
+6. DATABASE MODELS:
+   - User: name, email, password (hashed), role, timestamps
+   - StudentProfile: userId, fullName, avatar, bio, location, 
+     membershipTier, socialLinks, timestamps
+
+================================================================================
+                        CODABLE FRONTEND (codable-frontend)
+================================================================================
+
+TECHNOLOGY STACK:
+- React with Vite
+- React Router for navigation
+- Tailwind CSS for styling
+- shadcn/ui component library
+- WebSocket for code execution
+- Axios for API calls
+
+KEY FEATURES:
+
+1. AUTHENTICATION PAGES
+   - Login page with email/password
+   - Signup page for new users
+   - JWT token storage in localStorage
+   - Animated typing messages about platform features
+   - Google and GitHub sign-in (coming soon)
+
+2. ROLE SELECTION DASHBOARD
+   - Choose between Student and Mentor/Instructor roles
+
+3. STUDENT LEARNING DASHBOARD
+   - Progress tracking section
+   - Learning path with Java topics:
+     * Introduction to Java
+     * Variables & Data Types
+     * Control Flow
+     * Loops
+     * Functions & Methods
+     * Object-Oriented Programming
+     * Inheritance
+     * Polymorphism
+     * Encapsulation
+     * Abstract Classes & Interfaces
+     * Exception Handling
+     * Collections Framework
+   - Topic status: completed, in-progress, not-started, locked
+   - Topic duration information
+   - Virtual AI Assistant/Chat popup
+   - Sidebar navigation
+
+4. STUDENT PROFILE & ANALYTICS
+   - Profile information display
+   - Edit profile functionality
+   - Profile header with avatar
+   - Analytics and statistics
+
+5. WORKSPACE (JAVA IDE)
+   - Code editor component
+   - File explorer
+   - Output console
+   - AI suggestions panel
+   - IDE navbar
+   - Run and Stop code execution
+   - Real-time output via WebSocket
+   - Input handling for stdin
+   - Java code templates
+
+6. MENTOR/INSTRUCTOR DASHBOARD
+   - Dashboard overview
+   - Class management
+   - Class creation
+   - Student performance tracking
+   - Personalized questions
+   - Progress charts
+   - Weak areas identification
+   - Recent activity
+   - Profile management
+   - Assignments module (coming soon)
+   - Reports & Analytics (coming soon)
+
+7. UI COMPONENTS
+   - shadcn/ui components (buttons, dialogs, cards, etc.)
+   - Custom components: Navbar, Sidebar, Avatar, etc.
+   - Responsive design
+   - Dark theme with gradients
+
+8. ROUTES:
+   - / - Role Selection Dashboard
+   - /login - Login page
+   - /signup - Signup page
+   - /student - Student Learning Dashboard
+   - /student/learning - Learning Page
+   - /student/profile-and-analytics - Profile & Analytics
+   - /mentor - Mentor Dashboard
+   - /workspace - Code IDE
+
+================================================================================
+                        KEY INTEGRATIONS
+================================================================================
+
+1. FRONTEND-BACKEND COMMUNICATION:
+   - REST API for authentication and profile management
+   - WebSocket for real-time code execution
+
+2. CODE EXECUTION FLOW:
+   - User writes Java code in the editor
+   - Code is sent via WebSocket to backend
+   - Backend compiles with javac and runs with java
+   - Output is streamed back via WebSocket
+   - User sees output in console
+
+3. AUTHENTICATION FLOW:
+   - User registers or logs in
+   - Backend returns JWT token
+   - Token is stored in localStorage
+   - Token is sent with each authenticated request
+
+================================================================================
+                        ADDITIONAL FEATURES
+================================================================================
+
+1. SPLASH SCREEN - Initial loading screen with branding
+
+2. VIRTUAL ASSISTANT - AI chatbot for student help
+
+3. PROGRESS TRACKING - Track completed topics and progress
+
+4. MEMBERSHIP SYSTEM - Free, Pro, Premium tiers
+
+5. SOCIAL LINKS - GitHub, LinkedIn, Twitter integration
+
+6. RESPONSIVE DESIGN - Works on different screen sizes
+
+================================================================================
+                        FILE STRUCTURE
+================================================================================
+
+codable-backend/
+├── src/
+│   ├── server.js          # Main Express server
+│   ├── config/
+│   │   └── db.js          # MongoDB connection
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── studentController.js
+│   │   └── pistonController.js
+│   ├── middlewares/
+│   │   ├── authMiddleware.js
+│   │   └── errorMiddleware.js
+│   ├── models/
+│   │   ├── User.js
+│   │   └── StudentProfile.js
+│   ├── routes/
+│   │   ├── authRoute.js
+│   │   ├── studentRoute.js
+│   │   └── pistonRoute.js
+│   ├── utils/
+│   │   ├── generateToken.js
+│   │   └── response.js
+│   ├── validators/
+│   │   ├── loginValidator.js
+│   │   └── signupValidator.js
+│   └── websocket/
+│       └── codeRunner.js  # WebSocket server for code execution
+└── package.json
+
+codable-frontend/
+├── src/
+│   ├── App.jsx            # Main React app with routing
+│   ├── components/        # Reusable components
+│   │   ├── ui/           # shadcn/ui components
+│   │   ├── Navbar.jsx
+│   │   ├── Sidebar.jsx
+│   │   └── ...
+│   ├── pages/
+│   │   ├── Auth/         # Login, Signup
+│   │   ├── Dashboard/    # Role Selection
+│   │   ├── Student/      # Learning, Profile
+│   │   ├── Mentor/       # Instructor Dashboard
+│   │   └── Workspace/    # Code IDE
+│   ├── services/
+│   │   └── apiClient.js  # API client
+│   └── ...
+└── package.json
+
+================================================================================

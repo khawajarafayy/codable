@@ -48,7 +48,7 @@ export function ProfileInfo({ profileData, loading, onProfileUpdate }) {
               className="text-muted-foreground hover:text-white"
               onClick={() => setIsEditDialogOpen(true)}
             >
-              <Edit2 className="h-4 w-4 mr-2" />
+              <Edit2 className="h-4 w-4 mr-2 cursor-pointer" />
               Edit
             </Button>
           </div>

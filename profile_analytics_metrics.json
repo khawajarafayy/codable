@@ -1,0 +1,467 @@
+{
+  "profile_and_analytics_metrics": {
+    "profile_stats": {
+      "description": "Main overview statistics cards",
+      "metrics": [
+        {
+          "id": "total_coding_time",
+          "label": "Total Coding Time",
+          "value": 247,
+          "unit": "hours",
+          "trend": "+18% from last month",
+          "trend_type": "positive"
+        },
+        {
+          "id": "completed_tasks",
+          "label": "Completed Tasks",
+          "value": 156,
+          "unit": "tasks",
+          "trend": "89% completion rate",
+          "trend_type": "positive"
+        },
+        {
+          "id": "average_score",
+          "label": "Average Score",
+          "value": 87,
+          "unit": "%",
+          "trend": "+5% improvement",
+          "trend_type": "positive"
+        },
+        {
+          "id": "current_streak",
+          "label": "Current Streak",
+          "value": 12,
+          "unit": "days",
+          "trend": "Personal best!",
+          "trend_type": "positive"
+        }
+      ]
+    },
+    "time_metrics": {
+      "description": "Time-related performance metrics",
+      "time_stats": [
+        {
+          "id": "avg_time_per_task",
+          "label": "Average Time Per Task",
+          "value": 18.5,
+          "unit": "minutes",
+          "trend": "-12% faster",
+          "trend_positive": true
+        },
+        {
+          "id": "total_coding_time",
+          "label": "Total Coding Time",
+          "value": 247,
+          "unit": "hours",
+          "trend": "+18% this month",
+          "trend_positive": true
+        },
+        {
+          "id": "fastest_solve_time",
+          "label": "Fastest Solve Time",
+          "value": 4.2,
+          "unit": "minutes",
+          "trend": "Personal best!",
+          "trend_positive": true
+        },
+        {
+          "id": "efficiency_score",
+          "label": "Efficiency Score",
+          "value": 8.4,
+          "unit": "/ 10",
+          "trend": "+0.3 from last week",
+          "trend_positive": true
+        }
+      ],
+      "time_breakdown": [
+        {
+          "category": "Easy Tasks",
+          "avg_time": "8 min",
+          "count": 45,
+          "color": "green"
+        },
+        {
+          "category": "Medium Tasks",
+          "avg_time": "18 min",
+          "count": 82,
+          "color": "yellow"
+        },
+        {
+          "category": "Hard Tasks",
+          "avg_time": "32 min",
+          "count": 29,
+          "color": "red"
+        }
+      ]
+    },
+    "coding_streaks": {
+      "description": "Coding streak and consistency metrics",
+      "streak_stats": {
+        "current_streak": 12,
+        "longest_streak": 28,
+        "total_days": 156,
+        "this_week": 7
+      },
+      "weekly_activity": [
+        { "day": "Mon", "active": true, "tasks": 3 },
+        { "day": "Tue", "active": true, "tasks": 5 },
+        { "day": "Wed", "active": true, "tasks": 4 },
+        { "day": "Thu", "active": true, "tasks": 6 },
+        { "day": "Fri", "active": true, "tasks": 4 },
+        { "day": "Sat", "active": true, "tasks": 2 },
+        { "day": "Sun", "active": true, "tasks": 3 }
+      ]
+    },
+    "topic_progress": {
+      "description": "Progress across different Java topics",
+      "topics": [
+        {
+          "name": "Introduction to Java",
+          "progress": 85,
+          "completed": 8,
+          "total": 11,
+          "status": "excellent",
+          "avg_time": "8 min"
+        },
+        {
+          "name": "Setup & First Program",
+          "progress": 90,
+          "completed": 9,
+          "total": 10,
+          "status": "excellent",
+          "avg_time": "12 min"
+        },
+        {
+          "name": "Variables & Data Types",
+          "progress": 55,
+          "completed": 11,
+          "total": 20,
+          "status": "good",
+          "avg_time": "10 min"
+        },
+        {
+          "name": "Operators & Expressions",
+          "progress": 50,
+          "completed": 5,
+          "total": 10,
+          "status": "good",
+          "avg_time": "9 min"
+        },
+        {
+          "name": "Control Flow (if / switch)",
+          "progress": 48,
+          "completed": 6,
+          "total": 12,
+          "status": "good",
+          "avg_time": "11 min"
+        },
+        {
+          "name": "Loops (for / while / do)",
+          "progress": 42,
+          "completed": 5,
+          "total": 12,
+          "status": "average",
+          "avg_time": "13 min"
+        },
+        {
+          "name": "Methods & Parameters",
+          "progress": 36,
+          "completed": 4,
+          "total": 11,
+          "status": "average",
+          "avg_time": "14 min"
+        },
+        {
+          "name": "Arrays & Basic Collections",
+          "progress": 30,
+          "completed": 3,
+          "total": 10,
+          "status": "average",
+          "avg_time": "16 min"
+        },
+        {
+          "name": "OOP Basics: Classes & Objects",
+          "progress": 25,
+          "completed": 2,
+          "total": 10,
+          "status": "average",
+          "avg_time": "18 min"
+        },
+        {
+          "name": "Constructors & Encapsulation",
+          "progress": 20,
+          "completed": 2,
+          "total": 10,
+          "status": "weak",
+          "avg_time": "15 min"
+        }
+      ]
+    },
+    "identified_weak_areas": {
+      "description": "Weak areas identified by the system requiring attention",
+      "summary": {
+        "areas_to_improve": 6,
+        "avg_gap": 22,
+        "priority_level": "Medium"
+      },
+      "weak_areas": [
+        {
+          "topic": "Java Syntax & Hello World",
+          "score": 64,
+          "avg_score": 80,
+          "difficulty": "Low",
+          "status": "needs-improvement",
+          "attempts": 8,
+          "success_rate": 70,
+          "recommendation": "Review basic syntax, class structure and main method",
+          "priority": 1
+        },
+        {
+          "topic": "Variables & Data Types",
+          "score": 58,
+          "avg_score": 78,
+          "difficulty": "Low",
+          "status": "needs-improvement",
+          "attempts": 12,
+          "success_rate": 62,
+          "recommendation": "Practice primitive vs reference types and type conversions",
+          "priority": 2
+        },
+        {
+          "topic": "Control Flow (if / switch)",
+          "score": 55,
+          "avg_score": 75,
+          "difficulty": "Low",
+          "status": "needs-improvement",
+          "attempts": 10,
+          "success_rate": 60,
+          "recommendation": "Work on conditional exercises and switch/case examples",
+          "priority": 3
+        },
+        {
+          "topic": "Loops (for / while / do-while)",
+          "score": 50,
+          "avg_score": 72,
+          "difficulty": "Low",
+          "status": "weak",
+          "attempts": 9,
+          "success_rate": 55,
+          "recommendation": "Practice loop patterns and common pitfalls (infinite loops)",
+          "priority": 4
+        },
+        {
+          "topic": "Methods & Parameters",
+          "score": 62,
+          "avg_score": 78,
+          "difficulty": "Low",
+          "status": "needs-improvement",
+          "attempts": 7,
+          "success_rate": 68,
+          "recommendation": "Understand method signatures, return types and overloading",
+          "priority": 5
+        },
+        {
+          "topic": "Arrays & Basic Collections",
+          "score": 48,
+          "avg_score": 70,
+          "difficulty": "Medium",
+          "status": "weak",
+          "attempts": 11,
+          "success_rate": 50,
+          "recommendation": "Practice array indexing, iteration and simple ArrayList usage",
+          "priority": 6
+        }
+      ]
+    },
+    "achievement_badges": {
+      "description": "Achievements and badges earned by the student",
+      "total_badges": 25,
+      "unlocked_badges": 8,
+      "achievements": [
+        {
+          "title": "Java Fundamentals Master",
+          "description": "Completed all Core Java basics",
+          "date_unlocked": "2 days ago",
+          "rarity": "gold"
+        },
+        {
+          "title": "100 Problems Solved",
+          "description": "Solved 100+ coding challenges",
+          "date_unlocked": "1 week ago",
+          "rarity": "gold"
+        },
+        {
+          "title": "Speed Demon",
+          "description": "Solved 10 problems under 5 minutes",
+          "date_unlocked": "3 days ago",
+          "rarity": "silver"
+        },
+        {
+          "title": "28-Day Streak",
+          "description": "Maintained longest coding streak",
+          "date_unlocked": "1 month ago",
+          "rarity": "gold"
+        },
+        {
+          "title": "OOP Expert",
+          "description": "Mastered all OOP concepts",
+          "date_unlocked": "5 days ago",
+          "rarity": "silver"
+        },
+        {
+          "title": "Perfect Score",
+          "description": "Got 100% on 5 assessments",
+          "date_unlocked": "1 week ago",
+          "rarity": "silver"
+        },
+        {
+          "title": "Collections Pro",
+          "description": "Completed all Collections Framework tasks",
+          "date_unlocked": "4 days ago",
+          "rarity": "bronze"
+        },
+        {
+          "title": "Early Bird",
+          "description": "Coded before 8 AM for 7 days",
+          "date_unlocked": "2 weeks ago",
+          "rarity": "bronze"
+        }
+      ]
+    },
+    "performance": {
+      "description": "Skills overview and performance metrics",
+      "skills_radar": [
+        { "subject": "Core Java", "score": 92, "full_mark": 100 },
+        { "subject": "OOP Concepts", "score": 88, "full_mark": 100 },
+        { "subject": "Collections", "score": 85, "full_mark": 100 },
+        { "subject": "Multithreading", "score": 68, "full_mark": 100 },
+        { "subject": "Spring Boot", "score": 78, "full_mark": 100 },
+        { "subject": "JVM & Memory", "score": 72, "full_mark": 100 }
+      ],
+      "category_performance": [
+        { "category": "Collections", "completed": 42, "total": 50 },
+        { "category": "Streams API", "completed": 35, "total": 40 },
+        { "category": "Exception Handling", "completed": 38, "total": 40 },
+        { "category": "Multithreading", "completed": 22, "total": 45 },
+        { "category": "Spring Framework", "completed": 28, "total": 50 }
+      ],
+      "progress_over_time": [
+        { "month": "Apr", "score": 65 },
+        { "month": "May", "score": 72 },
+        { "month": "Jun", "score": 78 },
+        { "month": "Jul", "score": 82 },
+        { "month": "Aug", "score": 85 },
+        { "month": "Sep", "score": 87 }
+      ],
+      "performance_metrics": {
+        "problem_solving_speed": {
+          "value": "12.5 min",
+          "trend": "15% faster than average",
+          "trend_type": "positive"
+        },
+        "first_attempt_success": {
+          "value": 68,
+          "unit": "%",
+          "trend": "8% from last month",
+          "trend_type": "positive"
+        },
+        "code_efficiency_rating": {
+          "value": 8.4,
+          "unit": "/ 10",
+          "trend": "Consistent with average",
+          "trend_type": "neutral"
+        }
+      }
+    },
+    "detailed_weak_areas": {
+      "description": "Detailed weak areas with performance gap analysis",
+      "weak_topics": [
+        {
+          "topic": "Multithreading & Concurrency",
+          "score": 52,
+          "attempts": 18,
+          "avg_score": 78,
+          "gap": 26
+        },
+        {
+          "topic": "Java Streams API",
+          "score": 58,
+          "attempts": 15,
+          "avg_score": 78,
+          "gap": 20
+        },
+        {
+          "topic": "Design Patterns",
+          "score": 62,
+          "attempts": 12,
+          "avg_score": 78,
+          "gap": 16
+        },
+        {
+          "topic": "JVM Internals & GC",
+          "score": 65,
+          "attempts": 10,
+          "avg_score": 78,
+          "gap": 13
+        }
+      ],
+      "recommendations": [
+        {
+          "title": "Master Multithreading",
+          "description": "Focus on ExecutorService, Locks, and synchronization",
+          "lessons": 12
+        },
+        {
+          "title": "Practice Streams API",
+          "description": "Master map, filter, reduce, and collectors",
+          "lessons": 8
+        },
+        {
+          "title": "Learn Design Patterns",
+          "description": "Understand Singleton, Factory, and Observer patterns",
+          "lessons": 10
+        }
+      ]
+    },
+    "profile_info": {
+      "description": "User profile information",
+      "personal_info": {
+        "full_name": "string",
+        "email": "string",
+        "initials": "string",
+        "bio": "string",
+        "location": {
+          "city": "string",
+          "country": "string"
+        },
+        "join_date": "date",
+        "member_since": "date"
+      },
+      "membership": {
+        "tier": {
+          "type": "enum",
+          "values": ["free", "pro", "premium"],
+          "default": "free"
+        },
+        "badge": "string"
+      },
+      "social_links": {
+        "github": "string",
+        "linkedin": "string",
+        "twitter": "string"
+      },
+      "java_skills_proficiency": [
+        { "name": "Core Java", "level": 92 },
+        { "name": "Spring Framework", "level": 78 },
+        { "name": "Hibernate/JPA", "level": 72 },
+        { "name": "SQL & JDBC", "level": 85 }
+      ],
+      "profile_achievements": [
+        { "title": "Java Master", "description": "Completed 100+ Java challenges" },
+        { "title": "OOP Expert", "description": "Mastered all OOP principles" },
+        { "title": "Spring Developer", "description": "Built 10+ Spring Boot apps" },
+        { "title": "Consistency King", "description": "30-day coding streak" }
+      ]
+    }
+  }
+}

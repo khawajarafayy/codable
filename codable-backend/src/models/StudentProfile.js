@@ -42,6 +42,55 @@ const studentProfileSchema = new mongoose.Schema({
     github: { type: String, default: '' },
     linkedin: { type: String, default: '' },
     twitter: { type: String, default: '' }
+  },
+  
+  // Learning Path
+  learningPath: {
+    type: String,
+    default: 'Java Programming'
+  },
+  
+  // Topic Mastery Tracking
+  topicMastery: [{
+    topicId: { type: String, required: true },
+    topicName: { type: String, required: true },
+    totalAttempts: { type: Number, default: 0 },
+    correctAttempts: { type: Number, default: 0 },
+    firstAttemptSuccesses: { type: Number, default: 0 },
+    totalProblems: { type: Number, default: 0 },
+    hintsUsed: { type: Number, default: 0 },
+    avgCompletionTime: { type: Number, default: 0 },
+    lastPracticed: { type: Date, default: null },
+    difficultyLevel: { type: String, enum: ['beginner', 'intermediate', 'advanced'], default: 'beginner' },
+    codeQualityScores: [{ type: Number }]
+  }],
+  
+  // Error Tracking
+  errorStats: {
+    syntaxErrors: { type: Number, default: 0 },
+    logicErrors: { type: Number, default: 0 },
+    runtimeErrors: { type: Number, default: 0 },
+    edgeCaseFailures: { type: Number, default: 0 },
+    totalErrors: { type: Number, default: 0 },
+    commonPatterns: [{ type: String }]
+  },
+  
+  // Performance History
+  performanceHistory: [{
+    date: { type: Date, default: Date.now },
+    problemsSolved: { type: Number, default: 0 },
+    avgScore: { type: Number, default: 0 },
+    timeSpent: { type: Number, default: 0 }
+  }],
+  
+  // Learning Behavior Metrics
+  behaviorMetrics: {
+    totalProblemsAttempted: { type: Number, default: 0 },
+    totalHintsUsed: { type: Number, default: 0 },
+    totalSessions: { type: Number, default: 0 },
+    avgSessionDuration: { type: Number, default: 0 },
+    consistencyScore: { type: Number, default: 0 },
+    lastActiveDate: { type: Date, default: null }
   }
 
 }, { timestamps: true });

@@ -8,6 +8,7 @@ import { FeedbackPanel } from './FeedbackPanel';
 export function PracticeMode({ onBackToLearning, topicIndex }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [viewMode, setViewMode] = useState('editor');
+  const [metrics, setMetrics] = useState(null);
   const [code, setCode] = useState(`public class Solution {
     public static void main(String[] args) {
         // Write your code here
@@ -76,6 +77,13 @@ export function PracticeMode({ onBackToLearning, topicIndex }) {
   ];
 
   const currentQuestion = questions[currentQuestionIndex];
+
+  const handleSubmit = (submittedMetrics) => {
+    setMetrics(submittedMetrics);
+    setViewMode('feedback');
+    console.log('Submitted metrics:', submittedMetrics);
+  };
+
 
   const handleRunCode = () => {
     console.log('Running code...');
@@ -149,7 +157,7 @@ export function PracticeMode({ onBackToLearning, topicIndex }) {
               code={code}
               onChange={setCode}
               onRun={handleRunCode}
-              onSubmit={handleSubmitCode}
+              onSubmit={handleSubmit}
               question={currentQuestion}
             />
           ) : (
@@ -157,6 +165,7 @@ export function PracticeMode({ onBackToLearning, topicIndex }) {
               onTryAgain={handleTryAgain}
               onNextQuestion={handleNextQuestion}
               hasNextQuestion={currentQuestionIndex < questions.length - 1}
+              metrics={metrics}
             />
           )}
         </div>

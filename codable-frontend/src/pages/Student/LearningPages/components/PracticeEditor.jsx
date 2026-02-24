@@ -1,4 +1,4 @@
-import { Play, Send, Code2, Terminal, Square, AlertCircle } from 'lucide-react';
+import { Play, Send, Code2, Terminal, Square, AlertCircle, Timer } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
@@ -11,10 +11,18 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
   const [isRunning, setIsRunning] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [syntaxErrors, setSyntaxErrors] = useState([]);
+  const [executionMetrics, setExecutionMetrics] = useState(null);
+  
+  // Solution time tracking
+  const [solutionStartTime, setSolutionStartTime] = useState(null);
+  const [solutionTime, setSolutionTime] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  
   const wsRef = useRef(null);
   const outputRef = useRef(null);
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
+  const timerIntervalRef = useRef(null);
 
   // Auto-scroll output
   useEffect(() => {
@@ -29,8 +37,30 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
     };
   }, []);
+
+  // Timer effect - updates every second
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerIntervalRef.current = setInterval(() => {
+        setSolutionTime(Math.floor((Date.now() - solutionStartTime) / 1000));
+      }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    }
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [isTimerRunning, solutionStartTime]);
 
   // Real-time Java syntax validation
   useEffect(() => {
@@ -49,7 +79,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
         );
         setSyntaxErrors([]);
       } catch (err) {
-        console.log('Parse error:', err); // Debug log
+        console.log('Parse error:', err);
         
         const markers = [];
         
@@ -69,7 +99,6 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
             endColumn: endColumn,
           });
         } else if (err.previousToken) {
-          // Handle other parse errors
           const line = err.previousToken.endLine || 1;
           const column = err.previousToken.endColumn || 1;
           
@@ -82,7 +111,6 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
             endColumn: column + 10,
           });
         } else {
-          // Fallback for unknown error format
           markers.push({
             severity: monacoRef.current.MarkerSeverity.Error,
             message: err.message || 'Syntax error detected',
@@ -120,6 +148,30 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
     }, 100);
   };
 
+  const handleCodeChange = (newCode) => {
+    // Start timer on first keystroke
+    if (!solutionStartTime && newCode && newCode.trim().length > 0) {
+      setSolutionStartTime(Date.now());
+      setIsTimerRunning(true);
+    }
+    
+    onChange(newCode || '');
+  };
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    } else {
+      return `${secs}s`;
+    }
+  };
+
   const handleRun = () => {
     if (syntaxErrors.length > 0) {
       setOutput('[ERROR] Please fix syntax errors before running code:\n' + 
@@ -129,6 +181,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
 
     setOutput('Connecting to compiler...\n');
     setIsRunning(true);
+    setExecutionMetrics(null);
 
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
@@ -147,6 +200,11 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
 
       if (msg.type === 'error') {
         setOutput((prev) => prev + `[ERROR] ${msg.data}`);
+      }
+
+      if (msg.type === 'metrics') {
+        setExecutionMetrics(msg.data);
+        setOutput((prev) => prev + `\n[Execution Time: ${msg.data.execution_time_formatted}]`);
       }
 
       if (msg.type === 'exit') {
@@ -184,6 +242,24 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
     setInputValue('');
   };
 
+  const handleSubmit = () => {
+    // Stop the timer
+    setIsTimerRunning(false);
+    
+    // Calculate final solution time
+    const finalSolutionTime = solutionStartTime 
+      ? Math.floor((Date.now() - solutionStartTime) / 1000)
+      : 0;
+    
+    // Pass all metrics to parent
+    onSubmit({
+      execution_time_ms: executionMetrics?.execution_time_ms,
+      execution_time_formatted: executionMetrics?.execution_time_formatted,
+      solution_time_seconds: finalSolutionTime,
+      solution_time_formatted: formatTime(finalSolutionTime)
+    });
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Question Summary Bar */}
@@ -195,12 +271,23 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
             <p className="text-gray-400 text-sm">{question.description}</p>
           </div>
         </div>
-        {syntaxErrors.length > 0 && (
-          <div className="flex items-center gap-2 text-red-400 text-sm">
-            <AlertCircle className="w-4 h-4" />
-            <span>{syntaxErrors.length} syntax error{syntaxErrors.length > 1 ? 's' : ''}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Timer Display */}
+          {isTimerRunning && (
+            <div className="flex items-center gap-2 bg-[#6C63FF]/10 border border-[#6C63FF]/30 rounded-lg px-3 py-1.5">
+              <Timer className="w-4 h-4 text-[#6C63FF] animate-pulse" />
+              <span className="text-[#6C63FF] font-mono text-sm">
+                {formatTime(solutionTime)}
+              </span>
+            </div>
+          )}
+          {syntaxErrors.length > 0 && (
+            <div className="flex items-center gap-2 text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4" />
+              <span>{syntaxErrors.length} syntax error{syntaxErrors.length > 1 ? 's' : ''}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Code Editor */}
@@ -237,7 +324,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
               )}
               <Button
                 size="sm"
-                onClick={onSubmit}
+                onClick={handleSubmit}
                 className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD] text-white h-8"
               >
                 <Send className="w-3.5 h-3.5 mr-1.5" />
@@ -253,7 +340,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
               language="java"
               theme="vs-dark"
               value={code}
-              onChange={(value) => onChange(value || '')}
+              onChange={handleCodeChange}
               onMount={handleEditorDidMount}
               options={{
                 fontSize: 14,
@@ -275,6 +362,11 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
           <div className="bg-[#13132B] px-4 py-2 flex items-center gap-2 border-b border-gray-800/30">
             <Terminal className="w-4 h-4 text-green-400" />
             <span className="text-gray-300">Console Output</span>
+            {executionMetrics && (
+              <span className="ml-auto text-gray-400 text-sm">
+                ⚡ {executionMetrics.execution_time_formatted}
+              </span>
+            )}
           </div>
           <div ref={outputRef} className="flex-1 overflow-auto">
             <pre className="p-4 text-gray-300 font-mono text-sm whitespace-pre-wrap">
@@ -306,4 +398,4 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
       </div>
     </div>
   );
-}
+};

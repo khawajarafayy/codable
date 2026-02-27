@@ -9,9 +9,11 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
 export function PracticeEditor({ code, onChange, onSubmit, question }) {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [syntaxErrors, setSyntaxErrors] = useState([]);
   const [executionMetrics, setExecutionMetrics] = useState(null);
+  const [complexityData, setComplexityData] = useState(null);
   
   // Solution time tracking
   const [solutionStartTime, setSolutionStartTime] = useState(null);
@@ -23,6 +25,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const timerIntervalRef = useRef(null);
+  const submitResolveRef = useRef(null);
 
   // Auto-scroll output
   useEffect(() => {
@@ -68,10 +71,8 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
 
     const validateJava = () => {
       try {
-        // Try to parse the Java code
         parse(code);
         
-        // No errors - clear all markers
         monacoRef.current.editor.setModelMarkers(
           editorRef.current.getModel(),
           'java-syntax',
@@ -79,11 +80,8 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
         );
         setSyntaxErrors([]);
       } catch (err) {
-        console.log('Parse error:', err);
-        
         const markers = [];
         
-        // Handle java-parser error format
         if (err.name === 'MismatchedTokenException' || err.name === 'NoViableAltException') {
           const line = err.token?.startLine || 1;
           const column = err.token?.startColumn || 1;
@@ -130,7 +128,6 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
       }
     };
 
-    // Debounce validation (wait 300ms after user stops typing)
     const timeoutId = setTimeout(validateJava, 300);
     return () => clearTimeout(timeoutId);
   }, [code]);
@@ -139,10 +136,8 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
     editorRef.current = editor;
     monacoRef.current = monaco;
     
-    // Initial validation
     setTimeout(() => {
       if (code) {
-        const event = new Event('input');
         editor.getModel().onDidChangeContent(() => {});
       }
     }, 100);
@@ -172,56 +167,92 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
     }
   };
 
-  const handleRun = () => {
+  const runCodeAndGetMetrics = () => {
+    return new Promise((resolve, reject) => {
+      if (syntaxErrors.length > 0) {
+        reject(new Error('Syntax errors present'));
+        return;
+      }
+
+      setOutput('Running code to collect metrics...\n');
+      setIsRunning(true);
+      setExecutionMetrics(null);
+      setComplexityData(null);
+
+      const ws = new WebSocket(WS_URL);
+      wsRef.current = ws;
+      submitResolveRef.current = resolve;
+
+      let tempMetrics = null;
+      let tempComplexity = null;
+
+      ws.onopen = () => {
+        setOutput((prev) => prev + 'Compiling and analyzing...\n');
+        ws.send(JSON.stringify({ type: 'run', code }));
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === 'output') {
+          setOutput((prev) => prev + msg.data);
+        }
+
+        if (msg.type === 'error') {
+          setOutput((prev) => prev + `[ERROR] ${msg.data}`);
+        }
+
+        if (msg.type === 'complexity') {
+          tempComplexity = msg.data;
+          setComplexityData(msg.data);
+          console.log('✅ Complexity data received:', msg.data);
+        }
+
+        if (msg.type === 'metrics') {
+          tempMetrics = msg.data;
+          setExecutionMetrics(msg.data);
+          console.log('✅ Execution metrics received:', msg.data);
+          setOutput((prev) => prev + `\n[Execution Time: ${msg.data.execution_time_formatted}]`);
+          setOutput((prev) => prev + `\n[Peak Memory: ${msg.data.peak_memory_formatted}]`);
+        }
+
+        if (msg.type === 'exit') {
+          setOutput((prev) => prev + `\n[Analysis complete]`);
+          setIsRunning(false);
+          ws.close();
+          
+          // Resolve with collected metrics
+          resolve({
+            execution: tempMetrics,
+            complexity: tempComplexity
+          });
+        }
+      };
+
+      ws.onerror = () => {
+        setOutput((prev) => prev + '\n[ERROR] Connection failed');
+        setIsRunning(false);
+        reject(new Error('WebSocket connection failed'));
+      };
+
+      ws.onclose = () => {
+        setIsRunning(false);
+      };
+    });
+  };
+
+  const handleRun = async () => {
     if (syntaxErrors.length > 0) {
       setOutput('[ERROR] Please fix syntax errors before running code:\n' + 
                 syntaxErrors.map(e => `Line ${e.startLineNumber}: ${e.message}`).join('\n'));
       return;
     }
 
-    setOutput('Connecting to compiler...\n');
-    setIsRunning(true);
-    setExecutionMetrics(null);
-
-    const ws = new WebSocket(WS_URL);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      setOutput('Compiling and running...\n');
-      ws.send(JSON.stringify({ type: 'run', code }));
-    };
-
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-
-      if (msg.type === 'output') {
-        setOutput((prev) => prev + msg.data);
-      }
-
-      if (msg.type === 'error') {
-        setOutput((prev) => prev + `[ERROR] ${msg.data}`);
-      }
-
-      if (msg.type === 'metrics') {
-        setExecutionMetrics(msg.data);
-        setOutput((prev) => prev + `\n[Execution Time: ${msg.data.execution_time_formatted}]`);
-      }
-
-      if (msg.type === 'exit') {
-        setOutput((prev) => prev + `\n[Process exited with code ${msg.code}]`);
-        setIsRunning(false);
-        ws.close();
-      }
-    };
-
-    ws.onerror = () => {
-      setOutput((prev) => prev + '\n[ERROR] WebSocket connection failed. Ensure backend is running.');
-      setIsRunning(false);
-    };
-
-    ws.onclose = () => {
-      setIsRunning(false);
-    };
+    try {
+      await runCodeAndGetMetrics();
+    } catch (error) {
+      console.error('Run error:', error);
+    }
   };
 
   const handleStop = () => {
@@ -242,22 +273,72 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
     setInputValue('');
   };
 
-  const handleSubmit = () => {
-    // Stop the timer
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     setIsTimerRunning(false);
     
-    // Calculate final solution time
+    // Calculate solution time
     const finalSolutionTime = solutionStartTime 
       ? Math.floor((Date.now() - solutionStartTime) / 1000)
       : 0;
-    
-    // Pass all metrics to parent
-    onSubmit({
-      execution_time_ms: executionMetrics?.execution_time_ms,
-      execution_time_formatted: executionMetrics?.execution_time_formatted,
-      solution_time_seconds: finalSolutionTime,
-      solution_time_formatted: formatTime(finalSolutionTime)
-    });
+
+    try {
+      // If code hasn't been run yet, run it first to collect metrics
+      if (!executionMetrics || !complexityData) {
+        setOutput('⏳ Running code to collect performance metrics...\n');
+        const { execution, complexity } = await runCodeAndGetMetrics();
+        
+        // Now we have fresh metrics
+        const metricsToSubmit = {
+          execution_time_ms: execution?.execution_time_ms || null,
+          execution_time_formatted: execution?.execution_time_formatted || 'Not measured',
+          peak_memory_kb: execution?.peak_memory_kb || null,
+          peak_memory_formatted: execution?.peak_memory_formatted || 'Not measured',
+          time_complexity: execution?.time_complexity || complexity?.timeComplexity || 'Not analyzed',
+          space_complexity: execution?.space_complexity || complexity?.spaceComplexity || 'Not analyzed',
+          solution_time_seconds: finalSolutionTime,
+          solution_time_formatted: formatTime(finalSolutionTime)
+        };
+        
+        console.log('✅ Submitting metrics (collected on submit):', metricsToSubmit);
+        onSubmit(metricsToSubmit);
+      } else {
+        // Use existing metrics
+        const metricsToSubmit = {
+          execution_time_ms: executionMetrics?.execution_time_ms || null,
+          execution_time_formatted: executionMetrics?.execution_time_formatted || 'Not measured',
+          peak_memory_kb: executionMetrics?.peak_memory_kb || null,
+          peak_memory_formatted: executionMetrics?.peak_memory_formatted || 'Not measured',
+          time_complexity: executionMetrics?.time_complexity || complexityData?.timeComplexity || 'Not analyzed',
+          space_complexity: executionMetrics?.space_complexity || complexityData?.spaceComplexity || 'Not analyzed',
+          solution_time_seconds: finalSolutionTime,
+          solution_time_formatted: formatTime(finalSolutionTime)
+        };
+        
+        console.log('✅ Submitting metrics (from previous run):', metricsToSubmit);
+        onSubmit(metricsToSubmit);
+      }
+    } catch (error) {
+      console.error('❌ Submit error:', error);
+      
+      // Submit with partial data if analysis fails
+      const metricsToSubmit = {
+        execution_time_ms: null,
+        execution_time_formatted: 'Analysis failed',
+        peak_memory_kb: null,
+        peak_memory_formatted: 'Analysis failed',
+        time_complexity: 'Analysis failed',
+        space_complexity: 'Analysis failed',
+        solution_time_seconds: finalSolutionTime,
+        solution_time_formatted: formatTime(finalSolutionTime)
+      };
+      
+      onSubmit(metricsToSubmit);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -315,7 +396,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
                 <Button
                   size="sm"
                   onClick={handleRun}
-                  disabled={syntaxErrors.length > 0}
+                  disabled={syntaxErrors.length > 0 || isSubmitting}
                   className="bg-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/30 border border-[#22D3EE]/30 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Play className="w-3.5 h-3.5 mr-1.5" />
@@ -325,15 +406,25 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
               <Button
                 size="sm"
                 onClick={handleSubmit}
-                className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD] text-white h-8"
+                disabled={isSubmitting || syntaxErrors.length > 0}
+                className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD] text-white h-8 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send className="w-3.5 h-3.5 mr-1.5" />
-                Submit
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 mr-1.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 mr-1.5" />
+                    Submit
+                  </>
+                )}
               </Button>
             </div>
           </div>
 
-          {/* Monaco Editor with LSP */}
+          {/* Monaco Editor */}
           <div className="absolute inset-0 top-[42px]">
             <Editor
               height="100%"
@@ -364,7 +455,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
             <span className="text-gray-300">Console Output</span>
             {executionMetrics && (
               <span className="ml-auto text-gray-400 text-sm">
-                ⚡ {executionMetrics.execution_time_formatted}
+                ⚡ {executionMetrics.execution_time_formatted} | 💾 {executionMetrics.peak_memory_formatted}
               </span>
             )}
           </div>
@@ -374,7 +465,7 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
             </pre>
           </div>
 
-          {/* Input Field (only show when running) */}
+          {/* Input Field */}
           {isRunning && (
             <form onSubmit={handleInput} className="border-t border-gray-800/30 bg-[#13132B] p-2 flex gap-2">
               <input
@@ -398,4 +489,4 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
       </div>
     </div>
   );
-};
+}

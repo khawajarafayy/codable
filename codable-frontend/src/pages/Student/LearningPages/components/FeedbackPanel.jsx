@@ -13,10 +13,10 @@ import {
   Timer
 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
-import { ScrollArea } from '../../../../components/ui/scroll-area';
 
 export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, metrics }) {
-  // Simulated feedback data - in real app this would come from backend
+  console.log('FeedbackPanel received metrics:', metrics);
+
   const feedback = {
     passed: true,
     score: 95,
@@ -25,9 +25,10 @@ export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, met
       passed: 3,
       failed: 0
     },
-    timeComplexity: 'O(1)',
-    spaceComplexity: 'O(1)',
+    timeComplexity: metrics?.time_complexity || 'Not analyzed',
+    spaceComplexity: metrics?.space_complexity || 'Not analyzed',
     solutionTime: metrics?.solution_time_formatted || '0s',
+    peakMemory: metrics?.peak_memory_formatted || 'Not measured',
     codeQuality: {
       score: 90,
       issues: [
@@ -108,7 +109,7 @@ export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, met
               Performance Metrics
             </h3>
             
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
                 <div className="flex items-center gap-2 mb-2">
                   <Timer className="w-4 h-4 text-[#6C63FF]" />
@@ -116,6 +117,15 @@ export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, met
                 </div>
                 <div className="text-white text-xl font-mono">{feedback.solutionTime}</div>
                 <div className="text-gray-500 text-xs mt-1">Time to write code</div>
+              </div>
+
+              <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-blue-400" />
+                  <span className="text-gray-400 text-sm">Memory Used</span>
+                </div>
+                <div className="text-white text-xl font-mono">{feedback.peakMemory}</div>
+                <div className="text-gray-500 text-xs mt-1">Peak memory usage</div>
               </div>
 
               <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
@@ -253,17 +263,7 @@ export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, met
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         )}
-
-        {!hasNextQuestion && (
-          <Button
-            onClick={onTryAgain}
-            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
-          >
-            <CheckCircle2 className="w-4 h-4 mr-2" />
-            Complete Practice
-          </Button>
-        )}
       </div>
     </div>
   );
-};
+}

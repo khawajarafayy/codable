@@ -4,105 +4,7 @@ import { TopicCard } from './components/TopicCard';
 import { Sidebar } from './components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-
-const topics = [
-	{
-		id: 1,
-		title: 'Introduction to Java',
-		description: 'Get started with Java basics and setup to get concepts',
-		duration: '2 hours',
-		locked: false,
-		status: 'completed',
-	},
-	{
-		id: 2,
-		title: 'Variables & Data Types',
-		description: 'Learn about different data types and variables',
-		duration: '3 hours',
-		locked: false,
-		status: 'completed',
-	},
-	{
-		id: 3,
-		title: 'Control Flow',
-		description: 'Master if-else statements and switch cases',
-		duration: '2.5 hours',
-		locked: false,
-		status: 'completed',
-	},
-	{
-		id: 4,
-		title: 'Loops',
-		description: 'Understand for, while, and do-while loops',
-		duration: '3 hours',
-		locked: false,
-		status: 'in-progress',
-	},
-	{
-		id: 5,
-		title: 'Functions & Methods',
-		description: 'Create reusable code with methods',
-		duration: '4 hours',
-		locked: false,
-		status: 'not-started',
-	},
-	{
-		id: 6,
-		title: 'Object-Oriented Programming',
-		description: 'Introduction to OOP concepts and classes',
-		duration: '5 hours',
-		locked: false,
-		status: 'not-started',
-	},
-	{
-		id: 7,
-		title: 'Inheritance',
-		description: 'Learn about extending classes and code reuse',
-		duration: '3.5 hours',
-		locked: true,
-		status: 'locked',
-	},
-	{
-		id: 8,
-		title: 'Polymorphism',
-		description: 'Master method overriding and overloading and learn its working',
-		duration: '3.5 hours',
-		locked: true,
-		status: 'locked',
-	},
-	{
-		id: 9,
-		title: 'Encapsulation',
-		description: 'Understand data hiding and access modifiers',
-		duration: '2.5 hours',
-		locked: true,
-		status: 'locked',
-	},
-	{
-		id: 10,
-		title: 'Abstract Classes & Interfaces',
-		description: 'Learn abstraction and interface implementation',
-		duration: '4 hours',
-		locked: true,
-		status: 'locked',
-	},
-	{
-		id: 11,
-		title: 'Exception Handling',
-		description: 'Handle errors gracefully in your code and make the flow smooth',
-		duration: '3 hours',
-		locked: true,
-		status: 'locked',
-	},
-	{
-		id: 12,
-		title: 'Collections Framework',
-		description: 'Work with Lists, Sets, and Maps for data storing in dynamic way',
-		duration: '5 hours',
-		locked: true,
-		status: 'locked',
-	},
-];
+import { javaBookTopics } from '../../../data/javaBookTopics';
 
 function ChatPopup({ open, onClose }) {
 	if (!open) return null;
@@ -196,8 +98,8 @@ export default function LearningDashboard() {
 	const [chatOpen, setChatOpen] = useState(false);
 	const toggleChat = () => setChatOpen((v) => !v);
 
-	const handleTopicAction = () => {
-		navigate(`/student/learning?topic=intro-to-java`);
+	const handleTopicAction = (topic) => {
+		navigate(`/student/learning?topic=${topic.id}`);
 	};
 
 	return (
@@ -219,12 +121,12 @@ export default function LearningDashboard() {
 						</div>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-							{topics.map((topic) => (
+							{javaBookTopics.map((topic) => (
 								<div key={topic.id} className="h-full">
 									<TopicCard
 										topic={topic}
 										onActionClick={() => {
-											handleTopicAction();
+											handleTopicAction(topic);
 										}}
 									/>
 								</div>

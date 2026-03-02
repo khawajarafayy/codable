@@ -1,112 +1,139 @@
-import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { PracticeTaskPanel } from './PracticeTaskPanel';
 import { PracticeEditor } from './PracticeEditor';
 import { FeedbackPanel } from './FeedbackPanel';
+import learningApi from '../../../../services/learningApi';
 
-export function PracticeMode({ onBackToLearning, topicIndex }) {
+export function PracticeMode({ onBackToLearning, topicId, topicTitle }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [viewMode, setViewMode] = useState('editor');
   const [metrics, setMetrics] = useState(null);
-  const [code, setCode] = useState(`public class Solution {
+  const [validationResult, setValidationResult] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [difficulty, setDifficulty] = useState('easy');
+  const [code, setCode] = useState('');
+  const [lastOutput, setLastOutput] = useState('');
+
+  // Fetch questions when component mounts or difficulty changes
+  useEffect(() => {
+    fetchQuestions();
+  }, [topicId, difficulty]);
+
+  // Reset code when question changes - start with empty editor
+  useEffect(() => {
+    // Start with empty code - user writes from scratch
+    setCode('');
+  }, [currentQuestionIndex, questions]);
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await learningApi.getPracticeQuestions(topicId, difficulty, 5);
+      if (response.success && response.questions?.length > 0) {
+        setQuestions(response.questions);
+        setCode(''); // Start with empty editor
+      } else {
+        setError('No questions available for this topic');
+        setQuestions(getDefaultQuestions());
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+      setError('Failed to load questions');
+      setQuestions(getDefaultQuestions());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDefaultStarterCode = () => {
+    return `public class Solution {
     public static void main(String[] args) {
         // Write your code here
         
     }
-}`);
+}`;
+  };
 
-  const questions = [
-    {
-      id: 1,
-      title: 'Print Your Name',
-      difficulty: 'Easy',
-      description: 'Write a Java program that prints your name to the console.',
-      constraints: [
-        'Use System.out.println() method',
-        'Your program must compile without errors',
-        'Output should be a single line'
-      ],
-      examples: [
-        { input: 'None', output: 'Your Name' }
-      ],
-      hints: [
-        'Remember that strings in Java are enclosed in double quotes',
-        'Every statement must end with a semicolon',
-        'The main method is the entry point of your program'
-      ]
-    },
-    {
-      id: 2,
-      title: 'Simple Addition',
-      difficulty: 'Easy',
-      description: 'Create a program that adds two numbers (5 and 10) and prints the result.',
-      constraints: [
-        'Declare two integer variables',
-        'Print the sum using System.out.println()',
-        'Expected output: 15'
-      ],
-      examples: [
-        { input: 'int a = 5, b = 10', output: '15' }
-      ],
-      hints: [
-        'Use the int data type for whole numbers',
-        'Addition in Java uses the + operator',
-        'You can print variables directly'
-      ]
-    },
-    {
-      id: 3,
-      title: 'String Concatenation',
-      difficulty: 'Easy',
-      description: 'Write a program that combines two strings "Hello" and "Java" with a space between them.',
-      constraints: [
-        'Use two String variables',
-        'Concatenate using the + operator',
-        'Print the combined result'
-      ],
-      examples: [
-        { input: 'String str1 = "Hello", str2 = "Java"', output: 'Hello Java' }
-      ],
-      hints: [
-        'String concatenation uses the + operator',
-        'Don\'t forget to add a space between the words',
-        'Strings are enclosed in double quotes'
-      ]
-    }
-  ];
+  const getDefaultQuestions = () => {
+    return [
+      {
+        id: 1,
+        title: 'Practice Exercise',
+        difficulty: difficulty,
+        description: 'Write a Java program to practice the concepts you learned.',
+        constraints: ['Your code must compile without errors'],
+        examples: [{ input: 'N/A', output: 'Your output' }],
+        hints: ['Start with the basic structure', 'Test your code'],
+        starterCode: getDefaultStarterCode(),
+        expectedOutput: '',
+        testCases: [],
+        solutionKeywords: [],
+        mustContain: ['public class', 'main'],
+        mustNotContain: []
+      }
+    ];
+  };
 
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex] || getDefaultQuestions()[0];
 
-  const handleSubmit = (submittedMetrics) => {
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+  };
+
+  const handleRunComplete = (output) => {
+    setLastOutput(output);
+  };
+
+  const handleSubmit = async (submittedMetrics) => {
     setMetrics(submittedMetrics);
-    setViewMode('feedback');
-    console.log('Submitted metrics:', submittedMetrics);
-  };
-
-
-  const handleRunCode = () => {
-    console.log('Running code...');
-  };
-
-  const handleSubmitCode = () => {
+    
+    // Validate the solution
+    try {
+      const validation = await learningApi.validateSolution(
+        code,
+        currentQuestion,
+        submittedMetrics.output || lastOutput
+      );
+      
+      if (validation.success) {
+        setValidationResult(validation.validation);
+      } else {
+        setValidationResult({
+          isCorrect: false,
+          score: 0,
+          feedback: ['Unable to validate solution'],
+          suggestions: ['Please try again']
+        });
+      }
+    } catch (err) {
+      console.error('Validation error:', err);
+      setValidationResult({
+        isCorrect: false,
+        score: submittedMetrics.score || 0,
+        feedback: ['Validation service unavailable'],
+        suggestions: ['Your code ran successfully. Manual review may be needed.']
+      });
+    }
+    
     setViewMode('feedback');
   };
 
   const handleTryAgain = () => {
     setViewMode('editor');
+    setValidationResult(null);
   };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setViewMode('editor');
-      setCode(`public class Solution {
-    public static void main(String[] args) {
-        // Write your code here
-        
-    }
-}`);
+      setValidationResult(null);
+      setMetrics(null);
     }
   };
 
@@ -114,35 +141,82 @@ export function PracticeMode({ onBackToLearning, topicIndex }) {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       setViewMode('editor');
+      setValidationResult(null);
+      setMetrics(null);
     }
   };
 
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
+    setCurrentQuestionIndex(0);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex flex-col bg-[#0B0B1A]">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-[#6C63FF] animate-spin mx-auto mb-4" />
+            <p className="text-gray-400">Loading practice questions...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen flex flex-col bg-[#0B0B1A]">
+    <div className="flex-1 flex flex-col bg-[#0B0B1A]">
       {/* Header */}
-      <div className="bg-[#13132B] border-b border-gray-800/50 px-6 py-4 flex items-center justify-between shrink-0">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={onBackToLearning}
-            className="text-gray-400 hover:text-white hover:bg-gray-800/50"
+            className="text-gray-400 hover:text-white"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Learning
+            <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="w-px h-6 bg-gray-700" />
-          <h1 className="text-white">Practice: Introduction to Java</h1>
+          <h1 className="text-white">Practice: {topicTitle || 'Java Programming'}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400">Question {currentQuestionIndex + 1} of {questions.length}</span>
+        <div className="flex items-center gap-4">
+          {/* Difficulty Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">Difficulty:</span>
+            <div className="flex gap-1">
+              {['easy', 'medium', 'hard'].map((d) => (
+                <Button
+                  key={d}
+                  variant={difficulty === d ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleDifficultyChange(d)}
+                  className={`capitalize ${
+                    difficulty === d
+                      ? 'bg-[#6C63FF] text-white'
+                      : 'text-gray-400 border-gray-600 hover:text-white'
+                  }`}
+                >
+                  {d}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <span className="text-gray-400">
+            Question {currentQuestionIndex + 1} of {questions.length}
+          </span>
         </div>
       </div>
+
+      {error && (
+        <div className="px-6 py-2 bg-yellow-900/20 border-b border-yellow-600/30">
+          <p className="text-yellow-400 text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Split Screen Layout */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left Panel - Task Description */}
-        <PracticeTaskPanel 
+        <PracticeTaskPanel
           question={currentQuestion}
           currentIndex={currentQuestionIndex}
           totalQuestions={questions.length}
@@ -155,17 +229,19 @@ export function PracticeMode({ onBackToLearning, topicIndex }) {
           {viewMode === 'editor' ? (
             <PracticeEditor
               code={code}
-              onChange={setCode}
-              onRun={handleRunCode}
+              onChange={handleCodeChange}
               onSubmit={handleSubmit}
+              onRunComplete={handleRunComplete}
               question={currentQuestion}
             />
           ) : (
             <FeedbackPanel
               onTryAgain={handleTryAgain}
               onNextQuestion={handleNextQuestion}
-              hasNextQuestion={currentQuestionIndex < questions.length - 1}
               metrics={metrics}
+              validationResult={validationResult}
+              question={currentQuestion}
+              isLastQuestion={currentQuestionIndex >= questions.length - 1}
             />
           )}
         </div>

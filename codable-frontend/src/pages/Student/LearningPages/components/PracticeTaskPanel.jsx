@@ -1,137 +1,175 @@
-import { CheckCircle2, ChevronLeft, ChevronRight, Code2, AlertCircle, Lightbulb } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lightbulb, Target, BookOpen } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
-import { ScrollArea } from '../../../../components/ui/scroll-area';
+import { useState } from 'react';
 
-export function PracticeTaskPanel({ 
-  question, 
-  currentIndex, 
-  totalQuestions,
-  onPrevious,
-  onNext 
-}) {
+export function PracticeTaskPanel({ question, currentIndex, totalQuestions, onPrevious, onNext }) {
+  const [showHints, setShowHints] = useState(false);
+  const [currentHintIndex, setCurrentHintIndex] = useState(0);
+
   const getDifficultyColor = (difficulty) => {
-    switch (difficulty.toLowerCase()) {
+    switch (difficulty?.toLowerCase()) {
       case 'easy':
-        return 'text-green-400 bg-green-400/10 border-green-400/30';
+        return 'bg-green-500/20 text-green-400 border-green-500/50';
       case 'medium':
-        return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30';
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
       case 'hard':
-        return 'text-red-400 bg-red-400/10 border-red-400/30';
+        return 'bg-red-500/20 text-red-400 border-red-500/50';
       default:
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/30';
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
+    }
+  };
+
+  const showNextHint = () => {
+    if (currentHintIndex < (question?.hints?.length || 0) - 1) {
+      setCurrentHintIndex(currentHintIndex + 1);
     }
   };
 
   return (
-    <div className="w-[480px] border-r border-gray-800/50 flex flex-col bg-[#0B0B1A] h-full">
-      {/* Task Header */}
-      <div className="bg-[#13132B]/50 border-b border-gray-800/50 px-6 py-4 shrink-0">
-        <div className="flex items-start justify-between mb-3">
-          <h2 className="text-white">{question.title}</h2>
-          <span className={`px-3 py-1 rounded-full border text-sm ${getDifficultyColor(question.difficulty)}`}>
-            {question.difficulty}
-          </span>
+    <div className="w-[450px] border-r border-gray-800 flex flex-col bg-[#0d0d1a]">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-800">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">Question {currentIndex + 1}/{totalQuestions}</span>
+            <span className={`px-2 py-0.5 rounded text-xs border ${getDifficultyColor(question?.difficulty)}`}>
+              {question?.difficulty || 'Unknown'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onPrevious}
+              disabled={currentIndex === 0}
+              className="h-8 w-8 text-gray-400 hover:text-white disabled:opacity-30"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onNext}
+              disabled={currentIndex === totalQuestions - 1}
+              className="h-8 w-8 text-gray-400 hover:text-white disabled:opacity-30"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <Code2 className="w-4 h-4" />
-          <span>Java Programming</span>
-        </div>
+        <h2 className="text-xl font-semibold text-white">{question?.title || 'Loading...'}</h2>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="p-6 space-y-6">
-          {/* Description */}
-          <section>
-            <h3 className="text-white mb-3">Description</h3>
-            <p className="text-gray-300 leading-relaxed">
-              {question.description}
-            </p>
-          </section>
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-auto p-4 space-y-4">
+        {/* Description */}
+        <div>
+          <div className="flex items-center gap-2 text-gray-400 mb-2">
+            <BookOpen className="h-4 w-4" />
+            <span className="text-sm font-medium">Description</span>
+          </div>
+          <p className="text-gray-300 leading-relaxed">
+            {question?.description || 'No description available'}
+          </p>
+        </div>
 
-          {/* Examples */}
-          <section>
-            <h3 className="text-white mb-3">Examples</h3>
-            <div className="space-y-3">
-              {question.examples.map((example, index) => (
-                <div 
-                  key={index}
-                  className="bg-[#13132B]/50 rounded-lg p-4 border border-gray-800/50 space-y-2"
-                >
-                  <div>
-                    <span className="text-gray-400">Input:</span>
-                    <pre className="text-[#22D3EE] font-mono mt-1">{example.input}</pre>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Output:</span>
-                    <pre className="text-green-400 font-mono mt-1">{example.output}</pre>
-                  </div>
-                </div>
-              ))}
+        {/* Constraints */}
+        {question?.constraints?.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 text-gray-400 mb-2">
+              <Target className="h-4 w-4" />
+              <span className="text-sm font-medium">Constraints</span>
             </div>
-          </section>
-
-          {/* Constraints */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <AlertCircle className="w-4 h-4 text-[#6C63FF]" />
-              <h3 className="text-white">Constraints</h3>
-            </div>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {question.constraints.map((constraint, index) => (
-                <li key={index} className="flex gap-2 text-gray-300">
-                  <CheckCircle2 className="w-5 h-5 text-[#6C63FF] shrink-0 mt-0.5" />
+                <li key={index} className="text-gray-400 text-sm flex items-start gap-2">
+                  <span className="text-[#6C63FF] mt-1">•</span>
                   <span>{constraint}</span>
                 </li>
               ))}
             </ul>
-          </section>
+          </div>
+        )}
 
-          {/* Hints */}
-          <section className="bg-gradient-to-br from-[#6C63FF]/10 to-[#22D3EE]/10 rounded-xl p-5 border border-[#6C63FF]/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Lightbulb className="w-5 h-5 text-[#22D3EE]" />
-              <h3 className="text-[#22D3EE]">Hints</h3>
+        {/* Examples */}
+        {question?.examples?.length > 0 && (
+          <div>
+            <h3 className="text-gray-400 text-sm font-medium mb-2">Examples</h3>
+            {question.examples.map((example, index) => (
+              <div key={index} className="bg-[#1a1a2e] rounded-lg p-3 mb-2 border border-gray-800">
+                {example.input && (
+                  <div className="mb-2">
+                    <span className="text-gray-500 text-xs">Input:</span>
+                    <pre className="text-gray-300 text-sm font-mono mt-1 whitespace-pre-wrap">
+                      {example.input}
+                    </pre>
+                  </div>
+                )}
+                <div>
+                  <span className="text-gray-500 text-xs">Output:</span>
+                  <pre className="text-green-400 text-sm font-mono mt-1 whitespace-pre-wrap">
+                    {example.output}
+                  </pre>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Expected Output */}
+        {question?.expectedOutput && (
+          <div>
+            <h3 className="text-gray-400 text-sm font-medium mb-2">Expected Output</h3>
+            <div className="bg-[#1a1a2e] rounded-lg p-3 border border-green-500/30">
+              <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
+                {question.expectedOutput}
+              </pre>
             </div>
-            <ul className="space-y-2">
-              {question.hints.map((hint, index) => (
-                <li key={index} className="flex gap-2 text-gray-300">
-                  <span className="text-[#6C63FF]">{index + 1}.</span>
-                  <span>{hint}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      </div>
+          </div>
+        )}
 
-      {/* Navigation */}
-      <div className="bg-[#13132B]/50 border-t border-gray-800/50 px-6 py-4 flex items-center justify-between shrink-0">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPrevious}
-          disabled={currentIndex === 0}
-          className="border-gray-700 text-gray-300 hover:bg-gray-800/50 hover:text-white disabled:opacity-30"
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Previous
-        </Button>
-
-        <span className="text-gray-400 text-sm">
-          {currentIndex + 1} / {totalQuestions}
-        </span>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onNext}
-          disabled={currentIndex === totalQuestions - 1}
-          className="border-gray-700 text-gray-300 hover:bg-gray-800/50 hover:text-white disabled:opacity-30"
-        >
-          Next
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
+        {/* Hints Section */}
+        {question?.hints?.length > 0 && (
+          <div>
+            <Button
+              variant="ghost"
+              onClick={() => setShowHints(!showHints)}
+              className="flex items-center gap-2 text-yellow-400 hover:text-yellow-300 p-0 h-auto"
+            >
+              <Lightbulb className="h-4 w-4" />
+              <span className="text-sm">
+                {showHints ? 'Hide Hints' : `Show Hints (${question.hints.length} available)`}
+              </span>
+            </Button>
+            
+            {showHints && (
+              <div className="mt-3 space-y-2">
+                {question.hints.slice(0, currentHintIndex + 1).map((hint, index) => (
+                  <div
+                    key={index}
+                    className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3"
+                  >
+                    <div className="flex items-center gap-2 text-yellow-400 text-xs mb-1">
+                      <Lightbulb className="h-3 w-3" />
+                      Hint {index + 1}
+                    </div>
+                    <p className="text-gray-300 text-sm">{hint}</p>
+                  </div>
+                ))}
+                {currentHintIndex < question.hints.length - 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={showNextHint}
+                    className="text-yellow-400 text-xs hover:text-yellow-300"
+                  >
+                    Show next hint →
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -88,9 +88,13 @@ def create_vector_store(documents, persist_directory="./chroma_db"):
         print(f"❌ Error creating vector store: {e}")
         return None
 
-def load_existing_vector_store(persist_directory="./chroma_db"):
+def load_existing_vector_store(persist_directory=None):
     """Load an existing vector store"""
     try:
+        # Use absolute path based on this file's location
+        if persist_directory is None:
+            persist_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+        
         embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             model_kwargs={'device': 'cpu'},

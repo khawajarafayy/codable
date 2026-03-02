@@ -1,43 +1,22 @@
-# Core LangChain packages
-langchain>=0.3.0
-langchain-core>=0.3.0
-langchain-chroma>=1.0.0
-langchain-text-splitters>=1.0.0
-
-# LLM Integration
-langchain-groq>=1.0.0
+# RAG Project Dependencies
+# Let pip resolve compatible versions
+langchain>=0.3.0,<0.4.0
+langchain-groq>=0.2.0,<0.3.0
+langchain-huggingface>=0.1.0
+langchain-chroma>=0.1.0
+langchain-core>=0.3.0,<0.4.0
+langchain-text-splitters>=0.3.0,<0.4.0
+pandas>=2.0.0
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+transformers>=4.40.0
 groq>=0.30.0
-
-# Embeddings
-langchain-huggingface>=1.0.0
-sentence-transformers>=5.0.0
-
-# MongoDB
 pymongo>=4.0.0
 dnspython>=2.0.0
-
-# Security
+flask>=3.0.0
+flask-cors>=5.0.0
 bcrypt>=4.0.0
 python-dotenv>=1.0.0
-
-# Data processing
-pandas>=2.0.0
 numpy>=1.24.0
-
-# Vector database
-chromadb>=0.4.0
-
-# Utilities
 tqdm>=4.65.0
 pydantic>=2.0.0
-
-# RAG Project Dependencies - Groq Version
-langchain==0.3.10
-langchain-groq==0.2.1
-langchain-huggingface==0.1.2
-langchain-chroma==0.1.4
-langchain-core==0.3.21
-pandas==2.2.3
-chromadb==0.5.23
-sentence-transformers==3.3.1
-transformers==4.47.0

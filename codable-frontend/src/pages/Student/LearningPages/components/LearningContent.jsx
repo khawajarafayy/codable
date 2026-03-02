@@ -1,364 +1,429 @@
-import { Book, Code2, Lightbulb, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
-import { CodeBlock } from './CodeBlock';
-import { ScrollArea } from '../../../../components/ui/scroll-area';
 import { useState, useEffect } from 'react';
-import { FeedbackPanel } from './FeedbackPanel';
-import { PracticeEditor } from './PracticeEditor';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, BookOpen, Code, CheckCircle, Lightbulb, AlertCircle, GraduationCap, Lock, ArrowLeft } from 'lucide-react';
+import { Button } from '../../../../components/ui/button';
+import learningApi from '../../../../services/learningApi';
 
-export function LearningContent({ onStartPractice, topicIndex }) {
+export function LearningContent({ onStartPractice, chapterId }) {
   const navigate = useNavigate();
-  const [showPracticeButton, setShowPracticeButton] = useState(false);
-  const [feedback, setFeedback] = useState(null);
+  const [topics, setTopics] = useState([]);
+  const [chapterTitle, setChapterTitle] = useState('');
+  const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [completedTopics, setCompletedTopics] = useState(new Set());
 
+  // Check if all topics are completed
+  const allTopicsCompleted = topics.length > 0 && completedTopics.size >= topics.length;
+
+  // Check if a topic is accessible (completed or next in sequence)
+  const isTopicAccessible = (index) => {
+    if (index === 0) return true; // First topic always accessible
+    return completedTopics.has(index - 1); // Previous topic must be completed
+  };
+
+  // Load topics for chapter
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowPracticeButton(true);
-    }, 2000);
-
-    const handleScroll = (e) => {
-      const target = e.target;
-      const scrollPosition = target.scrollTop + target.clientHeight;
-      const scrollHeight = target.scrollHeight;
-
-      if (scrollHeight - scrollPosition < 200) {
-        setShowPracticeButton(true);
+    const loadTopics = async () => {
+      if (!chapterId) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await learningApi.getChapterTopics(chapterId);
+        
+        if (response.success) {
+          setTopics(response.topics);
+          setChapterTitle(response.chapter_title);
+        } else {
+          setError(response.error || 'Failed to load topics');
+        }
+      } catch (err) {
+        console.error('Error loading topics:', err);
+        setError('Failed to load topics. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    const scrollArea = document.querySelector('[data-radix-scroll-area-viewport]');
-    scrollArea?.addEventListener('scroll', handleScroll);
+    loadTopics();
+  }, [chapterId]);
 
-    return () => {
-      clearTimeout(timer);
-      scrollArea?.removeEventListener('scroll', handleScroll);
+  // Load content for current topic
+  useEffect(() => {
+    const loadContent = async () => {
+      if (topics.length === 0) return;
+      
+      const currentTopic = topics[currentTopicIndex];
+      if (!currentTopic) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await learningApi.getTopicContent(currentTopic.id);
+        
+        if (response.success) {
+          setContent(response);
+          setCurrentSectionIndex(0); // Reset to first section
+        } else {
+          setError(response.error || 'Failed to load content');
+        }
+      } catch (err) {
+        console.error('Error loading content:', err);
+        setError('Failed to load content. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
 
-  const handleSubmit = (fb) => {
-    setFeedback(fb);
-    if (fb) {
-      setTimeout(() => setFeedback(null), 6000);
+    loadContent();
+  }, [currentTopicIndex, topics]);
+
+  const currentTopic = topics[currentTopicIndex];
+  const sections = content?.sections || [];
+  const currentSection = sections[currentSectionIndex];
+  const totalSections = sections.length;
+
+  const handleNextSection = () => {
+    if (currentSectionIndex < totalSections - 1) {
+      setCurrentSectionIndex(currentSectionIndex + 1);
+    } else {
+      // Mark current topic as completed when finishing last section
+      setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
+      
+      if (currentTopicIndex < topics.length - 1) {
+        // Move to next topic
+        setCurrentTopicIndex(currentTopicIndex + 1);
+        setCurrentSectionIndex(0);
+      }
     }
   };
 
-  return (
-    <div className="flex flex-col gap-4">
+  const handlePreviousSection = () => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex(currentSectionIndex - 1);
+    } else if (currentTopicIndex > 0) {
+      // Move to previous topic's last section
+      setCurrentTopicIndex(currentTopicIndex - 1);
+      // Will load content and we set to last section in useEffect
+    }
+  };
 
-      {/* Header / Breadcrumb */}
-      <div className="bg-[#13132B] border-b border-gray-800/50 px-8 py-4 sticky top-0 z-10 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => navigate('/student')}
-            className="text-gray-300 hover:text-white flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
+  const handleTopicClick = (index) => {
+    if (!isTopicAccessible(index)) return; // Don't allow jumping to locked topics
+    setCurrentTopicIndex(index);
+    setCurrentSectionIndex(0);
+  };
+
+  // Section type configurations
+  const sectionConfig = {
+    introduction: {
+      icon: <BookOpen className="w-6 h-6" />,
+      gradient: 'from-[#6C63FF]/20 to-[#22D3EE]/10',
+      borderColor: 'border-[#6C63FF]/40',
+      iconBg: 'bg-[#6C63FF]/20',
+      iconColor: 'text-[#6C63FF]',
+      label: 'Introduction'
+    },
+    explanation: {
+      icon: <Lightbulb className="w-6 h-6" />,
+      gradient: 'from-amber-500/10 to-orange-500/5',
+      borderColor: 'border-amber-500/30',
+      iconBg: 'bg-amber-500/20',
+      iconColor: 'text-amber-400',
+      label: 'Core Concepts'
+    },
+    code: {
+      icon: <Code className="w-6 h-6" />,
+      gradient: 'from-emerald-500/10 to-green-500/5',
+      borderColor: 'border-emerald-500/30',
+      iconBg: 'bg-emerald-500/20',
+      iconColor: 'text-emerald-400',
+      label: 'Code Examples'
+    },
+    details: {
+      icon: <AlertCircle className="w-6 h-6" />,
+      gradient: 'from-rose-500/10 to-pink-500/5',
+      borderColor: 'border-rose-500/30',
+      iconBg: 'bg-rose-500/20',
+      iconColor: 'text-rose-400',
+      label: 'Important Notes'
+    },
+    summary: {
+      icon: <GraduationCap className="w-6 h-6" />,
+      gradient: 'from-cyan-500/10 to-blue-500/5',
+      borderColor: 'border-cyan-500/30',
+      iconBg: 'bg-cyan-500/20',
+      iconColor: 'text-cyan-400',
+      label: 'Summary'
+    }
+  };
+
+  const getSectionStyle = (type) => {
+    return sectionConfig[type] || sectionConfig.explanation;
+  };
+
+  if (loading && topics.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#6C63FF] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading chapter content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()} className="bg-[#6C63FF]">
+            Retry
           </Button>
+        </div>
+      </div>
+    );
+  }
 
-          <div className="flex items-center gap-3 text-gray-400">
-            <span>Java Fundamentals</span>
-            <span>/</span>
-            <span className="text-white">Chapter 1: Introduction to Java</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
+      {/* Header */}
+      <div className="bg-[#13132B]/80 border-b border-gray-800/50 px-6 py-4 sticky top-0 z-10 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => navigate('/student')}
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-800/50 p-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <p className="text-[#6C63FF] text-sm mb-1">Chapter {chapterId}</p>
+                <h1 className="text-2xl text-white mb-1">{chapterTitle}</h1>
+                <p className="text-gray-400">
+                  Topic {currentTopicIndex + 1} of {topics.length} • 
+                  Section {currentSectionIndex + 1} of {totalSections}
+                </p>
+              </div>
+            </div>
+            <div className="relative group">
+              <Button
+                onClick={() => onStartPractice(currentTopic?.id, currentTopic?.title)}
+                disabled={!allTopicsCompleted}
+                className={`${allTopicsCompleted 
+                  ? 'bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD]' 
+                  : 'bg-gray-700 cursor-not-allowed opacity-60'}`}
+              >
+                {!allTopicsCompleted && <Lock className="w-4 h-4 mr-2" />}
+                {allTopicsCompleted && <Code className="w-4 h-4 mr-2" />}
+                Start Practice
+              </Button>
+              {!allTopicsCompleted && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 border border-amber-500/50 rounded-lg text-amber-400 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-3 h-3" />
+                    Complete all topics first to unlock practice
+                  </div>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-amber-500/50"></div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div /> {/* right-side placeholder for actions if needed */}
+      {/* Topic Navigation Bar */}
+      <div className="bg-[#0B0B1A]/80 border-b border-gray-800/50 sticky top-[89px] z-10">
+        <div className="max-w-6xl mx-auto px-6 py-3">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            {topics.map((topic, index) => {
+              const accessible = isTopicAccessible(index);
+              const isCompleted = completedTopics.has(index);
+              const isCurrent = index === currentTopicIndex;
+              
+              return (
+                <div key={topic.id} className="relative group flex-shrink-0">
+                  <button
+                    onClick={() => handleTopicClick(index)}
+                    disabled={!accessible}
+                    className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                      isCurrent
+                        ? 'bg-[#6C63FF] text-white'
+                        : isCompleted
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-pointer'
+                        : accessible
+                        ? 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 cursor-pointer'
+                        : 'bg-gray-900/50 text-gray-600 cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    {!accessible && <Lock className="w-3 h-3 inline mr-1" />}
+                    {isCompleted && <CheckCircle className="w-3 h-3 inline mr-1" />}
+                    {topic.title}
+                  </button>
+                  {!accessible && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 border border-amber-500/50 rounded-lg text-amber-400 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="w-3 h-3" />
+                        Complete previous topics first
+                      </div>
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-amber-500/50"></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
-      <ScrollArea className="flex-1">
-        <div className="max-w-5xl mx-auto px-8 py-12 space-y-10">
-          {/* Topic Header */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-[#6C63FF]/20 to-[#22D3EE]/20 rounded-xl border border-[#6C63FF]/30">
-                <Book className="w-7 h-7 text-[#6C63FF]" />
-              </div>
-              <div>
-                <h1 className="text-white text-3xl">Introduction to Java</h1>
-                <p className="text-gray-400 mt-1">Chapter 1 • 15 min read</p>
-              </div>
-            </div>
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {loading ? (
+          <div className="bg-[#13132B]/50 rounded-xl border border-gray-800/50 p-8 text-center">
+            <div className="w-8 h-8 border-4 border-[#6C63FF] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-400">Loading content...</p>
           </div>
-
-          {/* Introduction Section */}
-          <section className="bg-[#13132B]/50 rounded-2xl p-8 border border-gray-800/50 space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-6 bg-gradient-to-b from-[#6C63FF] to-[#22D3EE] rounded-full" />
-              <h2 className="text-white">What is Java?</h2>
-            </div>
-            <p className="text-gray-300 leading-relaxed">
-              Java is one of the most popular programming languages in the world. Created by James Gosling
-              at Sun Microsystems in 1995, Java was designed with the principle of "Write Once, Run Anywhere" (WORA).
-              This means that compiled Java code can run on all platforms that support Java without the need for recompilation.
-            </p>
-            <p className="text-gray-300 leading-relaxed">
-              Java is used for building enterprise-scale applications, Android mobile apps, web applications,
-              cloud-based solutions, game development, and much more. Companies like Google, Netflix, Amazon,
-              and countless others rely on Java for their critical systems.
-            </p>
-          </section>
-
-          {/* Key Features */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-[#6C63FF] to-[#22D3EE] rounded-full" />
-              <h2 className="text-white">Key Features of Java</h2>
+        ) : (
+          <>
+            {/* Current Topic Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl text-white mb-2">{currentTopic?.title}</h2>
+              <p className="text-gray-400">{currentTopic?.description}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                {
-                  title: 'Platform Independent',
-                  description: 'Java code runs on any device with JVM installed',
-                  icon: '🌐'
-                },
-                {
-                  title: 'Object-Oriented',
-                  description: 'Everything in Java is an object, making code modular and reusable',
-                  icon: '📦'
-                },
-                {
-                  title: 'Secure',
-                  description: 'Built-in security features protect against viruses and malicious code',
-                  icon: '🔒'
-                },
-                {
-                  title: 'Multithreaded',
-                  description: 'Supports concurrent execution of multiple threads',
-                  icon: '⚡'
-                }
-              ].map((feature, index) => (
-                <div
-                  key={index}
-                  className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50 hover:border-[#6C63FF]/30 transition-colors"
-                >
-                  <div className="text-3xl mb-3">{feature.icon}</div>
-                  <h3 className="text-white mb-2">{feature.title}</h3>
-                  <p className="text-gray-400">{feature.description}</p>
+            {/* Section Content */}
+            {currentSection && (
+              <div className={`bg-gradient-to-br ${getSectionStyle(currentSection.type).gradient} rounded-2xl border ${getSectionStyle(currentSection.type).borderColor} p-8 mb-6 shadow-lg`}>
+                {/* Section Header */}
+                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-700/50">
+                  <div className={`p-3 rounded-xl ${getSectionStyle(currentSection.type).iconBg}`}>
+                    <span className={getSectionStyle(currentSection.type).iconColor}>
+                      {getSectionStyle(currentSection.type).icon}
+                    </span>
+                  </div>
+                  <div>
+                    <span className={`text-xs font-medium uppercase tracking-wider ${getSectionStyle(currentSection.type).iconColor}`}>
+                      {getSectionStyle(currentSection.type).label}
+                    </span>
+                    <h3 className="text-2xl font-semibold text-white">{currentSection.title}</h3>
+                  </div>
                 </div>
+
+                {/* Section Content */}
+                <div className="prose prose-invert max-w-none">
+                  {currentSection.content && (
+                    <div className="text-gray-200 leading-relaxed text-lg space-y-4">
+                      {currentSection.content.split('\n\n').map((paragraph, idx) => (
+                        <p key={idx} className="text-gray-200">{paragraph}</p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Code Examples - Enhanced */}
+                  {currentSection.examples && currentSection.examples.length > 0 && (
+                    <div className="mt-8 space-y-6">
+                      {currentSection.examples.map((code, index) => (
+                        <div key={index} className="relative group">
+                          <div className="absolute top-0 left-0 right-0 h-10 bg-gray-900 rounded-t-xl flex items-center px-4 border-b border-gray-700">
+                            <div className="flex gap-2">
+                              <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
+                              <div className="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+                              <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
+                            </div>
+                            <span className="ml-4 text-xs text-gray-400 font-mono">Example {index + 1}.java</span>
+                          </div>
+                          <pre className="bg-[#0D1117] pt-14 pb-6 px-6 rounded-xl overflow-x-auto border border-gray-700 shadow-xl">
+                            <code className="text-emerald-400 text-sm font-mono leading-relaxed">{code}</code>
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Key Points - Enhanced */}
+                  {currentSection.points && currentSection.points.length > 0 && (
+                    <div className="mt-8 grid gap-4">
+                      {currentSection.points.map((point, index) => (
+                        <div 
+                          key={index} 
+                          className="flex items-start gap-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/5 border border-cyan-500/30 rounded-xl p-5 hover:border-cyan-400/50 transition-all"
+                        >
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                            <span className="text-cyan-400 font-bold text-sm">{index + 1}</span>
+                          </div>
+                          <p className="text-gray-200 leading-relaxed flex-1">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Section Progress Dots */}
+            <div className="flex justify-center gap-2 mb-6">
+              {sections.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSectionIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === currentSectionIndex
+                      ? 'bg-[#6C63FF] w-8'
+                      : index < currentSectionIndex
+                      ? 'bg-green-500'
+                      : 'bg-gray-600'
+                  }`}
+                />
               ))}
             </div>
-          </section>
 
-          {/* First Java Program */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-[#6C63FF] to-[#22D3EE] rounded-full" />
-              <h2 className="text-white">Your First Java Program</h2>
-            </div>
-
-            <div className="bg-[#13132B]/50 rounded-2xl p-8 border border-gray-800/50 space-y-4">
-              <p className="text-gray-300 leading-relaxed">
-                Let's start with the traditional "Hello World" program. This is the simplest Java program
-                you can write, and it introduces you to the basic structure of a Java application.
-              </p>
-
-              <CodeBlock
-                language="java"
-                code={`public class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}`}
-              />
-
-              <div className="bg-gradient-to-r from-[#6C63FF]/10 to-[#22D3EE]/10 rounded-xl p-6 border border-[#6C63FF]/30 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-[#22D3EE]" />
-                  <h3 className="text-[#22D3EE]">Understanding the Code</h3>
-                </div>
-                <ul className="space-y-3 text-gray-300">
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#6C63FF] shrink-0 mt-0.5" />
-                    <div>
-                      <code className="text-[#22D3EE] bg-[#0B0B1A]/50 px-2 py-0.5 rounded">public class HelloWorld</code>
-                      <span className="text-gray-400"> - Declares a public class named HelloWorld. The class name must match the file name.</span>
-                    </div>
-                  </li>
-
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#6C63FF] shrink-0 mt-0.5" />
-                    <div>
-                      <code className="text-[#22D3EE] bg-[#0B0B1A]/50 px-2 py-0.5 rounded">public static void main(String[] args)</code>
-                      <span className="text-gray-400"> - The main method is the entry point of any Java program.</span>
-                    </div>
-                  </li>
-
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#6C63FF] shrink-0 mt-0.5" />
-                    <div>
-                      <code className="text-[#22D3EE] bg-[#0B0B1A]/50 px-2 py-0.5 rounded">System.out.println()</code>
-                      <span className="text-gray-400"> - Prints text to the console and adds a new line.</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Java Syntax Rules */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-[#6C63FF] to-[#22D3EE] rounded-full" />
-              <h2 className="text-white">Java Syntax Rules</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50">
-                <h3 className="text-white mb-3">1. Case Sensitivity</h3>
-                <p className="text-gray-400 mb-3">
-                  Java is case-sensitive. This means <code className="text-[#22D3EE] bg-[#0B0B1A]/50 px-2 py-0.5 rounded">Hello</code> and
-                  <code className="text-[#22D3EE] bg-[#0B0B1A]/50 px-2 py-0.5 rounded mx-1">hello</code> are considered different identifiers.
-                </p>
-
-                <CodeBlock
-                  language="java"
-                  code={`String name = "Java";  // Correct
-String Name = "Java";  // Different variable
-// System and system are different!`}
-                />
-              </div>
-
-              <div className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50">
-                <h3 className="text-white mb-3">2. Semicolons</h3>
-                <p className="text-gray-400 mb-3">
-                  Every statement in Java must end with a semicolon (;). This tells the compiler where one statement ends.
-                </p>
-
-                <CodeBlock
-                  language="java"
-                  code={`System.out.println("Hello");  // Correct
-System.out.println("World");  // Correct
-// System.out.println("Error")  // Wrong - missing semicolon`}
-                />
-              </div>
-
-              <div className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50">
-                <h3 className="text-white mb-3">3. Curly Braces</h3>
-                <p className="text-gray-400 mb-3">
-                  Curly braces {'{ }'} define blocks of code and determine scope. They must always come in pairs.
-                </p>
-
-                <CodeBlock
-                  language="java"
-                  code={`public class Example {  // Opening brace
-    public static void main(String[] args) {  // Opening brace
-        System.out.println("Inside main method");
-    }  // Closing brace for main
-}  // Closing brace for class`}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* JVM Architecture */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-6 bg-gradient-to-b from-[#6C63FF] to-[#22D3EE] rounded-full" />
-              <h2 className="text-white">How Java Works: JVM Architecture</h2>
-            </div>
-
-            <div className="bg-[#13132B]/50 rounded-2xl p-8 border border-gray-800/50 space-y-6">
-              <p className="text-gray-300 leading-relaxed">
-                Understanding how Java executes your code is crucial. The Java Virtual Machine (JVM) is what makes
-                Java platform-independent. Here's the process:
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-[#0B0B1A]/50 rounded-xl p-6 border border-gray-800/30 text-center">
-                  <div className="w-12 h-12 bg-[#6C63FF]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-[#6C63FF]">1</span>
-                  </div>
-                  <h3 className="text-white mb-2">Write Code</h3>
-                  <p className="text-gray-400">You write Java source code (.java files)</p>
-                </div>
-
-                <div className="bg-[#0B0B1A]/50 rounded-xl p-6 border border-gray-800/30 text-center">
-                  <div className="w-12 h-12 bg-[#6C63FF]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-[#6C63FF]">2</span>
-                  </div>
-                  <h3 className="text-white mb-2">Compile</h3>
-                  <p className="text-gray-400">Compiler converts to bytecode (.class files)</p>
-                </div>
-
-                <div className="bg-[#0B0B1A]/50 rounded-xl p-6 border border-gray-800/30 text-center">
-                  <div className="w-12 h-12 bg-[#6C63FF]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-[#6C63FF]">3</span>
-                  </div>
-                  <h3 className="text-white mb-2">Execute</h3>
-                  <p className="text-gray-400">JVM runs the bytecode on any platform</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Summary */}
-          <section className="bg-gradient-to-br from-[#6C63FF]/10 via-[#13132B]/50 to-[#22D3EE]/10 rounded-2xl p-8 border border-[#6C63FF]/30 space-y-4">
-            <div className="flex items-center gap-2">
-              <Code2 className="w-6 h-6 text-[#6C63FF]" />
-              <h2 className="text-white">Summary</h2>
-            </div>
-
-            <p className="text-gray-300 leading-relaxed">
-              You've now learned the fundamentals of Java! You understand what Java is, its key features,
-              the basic structure of a Java program, and how the JVM makes Java platform-independent.
-            </p>
-
-            <div className="bg-[#0B0B1A]/50 rounded-xl p-6 border border-gray-800/30">
-              <h3 className="text-white mb-3">Key Takeaways:</h3>
-              <ul className="space-y-2 text-gray-300">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#6C63FF]">•</span>
-                  Java is platform-independent, object-oriented, and widely used
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#6C63FF]">•</span>
-                  Every Java program needs a main() method as an entry point
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#6C63FF]">•</span>
-                  Java code is compiled to bytecode, then executed by the JVM
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#6C63FF]">•</span>
-                  Java syntax is case-sensitive and requires semicolons and braces
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Practice Button */}
-          <div
-            className={`sticky bottom-8 transition-all duration-500 ${
-              showPracticeButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
-          >
-            <div className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] rounded-2xl p-8 text-center space-y-4 shadow-2xl border border-[#6C63FF]/50">
-              <h3 className="text-white text-2xl">Ready to Practice?</h3>
-              <p className="text-white/90">
-                Apply what you've learned with hands-on coding exercises
-              </p>
-
+            {/* Navigation */}
+            <div className="flex items-center justify-between">
               <Button
-                onClick={onStartPractice}
-                size="lg"
-                className="bg-white text-[#6C63FF] hover:bg-gray-100 px-8 py-6 text-lg h-auto"
+                onClick={handlePreviousSection}
+                disabled={currentTopicIndex === 0 && currentSectionIndex === 0}
+                variant="outline"
+                className="border-gray-700 text-gray-300 disabled:opacity-50"
               >
-                <Code2 className="w-5 h-5 mr-2" />
-                Start Practice
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Previous
               </Button>
-            </div>
-          </div>
 
-          {/* Spacer */}
-          <div className="h-32" />
-        </div>
-      </ScrollArea>
+              <div className="text-gray-400 text-sm">
+                Section {currentSectionIndex + 1} of {totalSections}
+              </div>
+
+              {currentTopicIndex === topics.length - 1 && currentSectionIndex === totalSections - 1 ? (
+                <Button
+                  onClick={() => {
+                    // Mark final topic as completed before starting practice
+                    setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
+                    onStartPractice(currentTopic?.id, currentTopic?.title);
+                  }}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                >
+                  Complete & Practice
+                  <CheckCircle className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNextSection}
+                  className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE]"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

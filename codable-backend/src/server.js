@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
 import studentRoute from "./routes/studentRoute.js";
+import learningRoute from "./routes/learningRoute.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import { startWebSocketServer } from "./websocket/codeRunner.js";
 import http from 'http';
@@ -58,6 +59,7 @@ app.use((req,res,next) => {
 // ------------------------
 app.use("/auth", authRoute);
 app.use("/student", studentRoute);
+app.use("/api/learning", learningRoute);
 // ------------------------
 // ERROR HANDLING
 // ------------------------

@@ -1,267 +1,324 @@
 import { 
-  CheckCircle2, 
+  CheckCircle, 
   XCircle, 
+  AlertTriangle, 
+  ArrowRight, 
+  RotateCcw, 
+  Trophy, 
   Clock, 
-  Zap, 
-  Code2, 
-  Lightbulb, 
-  TrendingUp,
-  RotateCcw,
-  ChevronRight,
-  Trophy,
-  Target,
-  Timer
+  Target, 
+  Zap,
+  Code,
+  FileText,
+  Activity
 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 
-export function FeedbackPanel({ onTryAgain, onNextQuestion, hasNextQuestion, metrics }) {
-  console.log('FeedbackPanel received metrics:', metrics);
+export function FeedbackPanel({ 
+  onTryAgain, 
+  onNextQuestion, 
+  metrics, 
+  validationResult,
+  question,
+  isLastQuestion 
+}) {
+  const isCorrect = validationResult?.isCorrect || false;
+  const score = validationResult?.score || metrics?.score || 0;
+  const feedback = validationResult?.feedback || [];
+  const suggestions = validationResult?.suggestions || [];
 
-  const feedback = {
-    passed: true,
-    score: 95,
-    testCases: {
-      total: 3,
-      passed: 3,
-      failed: 0
-    },
-    timeComplexity: metrics?.time_complexity || 'Not analyzed',
-    spaceComplexity: metrics?.space_complexity || 'Not analyzed',
-    solutionTime: metrics?.solution_time_formatted || '0s',
-    peakMemory: metrics?.peak_memory_formatted || 'Not measured',
-    codeQuality: {
-      score: 90,
-      issues: [
-        'Good use of proper naming conventions',
-        'Code is well-structured and readable'
-      ],
-      suggestions: [
-        'Consider adding comments to explain your logic',
-        'You could add error handling for edge cases'
-      ]
-    },
-    hints: [
-      'Great job! Your solution is correct.',
-      'Try to think about how this could be optimized further',
-      'Practice more complex variations of this problem'
-    ]
+  const getScoreColor = (score) => {
+    if (score >= 80) return 'text-green-400';
+    if (score >= 50) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+
+  const getScoreBg = (score) => {
+    if (score >= 80) return 'bg-green-500/20 border-green-500/50';
+    if (score >= 50) return 'bg-yellow-500/20 border-yellow-500/50';
+    return 'bg-red-500/20 border-red-500/50';
+  };
+
+  const formatTime = (seconds) => {
+    if (!seconds) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0B0B1A]">
-      {/* Header */}
-      <div className={`${
-        feedback.passed 
-          ? 'bg-gradient-to-r from-green-600/20 to-green-500/20 border-green-500/30' 
-          : 'bg-gradient-to-r from-red-600/20 to-red-500/20 border-red-500/30'
-      } border-b px-6 py-6 shrink-0`}>
-        <div className="flex items-center gap-4">
-          {feedback.passed ? (
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-green-400" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
-              <XCircle className="w-8 h-8 text-red-400" />
-            </div>
-          )}
-          <div>
-            <h2 className="text-white text-2xl mb-1">
-              {feedback.passed ? 'Accepted!' : 'Not Quite Right'}
-            </h2>
-            <p className="text-gray-300">
-              {feedback.passed 
-                ? 'Your solution passed all test cases' 
-                : 'Some test cases failed. Review the feedback below.'}
-            </p>
+    <div className="flex-1 flex flex-col bg-[#1a1a2e] p-6 overflow-auto">
+      {/* Result Header */}
+      <div className={`flex items-center gap-4 p-6 rounded-lg border ${getScoreBg(score)} mb-6`}>
+        {isCorrect ? (
+          <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
+            <CheckCircle className="w-10 h-10 text-green-400" />
+          </div>
+        ) : score >= 50 ? (
+          <div className="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center">
+            <AlertTriangle className="w-10 h-10 text-yellow-400" />
+          </div>
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
+            <XCircle className="w-10 h-10 text-red-400" />
+          </div>
+        )}
+        <div>
+          <h2 className={`text-2xl font-bold ${getScoreColor(score)}`}>
+            {isCorrect ? 'Correct!' : score >= 50 ? 'Almost There!' : 'Not Quite Right'}
+          </h2>
+          <p className="text-gray-400">
+            {isCorrect 
+              ? 'Great job! Your solution is correct.' 
+              : score >= 50 
+                ? 'Your solution is partially correct. Check the feedback below.'
+                : 'Review the feedback and try again.'}
+          </p>
+        </div>
+        <div className="ml-auto text-right">
+          <div className={`text-4xl font-bold ${getScoreColor(score)}`}>{score}%</div>
+          <div className="text-gray-400 text-sm">Score</div>
+        </div>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800">
+          <div className="flex items-center gap-2 text-gray-400 mb-2">
+            <Clock className="w-4 h-4" />
+            <span className="text-sm">Time</span>
+          </div>
+          <div className="text-xl font-semibold text-white">
+            {formatTime(metrics?.solutionTime)}
           </div>
         </div>
-
-        {/* Score */}
-        <div className="mt-6 flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Trophy className="w-6 h-6 text-yellow-400" />
-            <div>
-              <div className="text-3xl text-white">{feedback.score}%</div>
-              <div className="text-gray-400 text-sm">Score</div>
-            </div>
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800">
+          <div className="flex items-center gap-2 text-gray-400 mb-2">
+            <Target className="w-4 h-4" />
+            <span className="text-sm">Attempts</span>
           </div>
-          <div className="w-px h-12 bg-gray-700" />
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-[#6C63FF]" />
-            <div>
-              <div className="text-2xl text-white">
-                {feedback.testCases.passed}/{feedback.testCases.total}
-              </div>
-              <div className="text-gray-400 text-sm">Test Cases Passed</div>
-            </div>
+          <div className="text-xl font-semibold text-white">
+            {metrics?.attempts || 1}
+          </div>
+        </div>
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800">
+          <div className="flex items-center gap-2 text-gray-400 mb-2">
+            <Zap className="w-4 h-4" />
+            <span className="text-sm">Execution</span>
+          </div>
+          <div className="text-xl font-semibold text-white">
+            {metrics?.executionMetrics?.executionTime || 0}ms
+          </div>
+        </div>
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800">
+          <div className="flex items-center gap-2 text-gray-400 mb-2">
+            <Trophy className="w-4 h-4" />
+            <span className="text-sm">Output Match</span>
+          </div>
+          <div className={`text-xl font-semibold ${metrics?.outputMatches ? 'text-green-400' : 'text-red-400'}`}>
+            {metrics?.outputMatches ? 'Yes' : 'No'}
           </div>
         </div>
       </div>
 
-      {/* Scrollable Feedback */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="p-6 space-y-6">
-          {/* Performance Metrics */}
-          <section className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50 space-y-4">
-            <h3 className="text-white flex items-center gap-2">
-              <Zap className="w-5 h-5 text-[#22D3EE]" />
-              Performance Metrics
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <Timer className="w-4 h-4 text-[#6C63FF]" />
-                  <span className="text-gray-400 text-sm">Solution Time</span>
-                </div>
-                <div className="text-white text-xl font-mono">{feedback.solutionTime}</div>
-                <div className="text-gray-500 text-xs mt-1">Time to write code</div>
-              </div>
-
-              <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-blue-400" />
-                  <span className="text-gray-400 text-sm">Memory Used</span>
-                </div>
-                <div className="text-white text-xl font-mono">{feedback.peakMemory}</div>
-                <div className="text-gray-500 text-xs mt-1">Peak memory usage</div>
-              </div>
-
-              <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-purple-400" />
-                  <span className="text-gray-400 text-sm">Time Complexity</span>
-                </div>
-                <div className="text-white text-xl font-mono">{feedback.timeComplexity}</div>
-              </div>
-
-              <div className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-gray-800/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-green-400" />
-                  <span className="text-gray-400 text-sm">Space Complexity</span>
-                </div>
-                <div className="text-white text-xl font-mono">{feedback.spaceComplexity}</div>
-              </div>
-            </div>
-          </section>
-
-          {/* Code Quality */}
-          <section className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-white flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-[#6C63FF]" />
-                Code Quality
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="text-2xl text-white">{feedback.codeQuality.score}</div>
-                <div className="text-gray-400">/100</div>
-              </div>
-            </div>
-
-            {/* Quality Bar */}
-            <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] transition-all duration-500"
-                style={{ width: `${feedback.codeQuality.score}%` }}
-              />
-            </div>
-
-            <div className="space-y-3 mt-4">
-              <div>
-                <h4 className="text-green-400 mb-2 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  What You Did Well
-                </h4>
-                <ul className="space-y-2 ml-6">
-                  {feedback.codeQuality.issues.map((issue, index) => (
-                    <li key={index} className="text-gray-300 text-sm flex gap-2">
-                      <span className="text-green-400">•</span>
-                      <span>{issue}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-yellow-400 mb-2 flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4" />
-                  Suggestions for Improvement
-                </h4>
-                <ul className="space-y-2 ml-6">
-                  {feedback.codeQuality.suggestions.map((suggestion, index) => (
-                    <li key={index} className="text-gray-300 text-sm flex gap-2">
-                      <span className="text-yellow-400">•</span>
-                      <span>{suggestion}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Learning Points */}
-          <section className="bg-gradient-to-br from-[#6C63FF]/10 to-[#22D3EE]/10 rounded-xl p-6 border border-[#6C63FF]/30 space-y-4">
-            <h3 className="text-[#22D3EE] flex items-center gap-2">
-              <Lightbulb className="w-5 h-5" />
-              Key Learning Points
-            </h3>
-            <ul className="space-y-3">
-              {feedback.hints.map((hint, index) => (
-                <li key={index} className="flex gap-3 text-gray-300">
-                  <div className="w-6 h-6 bg-[#6C63FF]/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="text-[#6C63FF] text-sm">{index + 1}</span>
-                  </div>
-                  <span>{hint}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Test Cases Details */}
-          <section className="bg-[#13132B]/50 rounded-xl p-6 border border-gray-800/50 space-y-4">
-            <h3 className="text-white">Test Cases</h3>
-            
-            <div className="space-y-3">
-              {[1, 2, 3].map((testNum) => (
-                <div 
-                  key={testNum}
-                  className="bg-[#0B0B1A]/50 rounded-lg p-4 border border-green-500/30 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
-                    <span className="text-gray-300">Test Case {testNum}</span>
-                  </div>
-                  <span className="text-green-400">Passed</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Spacer */}
-          <div className="h-8" />
+      {/* Feedback Section */}
+      {feedback.length > 0 && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-green-400" />
+            Feedback
+          </h3>
+          <ul className="space-y-2">
+            {feedback.map((item, index) => (
+              <li key={index} className="text-gray-300 flex items-start gap-2">
+                <span className="text-[#6C63FF]">•</span>
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      )}
+
+      {/* Suggestions Section */}
+      {suggestions.length > 0 && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-yellow-500/30 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            Suggestions
+          </h3>
+          <ul className="space-y-2">
+            {suggestions.map((item, index) => (
+              <li key={index} className="text-gray-300 flex items-start gap-2">
+                <span className="text-yellow-400">→</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Code Analysis */}
+      {metrics?.codeAnalysis && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <Code className="w-4 h-4 text-[#6C63FF]" />
+            Code Analysis
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            {metrics.codeAnalysis.containsRequired?.length > 0 && (
+              <div>
+                <p className="text-green-400 text-sm mb-2">✓ Required Patterns Found:</p>
+                <ul className="text-gray-400 text-sm">
+                  {metrics.codeAnalysis.containsRequired.map((p, i) => (
+                    <li key={i} className="font-mono">{p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {metrics.codeAnalysis.missingRequired?.length > 0 && (
+              <div>
+                <p className="text-red-400 text-sm mb-2">✗ Missing Patterns:</p>
+                <ul className="text-gray-400 text-sm">
+                  {metrics.codeAnalysis.missingRequired.map((p, i) => (
+                    <li key={i} className="font-mono">{p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Complexity Analysis */}
+      {metrics?.complexity && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-purple-500/30 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <Activity className="w-4 h-4 text-purple-400" />
+            Complexity Analysis
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-400 text-sm">Time Complexity:</p>
+              <p className="text-purple-400 font-mono text-lg">{metrics.complexity.timeComplexity || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm">Space Complexity:</p>
+              <p className="text-purple-400 font-mono text-lg">{metrics.complexity.spaceComplexity || 'N/A'}</p>
+            </div>
+            {metrics.complexity.analysis && (
+              <div className="col-span-2 mt-2">
+                <p className="text-gray-400 text-sm mb-2">Analysis Details:</p>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  {metrics.complexity.analysis.maxLoopDepth !== undefined && (
+                    <div className="bg-[#1a1a2e] p-2 rounded">
+                      <span className="text-gray-500">Max Loop Depth:</span>
+                      <span className="text-purple-300 ml-2">{metrics.complexity.analysis.maxLoopDepth}</span>
+                    </div>
+                  )}
+                  {metrics.complexity.analysis.hasRecursion !== undefined && (
+                    <div className="bg-[#1a1a2e] p-2 rounded">
+                      <span className="text-gray-500">Recursion:</span>
+                      <span className={`ml-2 ${metrics.complexity.analysis.hasRecursion ? 'text-yellow-400' : 'text-gray-400'}`}>
+                        {metrics.complexity.analysis.hasRecursion ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                  )}
+                  {metrics.complexity.analysis.arrayAllocations !== undefined && (
+                    <div className="bg-[#1a1a2e] p-2 rounded">
+                      <span className="text-gray-500">Arrays:</span>
+                      <span className="text-purple-300 ml-2">{metrics.complexity.analysis.arrayAllocations}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Question & Output Comparison */}
+      {question && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <FileText className="w-4 h-4 text-cyan-400" />
+            Question: {question.title}
+          </h3>
+          <p className="text-gray-400 text-sm mb-4">{question.description}</p>
+          
+          {/* Output Comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-[#1a1a2e] rounded-lg p-3 border border-gray-700">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-green-400 text-sm font-medium">Expected Output:</span>
+              </div>
+              <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-[#0a0a15] p-2 rounded">
+                {question.expectedOutput || 'No expected output specified'}
+              </pre>
+            </div>
+            <div className="bg-[#1a1a2e] rounded-lg p-3 border border-gray-700">
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-sm font-medium ${metrics?.outputMatches ? 'text-green-400' : 'text-red-400'}`}>
+                  Your Output:
+                </span>
+                {metrics?.outputMatches ? (
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                ) : (
+                  <XCircle className="w-4 h-4 text-red-400" />
+                )}
+              </div>
+              <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-[#0a0a15] p-2 rounded">
+                {metrics?.output || 'No output'}
+              </pre>
+            </div>
+          </div>
+          
+          {/* Match Status */}
+          <div className={`mt-3 p-2 rounded text-sm text-center ${
+            metrics?.outputMatches 
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+          }`}>
+            {metrics?.outputMatches 
+              ? '✓ Output matches expected result!' 
+              : '✗ Output does not match expected result'}
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
-      <div className="bg-[#13132B] border-t border-gray-800/50 px-6 py-4 flex items-center justify-between shrink-0">
-        <Button
-          onClick={onTryAgain}
-          variant="outline"
-          className="border-gray-700 text-gray-300 hover:bg-gray-800/50 hover:text-white"
-        >
-          <RotateCcw className="w-4 h-4 mr-2" />
-          Try Again
-        </Button>
-
-        {hasNextQuestion && (
+      <div className="flex items-center justify-center gap-4 mt-auto pt-6">
+        {!isCorrect && (
+          <Button
+            onClick={onTryAgain}
+            variant="outline"
+            className="gap-2 border-gray-600 text-gray-300 hover:bg-gray-800"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Try Again
+          </Button>
+        )}
+        {!isLastQuestion && (
           <Button
             onClick={onNextQuestion}
-            className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD] text-white"
+            className="gap-2 bg-[#6C63FF] hover:bg-[#5a52d5]"
           >
             Next Question
-            <ChevronRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-4 h-4" />
           </Button>
+        )}
+        {isLastQuestion && isCorrect && (
+          <div className="text-center">
+            <div className="text-green-400 text-xl font-semibold mb-2">
+              🎉 Congratulations! You've completed all questions!
+            </div>
+            <Button
+              onClick={onTryAgain}
+              variant="outline"
+              className="gap-2 border-[#6C63FF] text-[#6C63FF] hover:bg-[#6C63FF]/20"
+            >
+              Practice More
+            </Button>
+          </div>
         )}
       </div>
     </div>

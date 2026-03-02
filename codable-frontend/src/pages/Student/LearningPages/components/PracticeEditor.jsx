@@ -1,4 +1,4 @@
-import { Play, Send, Code2, Terminal, Square, AlertCircle, Timer } from 'lucide-react';
+import { Play, Send, Code2, Terminal, Square, AlertCircle, Timer, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
@@ -6,7 +6,7 @@ import { parse } from 'java-parser';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
 
-export function PracticeEditor({ code, onChange, onSubmit, question }) {
+export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, question }) {
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,476 +14,484 @@ export function PracticeEditor({ code, onChange, onSubmit, question }) {
   const [syntaxErrors, setSyntaxErrors] = useState([]);
   const [executionMetrics, setExecutionMetrics] = useState(null);
   const [complexityData, setComplexityData] = useState(null);
+  const [outputMatch, setOutputMatch] = useState(null);
   
-  // Solution time tracking
+  // Solution time tracking - timer starts on first keystroke
+  const [timerStarted, setTimerStarted] = useState(false);
   const [solutionStartTime, setSolutionStartTime] = useState(null);
   const [solutionTime, setSolutionTime] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [attempts, setAttempts] = useState(0);
   
   const wsRef = useRef(null);
-  const outputRef = useRef(null);
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
-  const timerIntervalRef = useRef(null);
-  const submitResolveRef = useRef(null);
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
 
-  // Auto-scroll output
+  // Reset timer when question changes (timer starts on first keystroke)
   useEffect(() => {
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    // Reset everything for new question
+    setTimerStarted(false);
+    setSolutionStartTime(null);
+    startTimeRef.current = null;
+    setAttempts(0);
+    setOutput('');
+    setOutputMatch(null);
+    setSolutionTime(0);
+    
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-  }, [output]);
 
-  // Cleanup WebSocket on unmount
-  useEffect(() => {
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
     };
-  }, []);
+  }, [question?.id]);
 
-  // Timer effect - updates every second
-  useEffect(() => {
-    if (isTimerRunning) {
-      timerIntervalRef.current = setInterval(() => {
-        setSolutionTime(Math.floor((Date.now() - solutionStartTime) / 1000));
+  // Start timer on first keystroke
+  const startTimerIfNeeded = () => {
+    if (!timerStarted) {
+      const newStartTime = Date.now();
+      setSolutionStartTime(newStartTime);
+      startTimeRef.current = newStartTime;
+      setTimerStarted(true);
+      
+      timerRef.current = setInterval(() => {
+        if (startTimeRef.current) {
+          setSolutionTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
+        }
       }, 1000);
-    } else {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
     }
+  };
 
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-    };
-  }, [isTimerRunning, solutionStartTime]);
-
-  // Real-time Java syntax validation
+  // Check syntax errors in real-time and show red underlines
   useEffect(() => {
-    if (!editorRef.current || !monacoRef.current) return;
-
-    const validateJava = () => {
+    const checkSyntax = () => {
+      if (!code || code.trim().length === 0) {
+        setSyntaxErrors([]);
+        clearEditorMarkers();
+        return;
+      }
+      
       try {
         parse(code);
-        
-        monacoRef.current.editor.setModelMarkers(
-          editorRef.current.getModel(),
-          'java-syntax',
-          []
-        );
         setSyntaxErrors([]);
-      } catch (err) {
-        const markers = [];
-        
-        if (err.name === 'MismatchedTokenException' || err.name === 'NoViableAltException') {
-          const line = err.token?.startLine || 1;
-          const column = err.token?.startColumn || 1;
-          const endLine = err.token?.endLine || line;
-          const endColumn = err.token?.endColumn || column + 1;
-          
-          markers.push({
-            severity: monacoRef.current.MarkerSeverity.Error,
-            message: err.message || 'Syntax error',
-            startLineNumber: line,
-            startColumn: column,
-            endLineNumber: endLine,
-            endColumn: endColumn,
-          });
-        } else if (err.previousToken) {
-          const line = err.previousToken.endLine || 1;
-          const column = err.previousToken.endColumn || 1;
-          
-          markers.push({
-            severity: monacoRef.current.MarkerSeverity.Error,
-            message: err.message || 'Unexpected token',
-            startLineNumber: line,
-            startColumn: column,
-            endLineNumber: line,
-            endColumn: column + 10,
-          });
-        } else {
-          markers.push({
-            severity: monacoRef.current.MarkerSeverity.Error,
-            message: err.message || 'Syntax error detected',
-            startLineNumber: 1,
-            startColumn: 1,
-            endLineNumber: 1,
-            endColumn: 10,
-          });
+        clearEditorMarkers();
+      } catch (error) {
+        if (error.message) {
+          setSyntaxErrors([error.message]);
+          showEditorMarkers(error);
         }
-
-        monacoRef.current.editor.setModelMarkers(
-          editorRef.current.getModel(),
-          'java-syntax',
-          markers
-        );
-        setSyntaxErrors(markers);
       }
     };
 
-    const timeoutId = setTimeout(validateJava, 300);
-    return () => clearTimeout(timeoutId);
+    const debounce = setTimeout(checkSyntax, 300);
+    return () => clearTimeout(debounce);
   }, [code]);
 
-  const handleEditorDidMount = (editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-    
-    setTimeout(() => {
-      if (code) {
-        editor.getModel().onDidChangeContent(() => {});
+  // Clear Monaco editor error markers
+  const clearEditorMarkers = () => {
+    if (monacoRef.current && editorRef.current) {
+      const model = editorRef.current.getModel();
+      if (model) {
+        monacoRef.current.editor.setModelMarkers(model, 'java-syntax', []);
       }
-    }, 100);
-  };
-
-  const handleCodeChange = (newCode) => {
-    // Start timer on first keystroke
-    if (!solutionStartTime && newCode && newCode.trim().length > 0) {
-      setSolutionStartTime(Date.now());
-      setIsTimerRunning(true);
-    }
-    
-    onChange(newCode || '');
-  };
-
-  const formatTime = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m ${secs}s`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${secs}s`;
-    } else {
-      return `${secs}s`;
     }
   };
 
-  const runCodeAndGetMetrics = () => {
+  // Show red underline markers in Monaco editor
+  const showEditorMarkers = (error) => {
+    if (!monacoRef.current || !editorRef.current) return;
+    
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    // Try to extract line number from error message
+    let lineNumber = 1;
+    let startColumn = 1;
+    let endColumn = 1000;
+    
+    // Common patterns: "line X", "Line X", "at line X", "(X:Y)"
+    const lineMatch = error.message.match(/line\s*(\d+)/i) || 
+                      error.message.match(/\((\d+):\d+\)/) ||
+                      error.message.match(/at\s*(\d+)/);
+    if (lineMatch) {
+      lineNumber = parseInt(lineMatch[1], 10);
+    }
+    
+    // Column pattern: "column X" or "(line:column)"
+    const colMatch = error.message.match(/column\s*(\d+)/i) ||
+                     error.message.match(/\(\d+:(\d+)\)/);
+    if (colMatch) {
+      startColumn = parseInt(colMatch[1], 10);
+      endColumn = startColumn + 10;
+    }
+
+    // Ensure line number is valid
+    const totalLines = model.getLineCount();
+    if (lineNumber > totalLines) lineNumber = totalLines;
+    if (lineNumber < 1) lineNumber = 1;
+
+    const markers = [{
+      severity: monacoRef.current.MarkerSeverity.Error,
+      startLineNumber: lineNumber,
+      startColumn: startColumn,
+      endLineNumber: lineNumber,
+      endColumn: endColumn,
+      message: error.message
+    }];
+
+    monacoRef.current.editor.setModelMarkers(model, 'java-syntax', markers);
+  };
+
+  // Check if output matches expected
+  useEffect(() => {
+    if (output && question?.expectedOutput) {
+      const normalizedOutput = output.trim().toLowerCase();
+      const normalizedExpected = question.expectedOutput.trim().toLowerCase();
+      const matches = normalizedOutput.includes(normalizedExpected) || 
+                      normalizedExpected.includes(normalizedOutput) ||
+                      normalizedOutput === normalizedExpected;
+      setOutputMatch(matches);
+    }
+  }, [output, question?.expectedOutput]);
+
+  const connectWebSocket = () => {
     return new Promise((resolve, reject) => {
-      if (syntaxErrors.length > 0) {
-        reject(new Error('Syntax errors present'));
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        resolve(wsRef.current);
         return;
       }
 
-      setOutput('Running code to collect metrics...\n');
-      setIsRunning(true);
-      setExecutionMetrics(null);
-      setComplexityData(null);
+      wsRef.current = new WebSocket(WS_URL);
 
-      const ws = new WebSocket(WS_URL);
-      wsRef.current = ws;
-      submitResolveRef.current = resolve;
-
-      let tempMetrics = null;
-      let tempComplexity = null;
-
-      ws.onopen = () => {
-        setOutput((prev) => prev + 'Compiling and analyzing...\n');
-        ws.send(JSON.stringify({ type: 'run', code }));
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+        resolve(wsRef.current);
       };
 
-      ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-
-        if (msg.type === 'output') {
-          setOutput((prev) => prev + msg.data);
-        }
-
-        if (msg.type === 'error') {
-          setOutput((prev) => prev + `[ERROR] ${msg.data}`);
-        }
-
-        if (msg.type === 'complexity') {
-          tempComplexity = msg.data;
-          setComplexityData(msg.data);
-          console.log('✅ Complexity data received:', msg.data);
-        }
-
-        if (msg.type === 'metrics') {
-          tempMetrics = msg.data;
-          setExecutionMetrics(msg.data);
-          console.log('✅ Execution metrics received:', msg.data);
-          setOutput((prev) => prev + `\n[Execution Time: ${msg.data.execution_time_formatted}]`);
-          setOutput((prev) => prev + `\n[Peak Memory: ${msg.data.peak_memory_formatted}]`);
-        }
-
-        if (msg.type === 'exit') {
-          setOutput((prev) => prev + `\n[Analysis complete]`);
-          setIsRunning(false);
-          ws.close();
-          
-          // Resolve with collected metrics
-          resolve({
-            execution: tempMetrics,
-            complexity: tempComplexity
-          });
+      wsRef.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          handleWebSocketMessage(data);
+        } catch (e) {
+          console.error('Failed to parse WebSocket message:', e);
         }
       };
 
-      ws.onerror = () => {
-        setOutput((prev) => prev + '\n[ERROR] Connection failed');
-        setIsRunning(false);
-        reject(new Error('WebSocket connection failed'));
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        reject(error);
       };
 
-      ws.onclose = () => {
-        setIsRunning(false);
+      wsRef.current.onclose = () => {
+        console.log('WebSocket disconnected');
       };
     });
   };
 
+  const handleWebSocketMessage = (data) => {
+    switch (data.type) {
+      case 'output':
+        setOutput((prev) => prev + data.data);
+        break;
+      case 'error':
+        setOutput((prev) => prev + `\nError: ${data.data}`);
+        break;
+      case 'exit':
+        setIsRunning(false);
+        setExecutionMetrics({
+          executionTime: data.executionTime,
+          memoryUsed: data.memoryUsed
+        });
+        if (onRunComplete) {
+          onRunComplete(output);
+        }
+        break;
+      case 'complexity':
+        setComplexityData(data.data);
+        break;
+      default:
+        console.log('Unknown message type:', data.type);
+    }
+  };
+
   const handleRun = async () => {
     if (syntaxErrors.length > 0) {
-      setOutput('[ERROR] Please fix syntax errors before running code:\n' + 
-                syntaxErrors.map(e => `Line ${e.startLineNumber}: ${e.message}`).join('\n'));
+      setOutput('⚠️ Please fix syntax errors before running:\n' + syntaxErrors.join('\n'));
       return;
     }
 
+    setIsRunning(true);
+    setOutput('');
+    setOutputMatch(null);
+    setAttempts(prev => prev + 1);
+
     try {
-      await runCodeAndGetMetrics();
+      const ws = await connectWebSocket();
+      ws.send(JSON.stringify({
+        type: 'run',
+        code: code,
+        input: inputValue,
+        questionId: question?.id
+      }));
     } catch (error) {
-      console.error('Run error:', error);
+      setOutput(`Failed to connect: ${error.message}`);
+      setIsRunning(false);
     }
   };
 
   const handleStop = () => {
-    if (wsRef.current) {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: 'stop' }));
-      wsRef.current.close();
     }
-    setOutput((prev) => prev + '\n[Execution stopped by user]');
     setIsRunning(false);
   };
 
-  const handleInput = (e) => {
-    e.preventDefault();
-    if (!inputValue.trim() || !isRunning || !wsRef.current) return;
+  const handleSubmit = async () => {
+    if (syntaxErrors.length > 0) {
+      setOutput('⚠️ Please fix syntax errors before submitting:\n' + syntaxErrors.join('\n'));
+      return;
+    }
 
-    wsRef.current.send(JSON.stringify({ type: 'input', data: inputValue }));
-    setOutput((prev) => prev + inputValue + '\n');
-    setInputValue('');
+    setIsSubmitting(true);
+    
+    // Run the code first if not already run
+    if (!output) {
+      await handleRun();
+      // Wait for execution to complete
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    // Calculate total time (use current solutionTime if timer was started, otherwise 0)
+    const totalTime = timerStarted && startTimeRef.current 
+      ? Math.floor((Date.now() - startTimeRef.current) / 1000) 
+      : 0;
+    
+    // Check code against question requirements
+    const codeAnalysis = analyzeCode(code, question);
+    
+    const metrics = {
+      solutionTime: totalTime,
+      attempts: attempts,
+      syntaxErrors: syntaxErrors.length,
+      output: output,
+      executionMetrics: executionMetrics,
+      complexity: complexityData,
+      codeAnalysis: codeAnalysis,
+      outputMatches: outputMatch,
+      score: calculateScore(codeAnalysis, outputMatch, attempts, totalTime)
+    };
+
+    setIsSubmitting(false);
+    onSubmit(metrics);
   };
 
-  const handleSubmit = async () => {
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    setIsTimerRunning(false);
-    
-    // Calculate solution time
-    const finalSolutionTime = solutionStartTime 
-      ? Math.floor((Date.now() - solutionStartTime) / 1000)
-      : 0;
+  const analyzeCode = (code, question) => {
+    const analysis = {
+      containsRequired: [],
+      missingRequired: [],
+      containsForbidden: [],
+      keywordsFound: []
+    };
 
-    try {
-      // If code hasn't been run yet, run it first to collect metrics
-      if (!executionMetrics || !complexityData) {
-        setOutput('⏳ Running code to collect performance metrics...\n');
-        const { execution, complexity } = await runCodeAndGetMetrics();
-        
-        // Now we have fresh metrics
-        const metricsToSubmit = {
-          execution_time_ms: execution?.execution_time_ms || null,
-          execution_time_formatted: execution?.execution_time_formatted || 'Not measured',
-          peak_memory_kb: execution?.peak_memory_kb || null,
-          peak_memory_formatted: execution?.peak_memory_formatted || 'Not measured',
-          time_complexity: execution?.time_complexity || complexity?.timeComplexity || 'Not analyzed',
-          space_complexity: execution?.space_complexity || complexity?.spaceComplexity || 'Not analyzed',
-          solution_time_seconds: finalSolutionTime,
-          solution_time_formatted: formatTime(finalSolutionTime)
-        };
-        
-        console.log('✅ Submitting metrics (collected on submit):', metricsToSubmit);
-        onSubmit(metricsToSubmit);
+    if (!question) return analysis;
+
+    // Check mustContain patterns
+    (question.mustContain || []).forEach(pattern => {
+      if (code.toLowerCase().includes(pattern.toLowerCase())) {
+        analysis.containsRequired.push(pattern);
       } else {
-        // Use existing metrics
-        const metricsToSubmit = {
-          execution_time_ms: executionMetrics?.execution_time_ms || null,
-          execution_time_formatted: executionMetrics?.execution_time_formatted || 'Not measured',
-          peak_memory_kb: executionMetrics?.peak_memory_kb || null,
-          peak_memory_formatted: executionMetrics?.peak_memory_formatted || 'Not measured',
-          time_complexity: executionMetrics?.time_complexity || complexityData?.timeComplexity || 'Not analyzed',
-          space_complexity: executionMetrics?.space_complexity || complexityData?.spaceComplexity || 'Not analyzed',
-          solution_time_seconds: finalSolutionTime,
-          solution_time_formatted: formatTime(finalSolutionTime)
-        };
-        
-        console.log('✅ Submitting metrics (from previous run):', metricsToSubmit);
-        onSubmit(metricsToSubmit);
+        analysis.missingRequired.push(pattern);
       }
-    } catch (error) {
-      console.error('❌ Submit error:', error);
-      
-      // Submit with partial data if analysis fails
-      const metricsToSubmit = {
-        execution_time_ms: null,
-        execution_time_formatted: 'Analysis failed',
-        peak_memory_kb: null,
-        peak_memory_formatted: 'Analysis failed',
-        time_complexity: 'Analysis failed',
-        space_complexity: 'Analysis failed',
-        solution_time_seconds: finalSolutionTime,
-        solution_time_formatted: formatTime(finalSolutionTime)
-      };
-      
-      onSubmit(metricsToSubmit);
-    } finally {
-      setIsSubmitting(false);
+    });
+
+    // Check mustNotContain patterns
+    (question.mustNotContain || []).forEach(pattern => {
+      if (code.toLowerCase().includes(pattern.toLowerCase())) {
+        analysis.containsForbidden.push(pattern);
+      }
+    });
+
+    // Check solution keywords
+    (question.solutionKeywords || []).forEach(keyword => {
+      if (code.toLowerCase().includes(keyword.toLowerCase())) {
+        analysis.keywordsFound.push(keyword);
+      }
+    });
+
+    return analysis;
+  };
+
+  const calculateScore = (analysis, outputMatches, attempts, time) => {
+    let score = 0;
+
+    // Output match: 50 points
+    if (outputMatches) score += 50;
+
+    // Required patterns: 30 points
+    const requiredTotal = analysis.containsRequired.length + analysis.missingRequired.length;
+    if (requiredTotal > 0) {
+      score += Math.round((analysis.containsRequired.length / requiredTotal) * 30);
+    } else {
+      score += 30;
     }
+
+    // No forbidden patterns: 10 points
+    if (analysis.containsForbidden.length === 0) score += 10;
+
+    // Bonus for fewer attempts: up to 5 points
+    if (attempts === 1) score += 5;
+    else if (attempts === 2) score += 3;
+    else if (attempts <= 4) score += 1;
+
+    // Bonus for quick solution: up to 5 points
+    if (time < 60) score += 5;
+    else if (time < 120) score += 3;
+    else if (time < 300) score += 1;
+
+    return Math.min(100, score);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Question Summary Bar */}
-      <div className="bg-[#13132B]/50 border-b border-gray-800/50 px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <Code2 className="w-5 h-5 text-[#6C63FF]" />
-          <div>
-            <h3 className="text-white">{question.title}</h3>
-            <p className="text-gray-400 text-sm">{question.description}</p>
-          </div>
-        </div>
+    <div className="flex-1 flex flex-col bg-[#1a1a2e]">
+      {/* Editor Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-[#0d0d1a] border-b border-gray-800">
         <div className="flex items-center gap-4">
-          {/* Timer Display */}
-          {isTimerRunning && (
-            <div className="flex items-center gap-2 bg-[#6C63FF]/10 border border-[#6C63FF]/30 rounded-lg px-3 py-1.5">
-              <Timer className="w-4 h-4 text-[#6C63FF] animate-pulse" />
-              <span className="text-[#6C63FF] font-mono text-sm">
-                {formatTime(solutionTime)}
-              </span>
-            </div>
+          <div className="flex items-center gap-2 text-gray-400">
+            <Code2 className="h-4 w-4" />
+            <span className="text-sm">Solution.java</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-400">
+            <Timer className="h-4 w-4" />
+            <span className="text-sm">
+              {timerStarted ? formatTime(solutionTime) : 'Start typing...'}
+            </span>
+          </div>
+          {attempts > 0 && (
+            <span className="text-sm text-gray-500">
+              Attempts: {attempts}
+            </span>
           )}
+        </div>
+        <div className="flex items-center gap-2">
           {syntaxErrors.length > 0 && (
-            <div className="flex items-center gap-2 text-red-400 text-sm">
-              <AlertCircle className="w-4 h-4" />
-              <span>{syntaxErrors.length} syntax error{syntaxErrors.length > 1 ? 's' : ''}</span>
+            <div className="flex items-center gap-1 text-red-400">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm">Syntax errors</span>
             </div>
           )}
+          {isRunning ? (
+            <Button
+              onClick={handleStop}
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+            >
+              <Square className="h-4 w-4" />
+              Stop
+            </Button>
+          ) : (
+            <Button
+              onClick={handleRun}
+              variant="outline"
+              size="sm"
+              className="gap-2 border-green-600 text-green-400 hover:bg-green-600/20"
+            >
+              <Play className="h-4 w-4" />
+              Run
+            </Button>
+          )}
+          <Button
+            onClick={handleSubmit}
+            size="sm"
+            className="gap-2 bg-[#6C63FF] hover:bg-[#5a52d5]"
+            disabled={isSubmitting || isRunning}
+          >
+            <Send className="h-4 w-4" />
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </Button>
         </div>
       </div>
 
       {/* Code Editor */}
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 relative">
-          {/* Editor Header */}
-          <div className="bg-[#13132B] px-4 py-2 flex items-center justify-between border-b border-gray-800/30">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
-              <span className="ml-3 text-gray-400">Solution.java</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {isRunning ? (
-                <Button
-                  size="sm"
-                  onClick={handleStop}
-                  className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 h-8"
-                >
-                  <Square className="w-3.5 h-3.5 mr-1.5" />
-                  Stop
-                </Button>
+      <div className="flex-1 min-h-0">
+        <Editor
+          height="100%"
+          defaultLanguage="java"
+          value={code}
+          onChange={(value) => {
+            startTimerIfNeeded();
+            onChange(value || '');
+          }}
+          theme="vs-dark"
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: 'on',
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            tabSize: 4,
+            wordWrap: 'on',
+            glyphMargin: true
+          }}
+          onMount={(editor, monaco) => {
+            editorRef.current = editor;
+            monacoRef.current = monaco;
+          }}
+        />
+      </div>
+
+      {/* Output Panel */}
+      <div className="h-48 border-t border-gray-800 flex flex-col">
+        <div className="flex items-center justify-between px-4 py-2 bg-[#0d0d1a] border-b border-gray-800">
+          <div className="flex items-center gap-2 text-gray-400">
+            <Terminal className="h-4 w-4" />
+            <span className="text-sm">Output</span>
+          </div>
+          {outputMatch !== null && (
+            <div className={`flex items-center gap-2 ${outputMatch ? 'text-green-400' : 'text-yellow-400'}`}>
+              {outputMatch ? (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="text-sm">Output matches expected!</span>
+                </>
               ) : (
-                <Button
-                  size="sm"
-                  onClick={handleRun}
-                  disabled={syntaxErrors.length > 0 || isSubmitting}
-                  className="bg-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/30 border border-[#22D3EE]/30 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Play className="w-3.5 h-3.5 mr-1.5" />
-                  Run Code
-                </Button>
+                <>
+                  <XCircle className="h-4 w-4" />
+                  <span className="text-sm">Output doesn't match expected</span>
+                </>
               )}
-              <Button
-                size="sm"
-                onClick={handleSubmit}
-                disabled={isSubmitting || syntaxErrors.length > 0}
-                className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD] text-white h-8 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-3.5 h-3.5 mr-1.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-3.5 h-3.5 mr-1.5" />
-                    Submit
-                  </>
-                )}
-              </Button>
             </div>
-          </div>
-
-          {/* Monaco Editor */}
-          <div className="absolute inset-0 top-[42px]">
-            <Editor
-              height="100%"
-              language="java"
-              theme="vs-dark"
-              value={code}
-              onChange={handleCodeChange}
-              onMount={handleEditorDidMount}
-              options={{
-                fontSize: 14,
-                fontFamily: 'JetBrains Mono, Consolas, Monaco, monospace',
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                lineNumbers: 'on',
-                automaticLayout: true,
-                tabSize: 4,
-                quickSuggestions: true,
-                suggestOnTriggerCharacters: true,
-              }}
-            />
-          </div>
+          )}
+          {executionMetrics && (
+            <div className="text-xs text-gray-500">
+              Time: {executionMetrics.executionTime}ms | Memory: {executionMetrics.memoryUsed}MB
+            </div>
+          )}
         </div>
-
-        {/* Output Console */}
-        <div className="h-48 border-t border-gray-800/50 bg-[#0B0B1A] flex flex-col shrink-0">
-          <div className="bg-[#13132B] px-4 py-2 flex items-center gap-2 border-b border-gray-800/30">
-            <Terminal className="w-4 h-4 text-green-400" />
-            <span className="text-gray-300">Console Output</span>
-            {executionMetrics && (
-              <span className="ml-auto text-gray-400 text-sm">
-                ⚡ {executionMetrics.execution_time_formatted} | 💾 {executionMetrics.peak_memory_formatted}
-              </span>
-            )}
-          </div>
-          <div ref={outputRef} className="flex-1 overflow-auto">
-            <pre className="p-4 text-gray-300 font-mono text-sm whitespace-pre-wrap">
-              {output || 'Click "Run Code" to see output...'}
-            </pre>
-          </div>
-
-          {/* Input Field */}
-          {isRunning && (
-            <form onSubmit={handleInput} className="border-t border-gray-800/30 bg-[#13132B] p-2 flex gap-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type input and press Enter..."
-                className="flex-1 bg-[#0B0B1A] text-gray-300 font-mono px-3 py-2 rounded border border-gray-700 focus:outline-none focus:border-[#6C63FF]"
-                autoFocus
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="bg-[#6C63FF] hover:bg-[#5B52EE] text-white"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
+        <div className="flex-1 p-4 overflow-auto bg-[#0a0a15]">
+          {isRunning && !output && (
+            <div className="text-gray-400 animate-pulse">Running...</div>
+          )}
+          <pre className="text-sm text-gray-300 font-mono whitespace-pre-wrap">
+            {output || 'Output will appear here...'}
+          </pre>
+          {question?.expectedOutput && (
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <p className="text-xs text-gray-500 mb-1">Expected Output:</p>
+              <pre className="text-sm text-gray-400 font-mono">{question.expectedOutput}</pre>
+            </div>
           )}
         </div>
       </div>

@@ -3,8 +3,9 @@ import { ProgressSection } from './components/ProgressSection';
 import { TopicCard } from './components/TopicCard';
 import { Sidebar } from './components/Sidebar';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { javaBookTopics } from '../../../data/javaBookTopics';
+import learningApi from '../../../services/learningApi';
 
 function ChatPopup({ open, onClose }) {
 	if (!open) return null;
@@ -96,9 +97,60 @@ function ChatPopup({ open, onClose }) {
 export default function LearningDashboard() {
 	const navigate = useNavigate();
 	const [chatOpen, setChatOpen] = useState(false);
+	const [chaptersProgress, setChaptersProgress] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [topics, setTopics] = useState(javaBookTopics);
 	const toggleChat = () => setChatOpen((v) => !v);
 
-	const handleTopicAction = (topic) => {
+	// Fetch user's chapter progress on mount
+	useEffect(() => {
+		const fetchProgress = async () => {
+			try {
+				setLoading(true);
+				const response = await learningApi.getChaptersProgress();
+				
+				if (response.success && response.chapters) {
+					setChaptersProgress(response.chapters);
+					
+					// Merge progress data with static topic data
+					const updatedTopics = javaBookTopics.map(topic => {
+						const chapterProgress = response.chapters.find(
+							ch => ch.chapterId === topic.chapter
+						);
+						
+						if (chapterProgress) {
+							return {
+								...topic,
+								status: chapterProgress.status,
+								locked: chapterProgress.status === 'locked',
+							};
+						}
+						return topic;
+					});
+					
+					setTopics(updatedTopics);
+				}
+			} catch (error) {
+				console.error('Error fetching progress:', error);
+				// Use default topics if fetch fails
+				setTopics(javaBookTopics);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchProgress();
+	}, []);
+
+	const handleTopicAction = async (topic) => {
+		// Start chapter if not already started
+		if (topic.status === 'not-started') {
+			try {
+				await learningApi.startChapter(topic.chapter);
+			} catch (error) {
+				console.error('Error starting chapter:', error);
+			}
+		}
 		navigate(`/student/learning?topic=${topic.id}`);
 	};
 
@@ -121,16 +173,23 @@ export default function LearningDashboard() {
 						</div>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-							{javaBookTopics.map((topic) => (
-								<div key={topic.id} className="h-full">
-									<TopicCard
-										topic={topic}
-										onActionClick={() => {
-											handleTopicAction(topic);
-										}}
-									/>
+							{loading ? (
+								<div className="col-span-3 text-center py-8">
+									<div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+									<p className="text-gray-400">Loading your progress...</p>
 								</div>
-							))}
+							) : (
+								topics.map((topic) => (
+									<div key={topic.id} className="h-full">
+										<TopicCard
+											topic={topic}
+											onActionClick={() => {
+												handleTopicAction(topic);
+											}}
+										/>
+									</div>
+								))
+							)}
 						</div>
 					</section>
 				</main>

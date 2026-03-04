@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from vector import get_relevant_context, load_existing_vector_store
 from question_generator import QuestionGenerator
-from config import GROQ_API_KEY
+from config import GROQ_API_KEY, MISTRAL_API_KEY
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173", "http://localhost:3000"])
@@ -750,97 +750,368 @@ def format_topic_content(raw_content, topic_info):
     return format_content_basic(cleaned, topic_info)
 
 
+def get_topic_constraints(topic_id, topic_title):
+    """Get what concepts are allowed and NOT allowed for each topic"""
+    
+    # Define concept progression - what's allowed at each stage
+    constraints = {
+        # Chapter 1 - Introduction
+        "1-1": {
+            "allowed": ["overview", "objectives", "what you will learn"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods", "variables"],
+            "focus": "Just introduce what computers and programming are about"
+        },
+        "1-2": {
+            "allowed": ["hardware", "CPU", "memory", "storage", "input/output devices"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods", "Java code"],
+            "focus": "Explain computer hardware components only"
+        },
+        "1-3": {
+            "allowed": ["programming languages", "machine language", "assembly", "high-level", "compiler", "interpreter"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods"],
+            "focus": "Explain types of programming languages"
+        },
+        "1-4": {
+            "allowed": ["operating system", "Windows", "Linux", "Mac", "resource management"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods", "Java code"],
+            "focus": "Explain operating systems"
+        },
+        "1-5": {
+            "allowed": ["Java history", "Sun Microsystems", "James Gosling", "web", "platform independence"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods"],
+            "focus": "Java history and evolution"
+        },
+        "1-6": {
+            "allowed": ["JDK", "API", "IDE", "Eclipse", "NetBeans", "development tools"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays"],
+            "focus": "Java development tools and environment"
+        },
+        "1-7": {
+            "allowed": ["Hello World", "class", "main method", "public static void main", "System.out.println", "print statement"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "multiple methods", "variables beyond simple strings"],
+            "focus": "ONLY basic Hello World program with print statements. NO user input!"
+        },
+        "1-8": {
+            "allowed": ["compile", "javac", "java command", "bytecode", "JVM", "run program"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays"],
+            "focus": "How to compile and run Java programs"
+        },
+        "1-9": {
+            "allowed": ["comments", "naming conventions", "indentation", "documentation", "code style"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays"],
+            "focus": "Programming style and documentation"
+        },
+        "1-10": {
+            "allowed": ["syntax errors", "runtime errors", "logic errors", "debugging", "error messages"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays"],
+            "focus": "Types of programming errors"
+        },
+        # Chapter 2 - Elementary Programming
+        "2-1": {
+            "allowed": ["elementary programming", "basics", "introduction"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Introduction to elementary programming"
+        },
+        "2-2": {
+            "allowed": ["simple program", "compute area", "basic calculation", "System.out.println"],
+            "not_allowed": ["Scanner", "user input", "if-else", "loops", "arrays", "methods"],
+            "focus": "Writing simple programs with basic calculations"
+        },
+        "2-3": {
+            "allowed": ["Scanner", "user input", "console input", "nextInt", "nextDouble", "nextLine", "keyboard input"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Reading user input with Scanner"
+        },
+        "2-4": {
+            "allowed": ["identifiers", "naming rules", "valid names", "invalid names"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Rules for naming identifiers"
+        },
+        "2-5": {
+            "allowed": ["variables", "declare", "assign", "int", "double", "data types"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Declaring and using variables"
+        },
+        "2-6": {
+            "allowed": ["assignment statement", "assignment expression", "=", "assign values"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Assignment statements"
+        },
+        "2-7": {
+            "allowed": ["final", "constant", "named constant", "PI", "unchanging value"],
+            "not_allowed": ["if-else", "loops", "arrays", "methods"],
+            "focus": "Named constants with final keyword"
+        },
+        "2-8": {
+            "allowed": ["camelCase", "naming convention", "class names", "variable names", "method names"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Java naming conventions"
+        },
+        "2-9": {
+            "allowed": ["int", "double", "float", "long", "byte", "short", "arithmetic", "+", "-", "*", "/", "%"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Numeric data types and arithmetic operations"
+        },
+        "2-10": {
+            "allowed": ["literal", "integer literal", "decimal", "floating-point", "scientific notation"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "How to write numeric literals"
+        },
+        "2-11": {
+            "allowed": ["expression", "operator precedence", "order of operations", "parentheses"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Expression evaluation and precedence"
+        },
+        "2-12": {
+            "allowed": ["+=", "-=", "*=", "/=", "%=", "augmented assignment", "shorthand"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Augmented assignment operators"
+        },
+        "2-13": {
+            "allowed": ["++", "--", "increment", "decrement", "prefix", "postfix"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Increment and decrement operators"
+        },
+        "2-14": {
+            "allowed": ["type casting", "widening", "narrowing", "(int)", "(double)", "convert"],
+            "not_allowed": ["if-else", "loops", "arrays"],
+            "focus": "Type casting and conversion"
+        },
+        # Chapter 3 - Selections
+        "3-1": {
+            "allowed": ["selection", "decision", "control flow", "introduction"],
+            "not_allowed": ["loops", "arrays", "methods"],
+            "focus": "Introduction to selection statements"
+        },
+        "3-2": {
+            "allowed": ["boolean", "true", "false", "comparison", "==", "!=", "<", ">", "<=", ">="],
+            "not_allowed": ["loops", "arrays", "methods"],
+            "focus": "Boolean data type and comparisons"
+        },
+        "3-3": {
+            "allowed": ["if", "if statement", "condition", "one-way selection"],
+            "not_allowed": ["loops", "arrays", "methods", "else if"],
+            "focus": "Simple if statements"
+        },
+        "3-4": {
+            "allowed": ["if", "else", "if-else", "two-way selection", "alternative"],
+            "not_allowed": ["loops", "arrays", "else if chain"],
+            "focus": "if-else statements"
+        },
+        "3-5": {
+            "allowed": ["nested if", "else if", "multi-way", "multiple conditions"],
+            "not_allowed": ["loops", "arrays"],
+            "focus": "Nested and multi-way if-else"
+        },
+        # Chapter 5 - Loops
+        "5-1": {
+            "allowed": ["loops", "iteration", "repeat", "introduction"],
+            "not_allowed": ["arrays", "methods"],
+            "focus": "Introduction to loops"
+        },
+        "5-2": {
+            "allowed": ["while", "while loop", "condition", "iteration"],
+            "not_allowed": ["arrays", "for loop", "do-while"],
+            "focus": "while loop"
+        },
+        "5-3": {
+            "allowed": ["do-while", "do while loop", "execute once"],
+            "not_allowed": ["arrays", "for loop"],
+            "focus": "do-while loop"
+        },
+        "5-4": {
+            "allowed": ["for", "for loop", "counter", "initialization", "increment"],
+            "not_allowed": ["arrays"],
+            "focus": "for loop"
+        },
+    }
+    
+    # Default constraints for topics not explicitly defined
+    default = {
+        "allowed": ["concepts from this topic only"],
+        "not_allowed": ["concepts from future chapters"],
+        "focus": f"Stay focused on {topic_title}"
+    }
+    
+    return constraints.get(topic_id, default)
+
+
 def format_content_with_ai(raw_content, topic_info):
-    """Use AI to organize and structure the raw book content"""
-    from langchain_groq import ChatGroq
+    """Use Mistral AI to organize and structure the raw book content into attractive learning material"""
+    from mistralai import Mistral
     import json
     
-    model = ChatGroq(
-        model="llama-3.3-70b-versatile",
-        groq_api_key=GROQ_API_KEY,
-        temperature=0.3,
-        max_tokens=8192
-    )
+    # Initialize Mistral client
+    client = Mistral(api_key=MISTRAL_API_KEY)
     
-    prompt = f"""You are an expert educational content writer. Your job is to take messy, raw textbook excerpts and rewrite them into clean, professional learning content.
+    # Get topic constraints
+    topic_id = topic_info.get('id', '')
+    topic_title = topic_info.get('title', 'Unknown Topic')
+    constraints = get_topic_constraints(topic_id, topic_title)
+    
+    allowed_concepts = ', '.join(constraints['allowed'])
+    not_allowed_concepts = ', '.join(constraints['not_allowed'])
+    topic_focus = constraints['focus']
+    
+    prompt = f"""You are an expert educational content designer. Transform raw textbook content into engaging learning material.
 
-TOPIC: {topic_info.get('title', 'Unknown Topic')}
-TOPIC DESCRIPTION: {topic_info.get('description', '')}
+📚 TOPIC: {topic_title}
+📝 DESCRIPTION: {topic_info.get('description', '')}
+🎯 TOPIC ID: {topic_id}
 
-RAW TEXTBOOK CONTENT (contains PDF artifacts, broken formatting, listing references, etc.):
+⚠️ CRITICAL TOPIC RESTRICTIONS - READ CAREFULLY:
+✅ ONLY USE THESE CONCEPTS: {allowed_concepts}
+❌ DO NOT USE THESE CONCEPTS (they are taught LATER): {not_allowed_concepts}
+🎯 FOCUS: {topic_focus}
+
+This is a sequential learning curriculum. Students have NOT learned concepts that come later.
+If this topic is about "Simple Java Program" or "Hello World", you can ONLY use:
+- System.out.println() for output
+- Basic class structure
+- main method
+- NO Scanner, NO user input, NO if-else, NO loops, NO arrays!
+
+RAW TEXTBOOK CONTENT:
 ---
-{raw_content[:8000]}
+{raw_content[:6000]}
 ---
 
-YOUR TASK: Completely REWRITE this content as professional learning material. DO NOT copy the messy text - extract the knowledge and present it clearly.
-
-OUTPUT FORMAT - Return ONLY this JSON array:
+📋 OUTPUT FORMAT - Return ONLY this JSON array:
 [
   {{
-    "title": "Introduction to {topic_info.get('title', 'the Topic')}",
-    "content": "Write 2-3 clear paragraphs introducing this topic. Explain what it is, why it's important, and what students will learn. Write in your own words - do not copy raw text.",
+    "title": "🎯 What You'll Learn",
+    "content": "Write 2-3 engaging paragraphs introducing THIS specific topic. Why is {topic_title} important?",
     "type": "introduction"
   }},
   {{
-    "title": "Understanding the Concepts",
-    "content": "Write a detailed explanation of the core concepts. Break down each concept clearly. Use simple language. Explain step by step. This should be 3-4 well-written paragraphs.",
+    "title": "💡 Understanding the Concept",
+    "content": "Explain {topic_title} using simple language. Use real-world analogies. Stay STRICTLY within the allowed concepts. 3-4 paragraphs.",
     "type": "explanation"
   }},
   {{
-    "title": "Code Examples",
-    "content": "Here are practical examples demonstrating the concepts:",
-    "type": "code",
-    "examples": [
-      "// Write clean, complete, working Java code example 1\\npublic class Example1 {{\\n    public static void main(String[] args) {{\\n        // Your code here\\n    }}\\n}}",
-      "// Write clean, complete, working Java code example 2 if applicable"
+    "title": "⚡ Key Points to Remember",
+    "content": "",
+    "type": "keypoints",
+    "points": [
+      "**Key Point 1**: Explanation relevant to {topic_title}",
+      "**Key Point 2**: Another important concept",
+      "**Key Point 3**: Common pattern or rule",
+      "**Key Point 4**: What students often forget",
+      "**Key Point 5**: Pro tip for this topic"
     ]
   }},
   {{
-    "title": "Tips and Best Practices",
-    "content": "Write 2-3 paragraphs about important tips, common mistakes to avoid, and best practices for this topic.",
-    "type": "details"
+    "title": "🖥️ Code in Action",
+    "content": "Examples demonstrating {topic_title}:",
+    "type": "code",
+    "examples": [
+      "// Example showing ONLY {topic_title} concepts\\n// NO concepts from the not-allowed list!\\npublic class Example {{\\n    public static void main(String[] args) {{\\n        // Code using ONLY allowed concepts\\n    }}\\n}}"
+    ]
   }},
   {{
-    "title": "Key Takeaways",
+    "title": "🔥 Pro Tips & Common Mistakes",
+    "content": "Tips and mistakes specific to {topic_title}. No advanced concepts!",
+    "type": "tips"
+  }},
+  {{
+    "title": "🧪 Try It Yourself",
+    "content": "Simple challenges using ONLY {topic_title} concepts. NO Scanner, NO input if not allowed!",
+    "type": "practice"
+  }},
+  {{
+    "title": "📝 Quick Summary",
     "content": "",
     "type": "summary",
     "points": [
-      "First key point - a clear, memorable takeaway",
-      "Second key point - another important concept",
-      "Third key point - practical advice",
-      "Fourth key point - what to remember",
-      "Fifth key point - how to apply this knowledge"
+      "Summary of {topic_title}",
+      "Most important rule",
+      "When to use this",
+      "What comes next"
     ]
   }}
 ]
 
-CRITICAL RULES:
-1. DO NOT copy messy text - REWRITE everything professionally
-2. Remove ALL: page numbers, "LISTING 1.1", "VideoNote", "Figure X.X", line number references, PDF artifacts
-3. Write ORIGINAL explanations based on the concepts - don't paste raw book text
-4. Code examples must be CLEAN, COMPLETE, and RUNNABLE - no "line numbers are for reference"
-5. Each content section needs 2-4 substantial paragraphs of CLEAN text
-6. Summary points should be concise single sentences
-7. Output ONLY valid JSON - no markdown, no explanation before/after
+🚨 ABSOLUTE RULES:
+1. Stay STRICTLY within allowed concepts for topic {topic_id}
+2. DO NOT include: {not_allowed_concepts}
+3. Code examples must ONLY use allowed concepts
+4. Practice challenges must be solvable with ONLY what's been taught
+5. If topic is about printing/Hello World - NO Scanner, NO user input!
+6. Output ONLY valid JSON - no markdown wrapper
 
-Generate the clean, professional learning content:"""
+Generate topic-appropriate content NOW:"""
 
     try:
-        print(f"   🤖 Sending to AI for content organization...")
-        response = model.invoke(prompt)
-        response_text = response.content.strip()
+        print(f"   🤖 Sending to Mistral AI for content organization...")
+        
+        # Call Mistral API
+        chat_response = client.chat.complete(
+            model="mistral-large-latest",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4,
+            max_tokens=8192
+        )
+        
+        response_text = chat_response.choices[0].message.content.strip()
+        
+        # Remove markdown code block wrapper if present
+        response_text = re.sub(r'^```json\s*\n?', '', response_text)
+        response_text = re.sub(r'^```\s*\n?', '', response_text)
+        response_text = re.sub(r'\n?\s*```$', '', response_text)
         
         # Extract JSON from response
         json_match = re.search(r'\[[\s\S]*\]', response_text)
         if json_match:
             json_str = json_match.group()
-            # Fix common JSON issues
-            json_str = json_str.replace('\n', '\\n').replace('\t', '\\t')
-            json_str = re.sub(r'\\n\\n+', '\\n\\n', json_str)
-            # Re-parse properly
-            json_str = json_match.group()
             
-            sections = json.loads(json_str)
+            # Fix control characters in JSON - robust approach
+            def fix_json_control_chars(s):
+                """Escape control characters inside JSON string values"""
+                result = []
+                in_string = False
+                i = 0
+                while i < len(s):
+                    char = s[i]
+                    
+                    # Track if we're inside a JSON string
+                    if char == '"':
+                        # Check if this quote is escaped
+                        num_backslashes = 0
+                        j = i - 1
+                        while j >= 0 and s[j] == '\\':
+                            num_backslashes += 1
+                            j -= 1
+                        # Quote is escaped if preceded by odd number of backslashes
+                        if num_backslashes % 2 == 0:
+                            in_string = not in_string
+                        result.append(char)
+                    elif in_string and ord(char) < 32:
+                        # Control character inside string - escape it
+                        if char == '\n':
+                            result.append('\\n')
+                        elif char == '\r':
+                            result.append('\\r')
+                        elif char == '\t':
+                            result.append('\\t')
+                        else:
+                            # Other control chars - use unicode escape
+                            result.append(f'\\u{ord(char):04x}')
+                    else:
+                        result.append(char)
+                    i += 1
+                return ''.join(result)
+            
+            # Apply the fix
+            fixed_json = fix_json_control_chars(json_str)
+            
+            try:
+                sections = json.loads(fixed_json)
+            except json.JSONDecodeError as e:
+                print(f"   ⚠️ JSON parse failed after fix: {e}")
+                print(f"   Response preview: {fixed_json[:800]}...")
+                return None
             
             # Validate sections
             if isinstance(sections, list) and len(sections) >= 3:
@@ -865,19 +1136,15 @@ Generate the clean, professional learning content:"""
                         validated_sections.append(section)
                 
                 if len(validated_sections) >= 3:
-                    print(f"   ✅ AI generated {len(validated_sections)} clean sections")
+                    print(f"   ✅ Mistral AI generated {len(validated_sections)} engaging sections")
                     return validated_sections
         
-        print(f"   ⚠️ AI response parsing failed")
+        print(f"   ⚠️ AI response parsing failed - no valid JSON found")
         print(f"   Response preview: {response_text[:500]}...")
         return None
         
-    except json.JSONDecodeError as e:
-        print(f"   ⚠️ JSON parsing error: {e}")
-        print(f"   Response preview: {response_text[:500]}...")
-        return None
     except Exception as e:
-        print(f"   ⚠️ AI formatting error: {e}")
+        print(f"   ⚠️ Mistral AI formatting error: {e}")
         import traceback
         traceback.print_exc()
         return None
@@ -1245,22 +1512,36 @@ def extract_key_points(text, keywords):
 
 
 def generate_fallback_content(topic_info):
-    """Generate fallback content when RAG doesn't return relevant results"""
+    """Generate attractive fallback content when RAG doesn't return relevant results"""
+    topic_title = topic_info.get('title', 'this topic')
+    description = topic_info.get('description', 'Key programming concepts')
+    
     return [
         {
-            "title": "Overview",
-            "content": f"This section covers {topic_info.get('title', 'this topic')}. {topic_info.get('description', '')}",
+            "title": "🎯 What You'll Learn",
+            "content": f"Welcome to **{topic_title}**! This is an exciting part of your Java journey.\n\n{description}\n\nBy the end of this section, you'll have a solid understanding of these concepts and be ready to apply them in your own programs. Let's dive in!",
             "type": "introduction"
         },
         {
-            "title": "Learning Objectives",
-            "content": f"In this section, you will learn:\n\n• {topic_info.get('description', 'Key concepts')}\n• Understanding the fundamental principles\n• How to apply these concepts in Java programming",
-            "type": "objectives"
+            "title": "💡 Understanding the Concept",
+            "content": f"**{topic_title}** is a fundamental concept in Java programming.\n\nThink of it this way: every great program is built from small, understandable pieces. This topic teaches you one of those essential building blocks.\n\nAs you learn, remember that practice makes perfect. Don't worry if it doesn't click immediately - that's completely normal!",
+            "type": "explanation"
         },
         {
-            "title": "Content Loading",
-            "content": "This is the learning content for topic " + topic_info.get('id', '') + ". The RAG system will provide detailed content from the Java textbook once it's running.",
-            "type": "explanation"
+            "title": "⚡ Key Points",
+            "content": "",
+            "type": "keypoints", 
+            "points": [
+                f"**Core Concept**: {description}",
+                "**Why It Matters**: This is foundational for more advanced topics",
+                "**Practice Tip**: Try writing code examples yourself",
+                "**Common Use**: You'll use this frequently in real programs"
+            ]
+        },
+        {
+            "title": "🧪 Try It Yourself",
+            "content": "Ready to practice? Try modifying the examples above and see what happens!\n\n**Quick Challenge**: Write your own version of the code examples. Change some values and observe the output.\n\n*Remember: Making mistakes is part of learning. Each error teaches you something new!*",
+            "type": "practice"
         }
     ]
 

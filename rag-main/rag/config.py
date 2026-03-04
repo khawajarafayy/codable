@@ -15,6 +15,9 @@ USERS_COLLECTION = "users"
 # Groq API Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# Mistral API Configuration
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
 # Application Settings
 MAX_QUESTIONS_PER_REQUEST = 10
 DEFAULT_QUESTIONS_COUNT = 5

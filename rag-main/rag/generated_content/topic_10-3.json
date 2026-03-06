@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "10-3",
+    "title": "Thinking in Objects",
+    "description": "Designing with objects in mind",
+    "chapter_id": 10,
+    "chapter_title": "Object-Oriented Thinking"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "14 min",
+    "nextTopicId": "10-4"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Thinking in objects is like seeing the world as LEGO blocks - everything fits together! You'll learn how to design programs by modeling real-world things as objects.\n\n• How to break problems into objects\n• Why objects make code more organized\n• How to design classes that work together",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're building a car. Instead of thinking about every single bolt and wire, you think about the big pieces: engine, wheels, seats. That's object-oriented thinking!\n\nObjects are like those car parts - they bundle data (like size, color) with actions (like drive, brake).\n\n• **Objects** = Things that exist (a specific car, a bank account)\n• **Classes** = Blueprints for objects (the design of a car model)\n• **Methods** = What objects can do (accelerate, withdraw money)\n\nFor example, a `Dog` class might have:\n• Data: name, breed, age\n• Actions: bark(), eat(), sleep()",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Thinking in Objects works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Identify the Objects",
+          "description": "Look at the problem. What real-world things are involved? For a library system, you might see: Books, Members, Librarians.",
+          "code": "// Potential classes\nclass Book { }\nclass Member { }\nclass Librarian { }"
+        },
+        {
+          "step": 2,
+          "title": "Define Their Properties",
+          "description": "What data does each object need? Books need titles, Members need names, etc.",
+          "code": "class Book {\n  String title;\n  String author;\n  boolean isCheckedOut;\n}"
+        },
+        {
+          "step": 3,
+          "title": "Add Behaviors",
+          "description": "What can each object do? Books can be checked out, Members can borrow books.",
+          "code": "class Book {\n  void checkOut() {\n    isCheckedOut = true;\n  }\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Objects combine data + actions (like a car has wheels + can drive)",
+        "✓ Classes are templates, objects are actual instances (like cookie cutter vs cookies)",
+        "✓ Good objects model real-world things naturally",
+        "✓ Objects interact by calling each other's methods",
+        "✓ Start design by identifying nouns (objects) and verbs (methods)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Start with real-world analogies",
+        "Keep objects focused on one purpose",
+        "Name classes clearly (e.g., `BankAccount` not `AccountThing`)"
+      ],
+      "donts": [
+        "Don't make objects do too much (like a Swiss Army knife)",
+        "Don't expose internal data directly",
+        "Don't create classes for things that aren't real objects"
+      ],
+      "protip": "If you can say 'a [class name] can [method name]', it's probably well-designed!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Thinking in Objects used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "E-commerce Systems",
+          "how": "Products, Carts, and Users are all objects that interact (e.g., a Cart object holds Product objects)"
+        },
+        {
+          "app": "Video Games",
+          "how": "Characters, weapons, and levels are objects with properties (health, damage) and actions (attack, move)"
+        },
+        {
+          "app": "Banking Apps",
+          "how": "Accounts, Transactions, and Customers are objects with methods like deposit() and withdraw()"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Design a simple `Student` class for a school system. A student should have:\n• Name and ID\n• Ability to enroll in courses\n• Track their grades",
+        "starterCode": "// Start with this template\nclass Student {\n  // Add properties here\n  \n  // Add methods here\n}",
+        "hints": [
+          "What data does a student need? (name, id, list of courses)",
+          "What actions can a student take? (enroll, get grades)",
+          "How would you store multiple courses?"
+        ],
+        "solution": "// Solution\nclass Student {\n  String name;\n  int id;\n  String[] courses = new String[5];\n  int[] grades = new int[5];\n  int courseCount = 0;\n  \n  void enroll(String course) {\n    courses[courseCount] = course;\n    courseCount++;\n  }\n  \n  void setGrade(String course, int grade) {\n    for (int i = 0; i < courseCount; i++) {\n      if (courses[i].equals(course)) {\n        grades[i] = grade;\n      }\n    }\n  }\n}",
+        "explanation": "This solution models a student with basic properties and methods. The `enroll()` method adds courses, and `setGrade()` updates grades. In real apps, you'd use more advanced data structures!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Objects = data + actions bundled together",
+        "📌 Design starts with identifying real-world things",
+        "📌 Practice by modeling everyday objects (phones, pets, etc.)",
+        "📌 Ready to learn about class relationships next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:49:49.756452",
+  "_topic_id": "10-3"
+}

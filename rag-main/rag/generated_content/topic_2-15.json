@@ -1,0 +1,142 @@
+{
+  "topic": {
+    "id": "2-15",
+    "title": "Software Development Process",
+    "description": "Steps in developing software programs",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "6 min",
+    "nextTopicId": "2-16"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever wondered how your favorite apps are made? Software development isn't just coding - it's a step-by-step journey!\n\n• The 7 key stages of building software\n• How to turn ideas into working programs\n• Why going back to fix things is totally normal",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine building a treehouse. You wouldn't just start hammering wood together! First you'd:\n\n• Ask your friends what features they want (a slide? a trapdoor?)\n• Sketch a blueprint\n• Gather materials\n• Build it piece by piece\n• Test if it's safe\n• Let everyone use it\n• Fix any wobbly parts later\n\nSoftware development works the same way! Here's how it breaks down:\n\n• **Requirements**: Like asking your friends what they want in the treehouse. What should the software do?\n• **Analysis**: Figuring out what materials (data) you need. What goes in? What comes out?\n• **Design**: Drawing the blueprint. How will all the pieces fit together?\n\nEach stage builds on the last, but sometimes you need to go back and fix things - just like realizing you need stronger wood after testing the treehouse!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Let's build a loan calculator app together - step by step!",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "📝 Requirements",
+          "description": "We talk to users and discover they need to calculate monthly loan payments. They want to enter:",
+          "code": "// Requirements document\n- Interest rate\n- Loan amount\n- Number of years"
+        },
+        {
+          "step": 2,
+          "title": "🔍 Analysis",
+          "description": "We figure out what we need to make this work. The output is monthly payment, so we need:",
+          "code": "// Input → Process → Output\n// Input: rate, amount, years\n// Output: monthlyPayment"
+        },
+        {
+          "step": 3,
+          "title": "🎨 Design",
+          "description": "We sketch how the program will work. We'll use a simple formula:",
+          "code": "// Formula: monthlyPayment = (loanAmount * monthlyRate) /\n// (1 - (1 + monthlyRate)^(-numberOfPayments))"
+        },
+        {
+          "step": 4,
+          "title": "💻 Implementation",
+          "description": "Now we write the actual code in Java:",
+          "code": "public class LoanCalculator {\n  public static void main(String[] args) {\n    Scanner input = new Scanner(System.in);\n    System.out.print(\"Enter interest rate: \");\n    double rate = input.nextDouble();\n    // ... more code to calculate payment\n  }\n}"
+        },
+        {
+          "step": 5,
+          "title": "🧪 Testing",
+          "description": "We test with sample values to make sure it works:",
+          "code": "// Test case: $100,000 loan, 5% interest, 30 years\n// Expected: ~$536.82/month\n// Actual output: $536.82 ✅"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Software development has 7 main stages - not just coding!",
+        "✓ Requirements come first - always know what you're building",
+        "✓ IPO: Input → Process → Output is the core of every program",
+        "✓ Testing catches bugs before users see them",
+        "✓ It's okay to go back and fix things - that's normal!"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Talk to users early - don't assume what they want",
+        "Break big problems into small pieces",
+        "Test as you go - don't wait until the end"
+      ],
+      "donts": [
+        "Don't skip the design phase - it saves time later",
+        "Don't ignore requirements - they're your roadmap",
+        "Don't be afraid to go back and fix things"
+      ],
+      "protip": "The best developers spend 50% of their time on requirements and design - not just coding!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where you see this in action:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Mobile Banking Apps",
+          "how": "Uses requirements gathering to understand what features users need (transfers, bill pay), then designs secure systems before coding"
+        },
+        {
+          "app": "Video Games",
+          "how": "Game designers create storyboards (requirements), level designers create maps (design), then programmers implement the game mechanics"
+        },
+        {
+          "app": "E-commerce Websites",
+          "how": "Analyze customer shopping patterns (analysis), design checkout flows (design), then implement payment systems (implementation)"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Let's build a simple tip calculator together!",
+      "type": "practice",
+      "problem": {
+        "description": "Create a program that calculates a 15% tip on a restaurant bill. The user should enter the bill amount, and the program should display the tip amount and total bill.",
+        "starterCode": "// Tip Calculator Starter\nimport java.util.Scanner;\n\npublic class TipCalculator {\n  public static void main(String[] args) {\n    Scanner input = new Scanner(System.in);\n    System.out.print(\"Enter bill amount: $\");\n    // Your code here\n  }\n}",
+        "hints": [
+          "Remember: tip = billAmount * 0.15",
+          "Total = billAmount + tip",
+          "Use System.out.println() to display results"
+        ],
+        "solution": "// Complete Solution\nimport java.util.Scanner;\n\npublic class TipCalculator {\n  public static void main(String[] args) {\n    Scanner input = new Scanner(System.in);\n    System.out.print(\"Enter bill amount: $\");\n    double bill = input.nextDouble();\n    \n    double tip = bill * 0.15;\n    double total = bill + tip;\n    \n    System.out.printf(\"Tip: $%.2f\\n\", tip);\n    System.out.printf(\"Total: $%.2f\", total);\n  }\n}",
+        "explanation": "We first get the bill amount from the user. Then we calculate 15% of that amount for the tip. Finally, we add them together for the total. The printf method helps format the output to 2 decimal places."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Software development is a step-by-step process - not just coding!",
+        "📌 Always start with requirements - know what you're building",
+        "📌 Break problems into small pieces (IPO: Input → Process → Output)",
+        "📌 Test early and often - catch bugs before users do",
+        "📌 You're ready to build your first complete program!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:10:14.047894",
+  "_topic_id": "2-15"
+}

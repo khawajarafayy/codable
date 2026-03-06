@@ -1,0 +1,139 @@
+{
+  "topic": {
+    "id": "10-7",
+    "title": "The String Class Methods",
+    "description": "String methods and operations",
+    "chapter_id": 10,
+    "chapter_title": "Object-Oriented Thinking"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "15 min",
+    "nextTopicId": "10-8"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Strings are everywhere in programming - from user input to file handling. Today, you'll master the essential String class methods that make text manipulation a breeze!\n\n• How to use common String methods like `length()`, `charAt()`, and `substring()`\n• The magic of string concatenation and comparison\n• Practical ways to transform and search strings",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine strings as a row of connected train cars. Each car holds one character, and you can:\n- Count how many cars there are (length)\n- Peek inside any car (charAt)\n- Take a segment of cars (substring)\n\nStrings in Java are objects with powerful built-in tools (methods) to work with text. Unlike primitive types, they come with their own set of superpowers!\n\n• **Immutable**: Once created, strings can't be changed (but you can create new ones)\n• **Zero-indexed**: First character is at position 0, not 1\n• **Method-rich**: Over 50 useful methods available at your fingertips",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how String methods work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Creating a String",
+          "description": "When you create a string, Java stores it in memory with each character at a specific index.",
+          "code": "String greeting = \"Hello, World!\";"
+        },
+        {
+          "step": 2,
+          "title": "Accessing Characters",
+          "description": "Use `charAt()` to peek at any character like opening a specific train car.",
+          "code": "char firstChar = greeting.charAt(0); // Returns 'H'"
+        },
+        {
+          "step": 3,
+          "title": "Extracting Substrings",
+          "description": "Use `substring()` to take a segment of the string, like cutting a section of train cars.",
+          "code": "String sub = greeting.substring(7, 12); // Returns \"World\""
+        },
+        {
+          "step": 4,
+          "title": "String Length",
+          "description": "Count all characters with `length()`, like counting all train cars.",
+          "code": "int length = greeting.length(); // Returns 13"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Strings are immutable - methods return new strings rather than modifying the original",
+        "✓ Indexes start at 0, not 1 (first character is at position 0)",
+        "✓ `substring()` is inclusive of start index but exclusive of end index",
+        "✓ Always check string length before accessing characters to avoid errors",
+        "✓ Use `equals()` for string comparison, not `==`"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `trim()` to remove unwanted whitespace from user input",
+        "Combine methods like `toLowerCase().contains()` for case-insensitive searches",
+        "Use `String.format()` for complex string building"
+      ],
+      "donts": [
+        "Don't use `==` to compare strings (it compares references, not content)",
+        "Don't forget that `substring()` can throw `IndexOutOfBoundsException`",
+        "Don't create too many string objects in loops (use StringBuilder instead)"
+      ],
+      "protip": "For frequent string modifications, use `StringBuilder` - it's like having a train where you can add/remove cars without building a whole new train!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "String methods are used everywhere in real applications:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Email Validation",
+          "how": "Using `contains(\"@\")` and `endsWith(\".com\")` to check email formats"
+        },
+        {
+          "app": "Search Engines",
+          "how": "Using `toLowerCase()` and `indexOf()` to find keywords in web pages"
+        },
+        {
+          "app": "Password Strength Checkers",
+          "how": "Using `length()`, `matches()` with regex to validate password requirements"
+        },
+        {
+          "app": "Data Parsing",
+          "how": "Using `split()` to break CSV files into individual values"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a method that takes a full name (e.g., \"John Michael Doe\") and returns the initials (e.g., \"JMD\"). The method should:\n1. Handle any number of names\n2. Work with mixed case input\n3. Ignore extra spaces",
+        "starterCode": "public class NameInitials {\n    public static String getInitials(String fullName) {\n        // Your code here\n    }\n    \n    public static void main(String[] args) {\n        System.out.println(getInitials(\"John Michael Doe\")); // Should print \"JMD\"\n    }\n}",
+        "hints": [
+          "Use `split()` to break the name into parts",
+          "Use `charAt(0)` to get the first character of each part",
+          "Use `toUpperCase()` to standardize the output"
+        ],
+        "solution": "public class NameInitials {\n    public static String getInitials(String fullName) {\n        String[] names = fullName.trim().split(\"\\\\s+\");\n        StringBuilder initials = new StringBuilder();\n        \n        for (String name : names) {\n            if (!name.isEmpty()) {\n                initials.append(name.charAt(0));\n            }\n        }\n        \n        return initials.toString().toUpperCase();\n    }\n}",
+        "explanation": "We first trim extra spaces and split the name into parts. Then we take the first character of each part, combine them, and convert to uppercase. The `StringBuilder` efficiently builds our result string."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Strings are objects with powerful built-in methods for text manipulation",
+        "📌 Most important methods: `length()`, `charAt()`, `substring()`, `equals()`, `contains()`",
+        "📌 Practice combining methods for more complex operations",
+        "📌 Ready to learn about `StringBuilder` for more efficient string modifications!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:52:33.687324",
+  "_topic_id": "10-7"
+}

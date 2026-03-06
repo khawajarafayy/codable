@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "9-2",
+    "title": "Defining Classes for Objects",
+    "description": "How to create class definitions",
+    "chapter_id": 9,
+    "chapter_title": "Objects and Classes"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "15 min",
+    "nextTopicId": "9-3"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's dive into how to create your own blueprints for objects in programming! Think of classes as cookie cutters that shape your data.\n\n• How to define a class with properties and behaviors\n• The basic structure of a class definition\n• How to turn classes into usable objects",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're designing a car. Before you build actual cars, you need a blueprint that defines:\n- What features it has (color, model, engine type)\n- What it can do (drive, brake, honk)\n\nA class is exactly that - a blueprint for creating objects!\n\n• **Properties (Fields)**: These are the characteristics (like color, model)\n• **Methods**: These are the actions (like drive(), brake())\n\nHere's the simplest class structure:\n```java\nclass Car {\n    // Fields (properties)\n    String color;\n    String model;\n    \n    // Methods (behaviors)\n    void drive() {\n        System.out.println(\"Vroom vroom!\");\n    }\n}\n```\n\n• The `class` keyword starts the definition\n• Curly braces `{}` contain all the class members\n• Fields store data, methods define behavior",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Defining Classes for Objects works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Define the Blueprint",
+          "description": "Create the class definition that describes what objects will look like",
+          "code": "class Dog {\n    String name;\n    int age;\n    \n    void bark() {\n        System.out.println(\"Woof!\");\n    }\n}"
+        },
+        {
+          "step": 2,
+          "title": "Create Objects",
+          "description": "Use the `new` keyword to create actual objects from the class",
+          "code": "Dog myDog = new Dog();\nmyDog.name = \"Buddy\";\nmyDog.age = 3;"
+        },
+        {
+          "step": 3,
+          "title": "Use the Objects",
+          "description": "Call methods and access properties of the created objects",
+          "code": "System.out.println(myDog.name); // Buddy\nmyDog.bark(); // Woof!"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ A class is a blueprint for creating objects",
+        "✓ Classes contain fields (data) and methods (behavior)",
+        "✓ Use `class ClassName { }` to define a class",
+        "✓ Fields store object state, methods define actions",
+        "✓ Objects are created from classes using `new`"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Start with simple classes to understand the structure",
+        "Name classes with PascalCase (e.g., `Car`, `Student`)",
+        "Keep related properties and methods together"
+      ],
+      "donts": [
+        "Don't put everything in one class - keep them focused",
+        "Don't forget the class keyword when defining",
+        "Don't confuse class definition with object creation"
+      ],
+      "protip": "Think of classes like recipes - they describe how to make something, but aren't the thing itself until you create it!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Defining Classes for Objects used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Social Media Apps",
+          "how": "User classes store profile info and methods for posting, liking, etc."
+        },
+        {
+          "app": "Banking Systems",
+          "how": "Account classes track balances and handle deposits/withdrawals"
+        },
+        {
+          "app": "Game Development",
+          "how": "Character classes define player attributes and actions"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create a `Book` class that represents a book in a library. It should have:\n- Title (String)\n- Author (String)\n- Pages (int)\n- A method `displayInfo()` that prints all book details",
+        "starterCode": "class Book {\n    // Add your fields here\n    \n    // Add your method here\n}",
+        "hints": [
+          "Start by declaring the fields inside the class",
+          "The method should print each field with descriptive text",
+          "Use `System.out.println()` for output"
+        ],
+        "solution": "class Book {\n    String title;\n    String author;\n    int pages;\n    \n    void displayInfo() {\n        System.out.println(\"Title: \" + title);\n        System.out.println(\"Author: \" + author);\n        System.out.println(\"Pages: \" + pages);\n    }\n}",
+        "explanation": "We defined three fields to store book information and a method that prints them in a readable format. This creates a reusable blueprint for book objects!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Classes are blueprints for creating objects",
+        "📌 They contain fields (data) and methods (behavior)",
+        "📌 Practice defining simple classes to master the structure",
+        "📌 You're now ready to create your own object blueprints!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:43:34.087514",
+  "_topic_id": "9-2"
+}

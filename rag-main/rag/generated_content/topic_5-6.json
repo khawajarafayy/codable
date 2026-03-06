@@ -1,0 +1,128 @@
+{
+  "topic": {
+    "id": "5-6",
+    "title": "Nested Loops",
+    "description": "Loops inside loops",
+    "chapter_id": 5,
+    "chapter_title": "Loops"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "9 min",
+    "nextTopicId": "5-7"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Nested loops might sound fancy, but they're just loops inside loops! Think of them like a clock: the hour hand (outer loop) moves slowly, while the minute hand (inner loop) zooms around.\n\n• How to write loops inside other loops\n• Why nested loops are powerful (and when to use them)\n• Common patterns and real-world uses",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a concert with rows of seats. The outer loop counts each row, and the inner loop counts each seat in that row. That's a nested loop!\n\nNested loops let you repeat actions in a grid-like pattern. The outer loop runs once, and the inner loop runs completely for each outer loop iteration.\n\n• Outer loop: Controls the big picture (like rows)\n• Inner loop: Handles the details (like seats in a row)\n• Each inner loop must finish before the outer loop moves forward",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Nested Loops works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Outer Loop Starts",
+          "description": "The outer loop begins with i = 1. The inner loop hasn't started yet.",
+          "code": "for (int i = 1; i <= 3; i++) {"
+        },
+        {
+          "step": 2,
+          "title": "Inner Loop Runs",
+          "description": "For i = 1, the inner loop runs completely (j = 1 to 3). Then i increments to 2.",
+          "code": "  for (int j = 1; j <= 3; j++) {\n    System.out.print(\"(\" + i + \",\" + j + \") \");\n  }"
+        },
+        {
+          "step": 3,
+          "title": "Final Output",
+          "description": "The pattern repeats for i = 2 and i = 3. Result: (1,1) (1,2) (1,3) (2,1) ... (3,3)",
+          "code": "Output: (1,1) (1,2) (1,3) (2,1) (2,2) (2,3) (3,1) (3,2) (3,3)"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Outer loop runs once → inner loop runs completely",
+        "✓ Inner loop is faster (like minute vs. hour hand)",
+        "✓ Total iterations = outer × inner loop iterations",
+        "✓ Great for grids, tables, and multi-dimensional data",
+        "✓ Watch out for infinite loops (always check conditions!)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Name loops clearly (e.g., `rowLoop`, `seatLoop`)",
+        "Keep inner loops simple and fast",
+        "Use for small, predictable iterations"
+      ],
+      "donts": [
+        "Don’t nest too deep (3+ levels gets messy)",
+        "Avoid complex logic in inner loops",
+        "Don’t forget to reset inner loop variables"
+      ],
+      "protip": "Use `break` in inner loops to exit early if needed (e.g., searching a grid)."
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Nested Loops used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Spreadsheets (Excel/Google Sheets)",
+          "how": "Outer loop: rows, Inner loop: columns → fills cells with formulas."
+        },
+        {
+          "app": "Video Games",
+          "how": "Outer loop: game frames, Inner loop: updates all objects per frame."
+        },
+        {
+          "app": "Image Processing",
+          "how": "Outer loop: rows of pixels, Inner loop: columns → edits each pixel."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Print a right-angled triangle of stars (*) with 5 rows. Example:\n*\n**\n***\n****\n*****",
+        "starterCode": "// Hint: Outer loop = rows, Inner loop = stars per row\nfor (int i = 1; i <= 5; i++) {\n  // Your code here\n}",
+        "hints": [
+          "The inner loop runs `i` times for each row.",
+          "Use `System.out.print(\"*\")` inside the inner loop."
+        ],
+        "solution": "for (int i = 1; i <= 5; i++) {\n  for (int j = 1; j <= i; j++) {\n    System.out.print(\"*\");\n  }\n  System.out.println();\n}",
+        "explanation": "Outer loop (i) controls rows. Inner loop (j) prints stars equal to the current row number (i)."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Nested loops = loops inside loops (like a clock’s hands)",
+        "📌 Outer loop: slow, Inner loop: fast and repetitive",
+        "📌 Practice with grids, patterns, and tables",
+        "📌 Ready to tackle 2D arrays next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:29:00.298276",
+  "_topic_id": "5-6"
+}

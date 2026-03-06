@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "9-9",
+    "title": "Passing Objects to Methods",
+    "description": "How objects are passed to methods",
+    "chapter_id": 9,
+    "chapter_title": "Objects and Classes"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "13 min",
+    "nextTopicId": "10-1"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever wondered how objects travel between methods in Java? Let's break it down!\n\n• How Java passes objects to methods (it's not what you think!)\n• The difference between passing objects vs. primitive types\n• How to modify objects inside methods safely",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a library. You don't carry the actual book around - you just show your library card (reference) to access it. That's exactly how Java passes objects!\n\nWhen you pass an object to a method:\n• You're actually passing a *reference* (like a library card) to the object\n• The method can use this reference to interact with the original object\n• Changes made inside the method affect the original object\n\nThis is different from primitive types (like `int` or `double`), which are passed by *value* - like making a photocopy of a page instead of showing your library card.",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Passing Objects to Methods works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Object Creation",
+          "description": "First, we create an object in memory. Think of it like writing a book and placing it on a shelf.",
+          "code": "Person person = new Person(\"Alice\");"
+        },
+        {
+          "step": 2,
+          "title": "Method Call",
+          "description": "When we pass the object to a method, we're actually passing its memory address (reference). The method gets a 'library card' to the original object.",
+          "code": "celebrateBirthday(person);"
+        },
+        {
+          "step": 3,
+          "title": "Method Execution",
+          "description": "The method uses the reference to modify the original object. The changes persist after the method ends!",
+          "code": "public static void celebrateBirthday(Person p) {\n    p.setAge(p.getAge() + 1);\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Objects are passed by *reference* (like a library card)",
+        "✓ Primitives are passed by *value* (like a photocopy)",
+        "✓ Changes to objects inside methods affect the original",
+        "✓ The method can call the object's methods using the reference",
+        "✓ Passing objects is memory-efficient (no copies made)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use clear parameter names to show you're working with objects",
+        "Document if your method modifies the passed object",
+        "Consider making objects immutable if they shouldn't change"
+      ],
+      "donts": [
+        "Don't assume primitives and objects behave the same way",
+        "Don't modify objects unexpectedly (it can cause bugs)",
+        "Don't forget that `null` can be passed as an object reference"
+      ],
+      "protip": "Use `final` for method parameters if you want to prevent reassigning the reference (though the object itself can still be modified!)"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Passing Objects to Methods used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Systems",
+          "how": "When you transfer money, the `Account` objects are passed to transaction methods that modify their balances"
+        },
+        {
+          "app": "Game Development",
+          "how": "Player objects are passed to collision detection methods that update their positions and health"
+        },
+        {
+          "app": "Social Media Apps",
+          "how": "User objects are passed to methods that update profiles, add friends, or post content"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create a `Rectangle` class with width and height fields. Write a method that takes a Rectangle object and doubles its size. Then create a test program that shows the rectangle's dimensions before and after the method call.",
+        "starterCode": "// Rectangle class\npublic class Rectangle {\n    private double width;\n    private double height;\n    \n    public Rectangle(double width, double height) {\n        this.width = width;\n        this.height = height;\n    }\n    \n    // Add getters and setters\n    \n    public String toString() {\n        return \"Rectangle[width=\" + width + \", height=\" + height + \"]\";\n    }\n}\n\n// Test class\npublic class TestRectangle {\n    public static void main(String[] args) {\n        Rectangle myRect = new Rectangle(5, 10);\n        System.out.println(\"Before: \" + myRect);\n        \n        // Call your method here\n        \n        System.out.println(\"After: \" + myRect);\n    }\n    \n    // Add your method here\n}",
+        "hints": [
+          "Remember: the method should modify the original object",
+          "You'll need to use the setters to change the dimensions",
+          "The method should take a Rectangle parameter"
+        ],
+        "solution": "public static void doubleSize(Rectangle rect) {\n    rect.setWidth(rect.getWidth() * 2);\n    rect.setHeight(rect.getHeight() * 2);\n}",
+        "explanation": "The method receives a reference to the original Rectangle object. By calling its setters, we modify the original object's fields. The changes persist after the method ends because we worked with the actual object, not a copy."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Objects are passed by reference - methods work with the original object",
+        "📌 Primitives are passed by value - methods get a copy",
+        "📌 Practice creating and modifying objects through methods",
+        "📌 You're ready to learn about returning objects from methods next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:47:55.934290",
+  "_topic_id": "9-9"
+}

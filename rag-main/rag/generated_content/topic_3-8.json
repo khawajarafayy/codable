@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "3-8",
+    "title": "Logical Operators",
+    "description": "Using AND, OR, and NOT operators",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "9 min",
+    "nextTopicId": "3-9"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Logical operators help you make decisions in code by combining or modifying conditions. Think of them as the 'and', 'or', and 'not' of programming!\n\n• How to use AND (`&&`), OR (`||`), and NOT (`!`) operators\n• Combining conditions to control program flow\n• Avoiding common mistakes with logical operators",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a coffee shop deciding what to order:\n- **AND (`&&`)**: You want coffee **AND** a croissant (both must be true)\n- **OR (`||`)**: You want coffee **OR** tea (either is fine)\n- **NOT (`!`)**: You want **NOT** decaf (invert the condition)\n\nLogical operators work the same way in code! They let you combine boolean conditions (true/false values) to make smarter decisions.\n\n• **AND (`&&`)**: Both conditions must be true\n  Example: `if (age > 18 && hasTicket)` - must be adult AND have ticket\n\n• **OR (`||`)**: Either condition can be true\n  Example: `if (isRaining || isCold)` - bring jacket if either is true\n\n• **NOT (`!`)**: Flips true to false (and vice versa)\n  Example: `if (!isEmpty)` - do something if NOT empty",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Logical Operators works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "AND Operator (`&&`)",
+          "description": "Checks if BOTH conditions are true. If either is false, the whole thing is false.",
+          "code": "boolean isSunny = true;\nboolean hasSunscreen = false;\nif (isSunny && hasSunscreen) {\n    System.out.println(\"Go to beach!\"); // Won't print\n}"
+        },
+        {
+          "step": 2,
+          "title": "OR Operator (`||`)",
+          "description": "Checks if EITHER condition is true. Only false if both are false.",
+          "code": "boolean hasCoffee = true;\nboolean hasTea = false;\nif (hasCoffee || hasTea) {\n    System.out.println(\"Caffeine time!\"); // Will print\n}"
+        },
+        {
+          "step": 3,
+          "title": "NOT Operator (`!`)",
+          "description": "Flips the boolean value. True becomes false, false becomes true.",
+          "code": "boolean isLocked = false;\nif (!isLocked) {\n    System.out.println(\"Door is open!\"); // Will print\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `&&` (AND) needs BOTH conditions to be true",
+        "✓ `||` (OR) needs just ONE condition to be true",
+        "✓ `!` (NOT) flips true ↔ false",
+        "✓ Combine them for complex conditions: `if ((a > b) && !(c == d))`",
+        "✓ Short-circuiting: Java stops checking after first false in `&&` or first true in `||`"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use parentheses to group conditions clearly",
+        "Test each condition separately first",
+        "Remember `&&` has higher precedence than `||`"
+      ],
+      "donts": [
+        "Don't confuse `&&` with `&` (bitwise AND)",
+        "Don't forget `!` flips the entire condition",
+        "Don't write `if (x == true)` - just `if (x)` is cleaner"
+      ],
+      "protip": "Use `!` to simplify negative conditions: `if (!(age < 18))` is the same as `if (age >= 18)`"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Logical Operators used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Login Systems",
+          "how": "Check if username AND password match: `if (usernameCorrect && passwordCorrect)`"
+        },
+        {
+          "app": "E-commerce Filters",
+          "how": "Show products that are in stock OR on sale: `if (inStock || onSale)`"
+        },
+        {
+          "app": "Game Development",
+          "how": "Check if player has key AND is at door: `if (hasKey && atDoor)`"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that checks if a student passes an exam. A student passes if:\n1. They score 50+ on the test OR\n2. They score 40+ AND have perfect attendance\n\nTest with these values: score = 45, attendance = true",
+        "starterCode": "public class ExamPass {\n    public static void main(String[] args) {\n        int score = 45;\n        boolean perfectAttendance = true;\n        \n        // Add your condition here\n        if ( /* your code */ ) {\n            System.out.println(\"Passed!\");\n        } else {\n            System.out.println(\"Failed.\");\n        }\n    }\n}",
+        "hints": [
+          "Combine conditions with `||` and `&&`",
+          "Remember the order of operations - use parentheses!",
+          "Test with different values to verify"
+        ],
+        "solution": "public class ExamPass {\n    public static void main(String[] args) {\n        int score = 45;\n        boolean perfectAttendance = true;\n        \n        if (score >= 50 || (score >= 40 && perfectAttendance)) {\n            System.out.println(\"Passed!\");\n        } else {\n            System.out.println(\"Failed.\");\n        }\n    }\n}",
+        "explanation": "The condition checks if EITHER the score is 50+ OR (score is 40+ AND attendance is perfect). Parentheses ensure the AND is evaluated first."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Logical operators combine boolean conditions to make decisions",
+        "📌 `&&` = AND, `||` = OR, `!` = NOT - remember these symbols!",
+        "📌 Practice combining conditions with parentheses for clarity",
+        "📌 Ready to use these in if-statements and loops next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T03:15:06.214068",
+  "_topic_id": "3-8"
+}

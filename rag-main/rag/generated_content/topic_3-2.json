@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "3-2",
+    "title": "boolean Data Type",
+    "description": "Understanding true/false values",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "9 min",
+    "nextTopicId": "3-3"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's explore the world of true/false values in programming! Booleans are like light switches - they're either ON (true) or OFF (false).\n\n• What boolean data types are and why they matter\n• How to compare values using relational operators\n• Where you'll use booleans in real code",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a traffic light. It's either RED (stop - false) or GREEN (go - true). That's exactly how booleans work in programming!\n\nBooleans are the simplest data type - they can only be:\n• `true` (yes, on, 1)\n• `false` (no, off, 0)\n\nThey're perfect for answering yes/no questions like:\n- Is the user logged in?\n- Is the password correct?\n- Has the game started?",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how boolean comparisons work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Declare a boolean",
+          "description": "Create a variable that can only hold true/false values",
+          "code": "boolean isRaining = true;"
+        },
+        {
+          "step": 2,
+          "title": "Compare numbers",
+          "description": "Use relational operators to compare values - the result is always a boolean",
+          "code": "boolean isAdult = (age >= 18); // true if age is 20"
+        },
+        {
+          "step": 3,
+          "title": "Use in conditions",
+          "description": "Booleans control program flow by making decisions",
+          "code": "if (isRaining) {\n  takeUmbrella();\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Booleans are like light switches - only two states: true/false",
+        "✓ Relational operators (>, <, ==) always return boolean results",
+        "✓ Default boolean value is `false` if not initialized",
+        "✓ Used in conditions to control program flow",
+        "✓ Essential for flags, status checks, and decision making"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use descriptive names like `isEmpty` or `hasPermission`",
+        "Initialize boolean variables when declaring them",
+        "Use `==` for equality comparison (not `=` which is assignment)"
+      ],
+      "donts": [
+        "Don't compare booleans with `== true` - just use the variable",
+        "Don't use numbers instead of booleans (0/1)",
+        "Don't forget that `!` flips the boolean value"
+      ],
+      "protip": "Name your boolean variables as questions: `isReady`, `hasAccess`, `shouldUpdate` - this makes your code read like English!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Booleans are everywhere in real applications! Here's where you'll see them:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Login Systems",
+          "how": "Check if `isLoggedIn` is true before showing user dashboard"
+        },
+        {
+          "app": "E-commerce",
+          "how": "Use `hasDiscount` to apply promotions and `isInStock` to show 'Add to Cart'"
+        },
+        {
+          "app": "Games",
+          "how": "Track `isGameOver`, `hasPowerUp`, or `isJumping` states"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Let's test your boolean skills! Write a program that checks if someone can ride a rollercoaster:",
+      "type": "practice",
+      "problem": {
+        "description": "A person can ride if they are at least 120cm tall AND at least 8 years old. Create variables for height and age, then determine if they can ride.",
+        "starterCode": "// Starter code\nint height = 130; // in cm\nint age = 10;\nboolean canRide;\n\n// Your code here\n\nSystem.out.println(\"Can ride: \" + canRide);",
+        "hints": [
+          "Use the `&&` (AND) operator to combine conditions",
+          "Remember: both conditions must be true",
+          "Try different height/age values to test"
+        ],
+        "solution": "// Solution\nboolean canRide = (height >= 120) && (age >= 8);",
+        "explanation": "We combine two conditions with `&&` (AND). The result is only true when both height is ≥120 AND age is ≥8. This creates a single boolean that answers our question!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Booleans are simple true/false values that power decisions in code",
+        "📌 Relational operators compare values and return booleans",
+        "📌 Practice using them in conditions and flags",
+        "📌 You're ready to learn about if-statements next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:11:50.340904",
+  "_topic_id": "3-2"
+}

@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "2-2",
+    "title": "Writing a Simple Program",
+    "description": "Creating basic Java programs step by step",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "8 min",
+    "nextTopicId": "2-3"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s build your first Java program together! You’ll learn how to turn a simple idea into working code.\n\n• How to structure a basic Java program\n• How to store and use data with variables\n• How to make your program interactive",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you’re baking a cake. 🎂 First, you need a recipe (your program). Then you gather ingredients (data like radius), mix them (calculate area), and finally serve the cake (display the result).\n\nA Java program works the same way:\n• It starts with a class (like a recipe book)\n• Has a main method (the actual recipe)\n• Uses variables to hold data (your ingredients)\n\nHere’s the simplest structure:\n```java\npublic class ComputeArea {\n    public static void main(String[] args) {\n        // Your code goes here\n    }\n}\n```\nThink of `main` as the starting line of a race - this is where your program begins running!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Writing a Simple Program works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Declare Variables",
+          "description": "First, we create containers (variables) to store our data. Like labeling jars for flour and sugar.",
+          "code": "double radius; // Jar for radius\ndouble area;   // Jar for area"
+        },
+        {
+          "step": 2,
+          "title": "Assign Values",
+          "description": "Now we put something in our jars. Here we’re using a fixed radius of 20.",
+          "code": "radius = 20; // Put 20 in the radius jar"
+        },
+        {
+          "step": 3,
+          "title": "Calculate & Display",
+          "description": "We mix our ingredients (calculate area) and show the result. Like baking and serving the cake!",
+          "code": "area = radius * radius * 3.14159;\nSystem.out.println(\"Area is \" + area);"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Every Java program needs a `main` method - it’s the starting point",
+        "✓ Variables are like labeled jars that store data",
+        "✓ `double` is used for decimal numbers (like 3.14)",
+        "✓ `System.out.println()` displays output to the screen",
+        "✓ Always end statements with semicolons (;)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Start with a simple outline before coding",
+        "Use descriptive variable names (like `radius` instead of `r`)",
+        "Add comments to explain your code"
+      ],
+      "donts": [
+        "Don’t forget semicolons at the end of statements",
+        "Don’t use spaces in variable names (use `camelCase` instead)",
+        "Don’t skip testing your program with different inputs"
+      ],
+      "protip": "Always compile and run your program after each small change - it’s easier to find mistakes!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Writing a Simple Program used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Apps",
+          "how": "Calculate interest rates using similar formulas"
+        },
+        {
+          "app": "Fitness Trackers",
+          "how": "Convert steps to calories burned using basic math"
+        },
+        {
+          "app": "Weather Apps",
+          "how": "Convert temperatures between Celsius and Fahrenheit"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that calculates the area of a rectangle. Ask the user for length and width, then display the area.",
+        "starterCode": "// Starter code\nimport java.util.Scanner;\n\npublic class RectangleArea {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        \n        // Your code here\n    }\n}",
+        "hints": [
+          "Declare variables for length and width",
+          "Use input.nextDouble() to get user input",
+          "Area = length * width"
+        ],
+        "solution": "// Solution\nimport java.util.Scanner;\n\npublic class RectangleArea {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        \n        System.out.print(\"Enter length: \");\n        double length = input.nextDouble();\n        \n        System.out.print(\"Enter width: \");\n        double width = input.nextDouble();\n        \n        double area = length * width;\n        System.out.println(\"Area is \" + area);\n    }\n}",
+        "explanation": "We first get the length and width from the user, then multiply them to get the area. The Scanner class helps us read user input."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Java programs start with a class and main method",
+        "📌 Variables store data like containers store ingredients",
+        "📌 Always test your program with different inputs",
+        "📌 You’re ready to make interactive programs next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:01:11.057484",
+  "_topic_id": "2-2"
+}

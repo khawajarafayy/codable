@@ -1,0 +1,131 @@
+{
+  "topic": {
+    "id": "7-3",
+    "title": "Copying Arrays",
+    "description": "How to copy array contents",
+    "chapter_id": 7,
+    "chapter_title": "Single-Dimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "11 min",
+    "nextTopicId": "7-4"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Copying arrays might seem simple, but there are important details to master. Let's break it down!\n\n• How to properly duplicate array contents\n• The difference between shallow and deep copies\n• Common mistakes to avoid when copying arrays",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you have a tray of cookies (your array). If you want to share them with a friend, you might:\n\n• Point to the same tray (this is like copying the reference)\n• Make a new tray with identical cookies (this is a proper copy)\n\nIn Java, arrays are objects, so simply assigning one array to another doesn't create a new copy - it just creates another reference to the same array!\n\n• **Shallow Copy**: Creates a new array but shares the same elements\n• **Deep Copy**: Creates a completely independent copy with new elements\n• **Common Methods**: Using loops, `clone()`, or `System.arraycopy()`",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Copying Arrays works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Original Array",
+          "description": "We start with an array containing values [1, 2, 3]",
+          "code": "int[] original = {1, 2, 3};"
+        },
+        {
+          "step": 2,
+          "title": "Bad Copy (Reference Only)",
+          "description": "This just creates another pointer to the same array - changes affect both!",
+          "code": "int[] badCopy = original;\nbadCopy[0] = 99; // original[0] is now 99 too!"
+        },
+        {
+          "step": 3,
+          "title": "Good Copy (New Array)",
+          "description": "This creates a completely independent copy - changes don't affect the original",
+          "code": "int[] goodCopy = new int[original.length];\nSystem.arraycopy(original, 0, goodCopy, 0, original.length);\ngoodCopy[0] = 99; // original[0] remains 1"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Arrays are objects - assignment copies references, not values",
+        "✓ Use `clone()`, `System.arraycopy()`, or loops for proper copies",
+        "✓ Primitive arrays can use simple copy methods",
+        "✓ Object arrays need special handling (deep copy)",
+        "✓ Always check array lengths match when copying"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `System.arraycopy()` for best performance",
+        "Check array lengths before copying",
+        "Remember to create a new array first",
+        "Test your copies to ensure they're independent"
+      ],
+      "donts": [
+        "Don't use simple assignment (=) to copy arrays",
+        "Don't forget to handle object arrays differently",
+        "Don't assume `clone()` works for all cases",
+        "Don't ignore array bounds when copying"
+      ],
+      "protip": "For object arrays, consider implementing `Cloneable` or using serialization for deep copies"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Copying Arrays used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Image Processing",
+          "how": "Creating backup copies of image data before applying filters"
+        },
+        {
+          "app": "Game Development",
+          "how": "Duplicating game state for undo/redo functionality"
+        },
+        {
+          "app": "Data Analysis",
+          "how": "Preserving original datasets while performing transformations"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a method that takes an array of integers and returns a new independent copy. Then modify the copy and verify the original remains unchanged.",
+        "starterCode": "public class ArrayCopy {\n    public static int[] copyArray(int[] original) {\n        // Your code here\n    }\n    \n    public static void main(String[] args) {\n        int[] original = {1, 2, 3, 4, 5};\n        int[] copy = copyArray(original);\n        // Modify copy and test\n    }\n}",
+        "hints": [
+          "Remember to create a new array first",
+          "Consider using System.arraycopy()",
+          "Test by changing values in the copy"
+        ],
+        "solution": "public static int[] copyArray(int[] original) {\n    int[] copy = new int[original.length];\n    System.arraycopy(original, 0, copy, 0, original.length);\n    return copy;\n}",
+        "explanation": "We create a new array of the same length, then use System.arraycopy() to efficiently copy all elements. This creates a completely independent copy."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Copying arrays requires creating new array objects, not just new references",
+        "📌 Use System.arraycopy() or clone() for primitive arrays",
+        "📌 Practice creating independent copies to avoid bugs",
+        "📌 Ready to learn about passing arrays to methods next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:36:12.632203",
+  "_topic_id": "7-3"
+}

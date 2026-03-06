@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "8-2",
+    "title": "Two-Dimensional Array Basics",
+    "description": "Creating and using 2D arrays",
+    "chapter_id": 8,
+    "chapter_title": "Multidimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "14 min",
+    "nextTopicId": "8-3"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's dive into 2D arrays - they're like spreadsheets for your code! You'll learn how to create and use them like a pro.\n\n• How to declare and initialize 2D arrays\n• Accessing elements with row and column indices\n• Practical ways to use them in real programs",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine a chessboard - that's a perfect real-world example of a 2D array! Each square has a row and column position, just like elements in a 2D array.\n\nA 2D array is simply an array of arrays. Think of it like:\n• A grid with rows and columns\n• A table where you can store data in organized rows\n• A way to represent game boards, images, or spreadsheets\n\nFor example, this creates a 3x3 grid:\n```java\nint[][] grid = new int[3][3];\n```\n• First number = rows (like floors in a building)\n• Second number = columns (like rooms on each floor)",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Two-Dimensional Array Basics works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Declaration",
+          "description": "We create a 2D array with 2 rows and 3 columns",
+          "code": "int[][] matrix = new int[2][3];"
+        },
+        {
+          "step": 2,
+          "title": "Initialization",
+          "description": "We fill the array with values using nested loops",
+          "code": "for(int i=0; i<2; i++) {\n  for(int j=0; j<3; j++) {\n    matrix[i][j] = i + j;\n  }\n}"
+        },
+        {
+          "step": 3,
+          "title": "Accessing Elements",
+          "description": "We can get any value by specifying its row and column",
+          "code": "int value = matrix[1][2]; // Gets value at row 1, column 2"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ 2D arrays use two indices: [row][column]",
+        "✓ Think of them like spreadsheets or game boards",
+        "✓ Use nested loops to process all elements",
+        "✓ Rows come first in declaration: new int[rows][columns]",
+        "✓ Each row can have different number of columns (jagged arrays)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use descriptive variable names like 'row' and 'col' in loops",
+        "Initialize arrays with default values if needed",
+        "Check array bounds before accessing elements"
+      ],
+      "donts": [
+        "Don't forget arrays are 0-indexed (first element is [0][0])",
+        "Don't assume all rows have same number of columns",
+        "Don't confuse row and column order"
+      ],
+      "protip": "Use enhanced for loops for cleaner code when you don't need indices: for(int[] row : matrix) { for(int value : row) { ... } }"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Two-Dimensional Array Basics used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Image Processing",
+          "how": "Each pixel's color values are stored in a 2D array (rows = height, columns = width)"
+        },
+        {
+          "app": "Game Development",
+          "how": "Game boards (chess, tic-tac-toe) and maps use 2D arrays to track positions"
+        },
+        {
+          "app": "Spreadsheet Software",
+          "how": "Cell values are stored in 2D arrays for quick access and calculations"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create a 3x3 tic-tac-toe board using a 2D array. Write methods to:\n1. Initialize the board with empty spaces\n2. Place an 'X' or 'O' at a specific position\n3. Check if a player has won",
+        "starterCode": "public class TicTacToe {\n  private char[][] board;\n  \n  public TicTacToe() {\n    // Initialize 3x3 board\n  }\n  \n  public void placeMark(int row, int col, char mark) {\n    // Place mark at position\n  }\n  \n  public boolean checkWin(char mark) {\n    // Check if mark has won\n    return false;\n  }\n}",
+        "hints": [
+          "Use nested loops to check rows, columns, and diagonals",
+          "Remember to validate row and column indices",
+          "Initialize with spaces: ' '"
+        ],
+        "solution": "public class TicTacToe {\n  private char[][] board;\n  \n  public TicTacToe() {\n    board = new char[3][3];\n    for(int i=0; i<3; i++) {\n      for(int j=0; j<3; j++) {\n        board[i][j] = ' ';\n      }\n    }\n  }\n  \n  public void placeMark(int row, int col, char mark) {\n    if(row >= 0 && row < 3 && col >= 0 && col < 3) {\n      board[row][col] = mark;\n    }\n  }\n  \n  public boolean checkWin(char mark) {\n    // Check rows\n    for(int i=0; i<3; i++) {\n      if(board[i][0] == mark && board[i][1] == mark && board[i][2] == mark) {\n        return true;\n      }\n    }\n    \n    // Check columns\n    for(int j=0; j<3; j++) {\n      if(board[0][j] == mark && board[1][j] == mark && board[2][j] == mark) {\n        return true;\n      }\n    }\n    \n    // Check diagonals\n    return (board[0][0] == mark && board[1][1] == mark && board[2][2] == mark) ||\n           (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark);\n  }\n}",
+        "explanation": "The solution initializes a 3x3 board with spaces, places marks safely within bounds, and checks all possible winning combinations (rows, columns, and diagonals)."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 2D arrays store data in rows and columns like a grid",
+        "📌 Use [row][column] to access elements (remember: 0-indexed!)",
+        "📌 Practice with nested loops to process all elements",
+        "📌 You're ready to build game boards and image processors!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:40:30.892829",
+  "_topic_id": "8-2"
+}

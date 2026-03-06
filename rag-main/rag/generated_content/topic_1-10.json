@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "1-10",
+    "title": "Programming Errors",
+    "description": "Types of errors: syntax, runtime, and logic errors",
+    "chapter_id": 1,
+    "chapter_title": "Introduction to Computers, Programs, and Java"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "6 min",
+    "nextTopicId": "2-1"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s break down programming errors into simple, digestible parts! You’ll be able to spot and fix errors like a pro.\n\n• What syntax, runtime, and logic errors are\n• How to identify each type of error\n• Common mistakes new programmers make",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you’re writing a recipe for a friend. Errors in programming are like mistakes in your recipe:\n\n- **Syntax errors** = Typos or missing words (e.g., forgetting a comma or period). The compiler catches these immediately.\n- **Runtime errors** = Ingredients that don’t mix (e.g., asking for 1/0 cups of flour). The program crashes while running.\n- **Logic errors** = The recipe works, but the cake tastes awful (e.g., using salt instead of sugar). The program runs but gives wrong results.\n\nLet’s dive deeper!\n\n• **Syntax Errors**: The compiler is your grammar checker. It flags missing semicolons, braces, or misspelled keywords. Example: Forgetting a closing quote in `System.out.println(\"Hello);`\n\n• **Runtime Errors**: These happen when the program is running. Common causes: dividing by zero, entering text when a number is expected, or trying to access a file that doesn’t exist.\n\n• **Logic Errors**: The trickiest! The program runs but doesn’t do what you intended. Example: Calculating the average of numbers but forgetting to divide by the count.",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Programming Errors work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Syntax Error Example",
+          "description": "The compiler spots a missing semicolon or brace. It highlights the line and tells you what’s wrong.",
+          "code": "public class Example {\n  public static void main(String[] args) {\n    System.out.println(\"Hello World\") // Missing semicolon\n  }\n}"
+        },
+        {
+          "step": 2,
+          "title": "Runtime Error Example",
+          "description": "The program crashes when it tries to divide by zero. The console shows an error message.",
+          "code": "int result = 10 / 0; // ArithmeticException: / by zero"
+        },
+        {
+          "step": 3,
+          "title": "Logic Error Example",
+          "description": "The program runs but gives the wrong output. Here, the sum is calculated instead of the average.",
+          "code": "int[] numbers = {10, 20, 30};\nint average = numbers[0] + numbers[1] + numbers[2]; // Should divide by 3!"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ **Syntax errors** = Compiler catches them (e.g., missing semicolons, braces).",
+        "✓ **Runtime errors** = Program crashes while running (e.g., division by zero).",
+        "✓ **Logic errors** = Program runs but gives wrong results (e.g., incorrect calculations).",
+        "✓ Always fix errors from the top down—one error can cause many others!",
+        "✓ Compare your code with examples to spot syntax errors quickly."
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use an IDE (like IntelliJ or VS Code) to highlight syntax errors in real-time.",
+        "Test your program with different inputs to catch runtime errors early.",
+        "Add print statements to debug logic errors (e.g., `System.out.println(\"Value: \" + variable);`)."
+      ],
+      "donts": [
+        "Don’t ignore compiler warnings—they often hint at future errors.",
+        "Don’t assume your program works just because it runs without crashing.",
+        "Don’t mix brace styles (e.g., end-of-line vs. next-line). Stick to one!"
+      ],
+      "protip": "For logic errors, rubber-duck debugging works wonders! Explain your code line-by-line to a rubber duck (or a friend). You’ll often spot the mistake yourself!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where are these errors found in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Apps",
+          "how": "Logic errors could cause incorrect balance calculations. Runtime errors might occur if a user enters text instead of a number for a transaction."
+        },
+        {
+          "app": "Social Media Platforms",
+          "how": "Syntax errors could break a feature during development. Runtime errors might happen if a user uploads an unsupported file type."
+        },
+        {
+          "app": "Video Games",
+          "how": "Logic errors could make a game unbeatable or too easy. Runtime errors might crash the game if a player tries to access a non-existent level."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Identify and fix the errors in the following code snippet. There’s one syntax error, one runtime error, and one logic error!",
+        "starterCode": "public class ErrorPractice {\n  public static void main(String[] args) {\n    int a = 10;\n    int b = 0;\n    int result = a / b; // Runtime error\n    \n    System.out.println(\"The result is: \" result); // Syntax error\n    \n    int sum = a + b;\n    System.out.println(\"The sum is: \" + sum / 2); // Logic error (should be average)\n  }\n}",
+        "hints": [
+          "Look for missing punctuation first (syntax error).",
+          "What happens when you divide by zero?",
+          "Is the calculation for the average correct?"
+        ],
+        "solution": "public class ErrorPractice {\n  public static void main(String[] args) {\n    int a = 10;\n    int b = 2; // Fixed runtime error (no division by zero)\n    int result = a / b;\n    \n    System.out.println(\"The result is: \" + result); // Fixed syntax error (added missing +)\n    \n    int sum = a + b;\n    double average = (double) sum / 2; // Fixed logic error (correct average)\n    System.out.println(\"The average is: \" + average);\n  }\n}",
+        "explanation": "1. **Syntax error**: Added a `+` to concatenate the string and variable. 2. **Runtime error**: Changed `b` to 2 to avoid division by zero. 3. **Logic error**: Corrected the average calculation by dividing by 2 and casting to `double` for precision."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 **Syntax errors** = Compiler catches them (e.g., missing semicolons). Fix these first!",
+        "📌 **Runtime errors** = Program crashes (e.g., division by zero). Test with different inputs.",
+        "📌 **Logic errors** = Program runs but gives wrong results. Debug carefully!",
+        "📌 Ready for the next topic? Let’s dive into debugging techniques!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:00:21.607067",
+  "_topic_id": "1-10"
+}

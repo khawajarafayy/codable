@@ -1,0 +1,130 @@
+{
+  "topic": {
+    "id": "6-6",
+    "title": "Modularizing Code",
+    "description": "Breaking code into reusable methods",
+    "chapter_id": 6,
+    "chapter_title": "Methods"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "10 min",
+    "nextTopicId": "6-7"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever felt like your code is one big, messy blob? Let's fix that! Modularizing code is like organizing your closet - it makes everything easier to find and reuse.\n\n• How to break big problems into small, manageable pieces\n• Why methods are your new best friends\n• How to write code that's easy to read and maintain",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're building a LEGO castle. Would you try to build it all in one giant piece? No way! You'd build small sections (walls, towers, gates) and then snap them together.\n\nModularizing code works the same way:\n\n• **Methods** are like LEGO pieces - small, reusable blocks\n• Each method does **one specific job** (like calculating tax or printing a receipt)\n• You can **reuse** methods anywhere in your program\n\nFor example, instead of writing the same code to calculate square roots in 10 places, you write it **once** as a method and call it whenever needed. Cleaner, smarter, and way less typing!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Modularizing Code works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Before Modularizing",
+          "description": "One giant method doing everything - hard to read and maintain!",
+          "code": "public static void main(String[] args) {\n  // 50 lines of code for user input\n  // 30 lines for calculations\n  // 20 lines for output\n  System.out.println(\"Result: \" + complexCalculation);\n}"
+        },
+        {
+          "step": 2,
+          "title": "After Modularizing",
+          "description": "Broken into small, focused methods - each with a clear purpose",
+          "code": "public static void main(String[] args) {\n  double input = getUserInput();\n  double result = calculateResult(input);\n  displayResult(result);\n}\n\nstatic double getUserInput() { /* 10 lines */ }\nstatic double calculateResult(double num) { /* 15 lines */ }\nstatic void displayResult(double res) { /* 5 lines */ }"
+        },
+        {
+          "step": 3,
+          "title": "The Magic of Reuse",
+          "description": "Now you can use these methods anywhere in your program!",
+          "code": "public static void anotherMethod() {\n  double value = getUserInput(); // Reusing!\n  // ...\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ **Single Responsibility**: Each method should do ONE thing well",
+        "✓ **Reusability**: Write once, use everywhere",
+        "✓ **Readability**: Small methods = easier to understand",
+        "✓ **Maintainability**: Fix one method, not 100 lines of code",
+        "✓ **Testing**: Small methods are easier to test"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Name methods clearly (e.g., `calculateTax()` not `doStuff()`)",
+        "Keep methods short (aim for < 20 lines)",
+        "Use methods to avoid code duplication"
+      ],
+      "donts": [
+        "Don't make methods do multiple unrelated things",
+        "Don't create methods with 10+ parameters",
+        "Don't ignore method return types"
+      ],
+      "protip": "If you're copying and pasting code, that's a sign you need a method!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Modularizing Code used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "E-commerce Websites",
+          "how": "Separate methods for: calculating discounts, processing payments, generating receipts, and sending confirmation emails"
+        },
+        {
+          "app": "Banking Systems",
+          "how": "Modular methods for: validating transactions, calculating interest, generating statements, and fraud detection"
+        },
+        {
+          "app": "Game Development",
+          "how": "Methods for: character movement, collision detection, scoring, and rendering graphics"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "You're building a simple calculator. Right now, all the logic is in one big method. Your task: break it into smaller methods!\n\nRequirements:\n• One method for each operation (+, -, *, /)\n• One method to get user input\n• One method to display results",
+        "starterCode": "public static void main(String[] args) {\n  Scanner input = new Scanner(System.in);\n  System.out.print(\"Enter first number: \");\n  double num1 = input.nextDouble();\n  System.out.print(\"Enter operator (+, -, *, /): \");\n  char op = input.next().charAt(0);\n  System.out.print(\"Enter second number: \");\n  double num2 = input.nextDouble();\n  \n  double result = 0;\n  switch(op) {\n    case '+': result = num1 + num2; break;\n    case '-': result = num1 - num2; break;\n    case '*': result = num1 * num2; break;\n    case '/': result = num1 / num2; break;\n  }\n  \n  System.out.println(\"Result: \" + result);\n}",
+        "hints": [
+          "Start by identifying the different 'jobs' in the code",
+          "Each operation (+, -, *, /) should be its own method",
+          "The input and output parts can be separate methods too"
+        ],
+        "solution": "public static void main(String[] args) {\n  double num1 = getNumber(\"Enter first number: \");\n  char op = getOperator();\n  double num2 = getNumber(\"Enter second number: \");\n  \n  double result = calculate(num1, num2, op);\n  displayResult(result);\n}\n\nstatic double getNumber(String prompt) {\n  Scanner input = new Scanner(System.in);\n  System.out.print(prompt);\n  return input.nextDouble();\n}\n\nstatic char getOperator() {\n  Scanner input = new Scanner(System.in);\n  System.out.print(\"Enter operator (+, -, *, /): \");\n  return input.next().charAt(0);\n}\n\nstatic double calculate(double num1, double num2, char op) {\n  switch(op) {\n    case '+': return add(num1, num2);\n    case '-': return subtract(num1, num2);\n    case '*': return multiply(num1, num2);\n    case '/': return divide(num1, num2);\n    default: return 0;\n  }\n}\n\nstatic double add(double a, double b) { return a + b; }\nstatic double subtract(double a, double b) { return a - b; }\nstatic double multiply(double a, double b) { return a * b; }\nstatic double divide(double a, double b) { return a / b; }\n\nstatic void displayResult(double result) {\n  System.out.println(\"Result: \" + result);\n}",
+        "explanation": "Now each part of the calculator has its own method! This makes the code:\n• Easier to read (clear method names)\n• Easier to maintain (change one method without breaking others)\n• Easier to extend (add new operations without touching existing code)"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Modularizing = breaking code into small, focused methods",
+        "📌 Each method should do ONE thing well",
+        "📌 Methods make code reusable and easier to maintain",
+        "📌 Practice by refactoring big methods into smaller ones",
+        "📌 You're now ready to learn about method parameters and return values!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:33:26.741446",
+  "_topic_id": "6-6"
+}

@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "2-11",
+    "title": "Evaluating Expressions and Operator Precedence",
+    "description": "Order of operations in expressions",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "8 min",
+    "nextTopicId": "2-12"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever wondered why 2 + 3 * 4 equals 14 and not 20? Let's crack the code of how Java evaluates expressions!\n\n• How Java decides the order of operations\n• Why parentheses are your best friends\n• How to avoid common calculation mistakes",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a restaurant with a special order rule: drinks first, then appetizers, then main course. Java follows similar rules when evaluating expressions!\n\nJava uses **operator precedence** - a set of rules that determines which operations happen first. Here's how it works:\n\n• **Parentheses** always win - they're like putting something in a VIP section\n• **Multiplication/Division** come next - they're the appetizers\n• **Addition/Subtraction** come last - they're the main course\n\nFor example: `3 + 4 * 2` equals 11, not 14, because multiplication happens before addition.",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Evaluating Expressions and Operator Precedence works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Parentheses First",
+          "description": "Java looks for parentheses and solves them first, starting from the innermost ones.",
+          "code": "(10.5 + 2 * 3) / (45 - 3.5)"
+        },
+        {
+          "step": 2,
+          "title": "Multiplication/Division",
+          "description": "Next, Java handles all multiplication and division from left to right.",
+          "code": "(10.5 + 6) / (45 - 3.5)"
+        },
+        {
+          "step": 3,
+          "title": "Addition/Subtraction",
+          "description": "Finally, Java does addition and subtraction from left to right.",
+          "code": "16.5 / 41.5 = 0.39759036144578"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Parentheses always go first - use them to control order",
+        "✓ Multiplication/Division > Addition/Subtraction",
+        "✓ Same precedence? Left to right!",
+        "✓ PEMDAS (Please Excuse My Dear Aunt Sally) helps remember the order",
+        "✓ When in doubt, add parentheses to make it clear"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use parentheses to make your intentions clear",
+        "Break complex expressions into smaller parts",
+        "Test your expressions with simple numbers first"
+      ],
+      "donts": [
+        "Don't rely on memory - use parentheses when unsure",
+        "Don't mix too many operations in one line",
+        "Don't forget that division comes before addition"
+      ],
+      "protip": "When writing complex expressions, solve them on paper first to verify the order!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Evaluating Expressions and Operator Precedence used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Shopping Cart Calculations",
+          "how": "Calculating totals with discounts, taxes, and shipping fees using proper operator precedence"
+        },
+        {
+          "app": "Game Physics Engines",
+          "how": "Determining movement, collisions, and scores using complex mathematical expressions"
+        },
+        {
+          "app": "Financial Applications",
+          "how": "Calculating interest, payments, and investment returns with precise order of operations"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a Java expression to calculate the average of three numbers (a, b, c) and then multiply it by a fourth number (d). What would be the result if a=5, b=10, c=15, and d=2?",
+        "starterCode": "// Write your expression here\npublic class AverageCalc {\n  public static void main(String[] args) {\n    int a = 5, b = 10, c = 15, d = 2;\n    // Your code goes here\n  }\n}",
+        "hints": [
+          "Remember the order of operations!",
+          "Parentheses can help group the average calculation",
+          "The average of three numbers is (a + b + c)/3"
+        ],
+        "solution": "// Complete solution\npublic class AverageCalc {\n  public static void main(String[] args) {\n    int a = 5, b = 10, c = 15, d = 2;\n    double result = ((a + b + c) / 3.0) * d;\n    System.out.println(result); // Output: 20.0\n  }\n}",
+        "explanation": "First we calculate the average (5+10+15)/3 = 10, then multiply by 2 to get 20. Using 3.0 ensures we get a precise decimal result."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Operator precedence determines the order of operations in Java",
+        "📌 Parentheses > Multiplication/Division > Addition/Subtraction",
+        "📌 Practice breaking down complex expressions step by step",
+        "📌 You're now ready to tackle more complex calculations!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:05:29.798729",
+  "_topic_id": "2-11"
+}

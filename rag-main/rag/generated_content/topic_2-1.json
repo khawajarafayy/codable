@@ -1,0 +1,124 @@
+{
+  "topic": {
+    "id": "2-1",
+    "title": "Introduction to Elementary Programming",
+    "description": "Overview of elementary programming concepts",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "7 min",
+    "nextTopicId": "2-2"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Hey there! 👋 Ready to learn **Introduction to Elementary Programming**?\n\nHere's what we'll cover:\n\n• Overview of elementary programming concepts\n• Why this matters for your coding journey\n• Hands-on examples you can try",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Think of **Introduction to Elementary Programming** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Let's see how Introduction to Elementary Programming works step by step:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Start Here",
+          "description": "Begin with the basic structure",
+          "code": "// Your code starts here"
+        },
+        {
+          "step": 2,
+          "title": "Add Logic",
+          "description": "Build on the foundation",
+          "code": "// Add your logic"
+        },
+        {
+          "step": 3,
+          "title": "See Results",
+          "description": "Run and observe output",
+          "code": "// Check the output!"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Overview of elementary programming concepts",
+        "✓ Foundation for advanced topics",
+        "✓ Practice by writing code yourself",
+        "✓ Used frequently in real programs",
+        "✓ Understanding this = easier future topics"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Read code carefully first",
+        "Modify examples to learn",
+        "Focus on understanding"
+      ],
+      "donts": [
+        "Skip the basics",
+        "Copy-paste blindly",
+        "Give up on errors"
+      ],
+      "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where do we use Introduction to Elementary Programming in real life?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Mobile Apps",
+          "how": "Building user interfaces and handling data"
+        },
+        {
+          "app": "Web Services",
+          "how": "Processing requests and managing information"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create a simple program using Introduction to Elementary Programming. Start with the example and modify it!",
+        "starterCode": "// Practice Introduction to Elementary Programming here\npublic class Practice {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
+        "hints": [
+          "Start with the basic structure",
+          "Run your code after each change"
+        ],
+        "solution": "// Solution will vary based on your approach",
+        "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Introduction to Elementary Programming - Overview of elementary programming concepts",
+        "📌 Master basics before advancing",
+        "📌 Practice with the examples",
+        "📌 Builds foundation for what's next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:00:45.326276",
+  "_topic_id": "2-1"
+}

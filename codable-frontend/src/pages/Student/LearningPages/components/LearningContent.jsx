@@ -225,8 +225,8 @@ export function LearningContent({ onStartPractice, chapterId }) {
   };
 
   // Separate sections into main content and sidebar
-  const mainSectionTypes = ['introduction', 'explanation', 'code', 'details'];
-  const sidebarSectionTypes = ['keypoints', 'tips', 'practice', 'summary'];
+  const mainSectionTypes = ['introduction', 'explanation', 'code', 'details', 'practice'];
+  const sidebarSectionTypes = ['keypoints', 'tips', 'summary'];
   
   const mainSections = sections.filter(s => mainSectionTypes.includes(s.type));
   const sidebarSections = sections.filter(s => sidebarSectionTypes.includes(s.type));

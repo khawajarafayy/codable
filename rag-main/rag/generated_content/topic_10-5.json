@@ -1,0 +1,130 @@
+{
+  "topic": {
+    "id": "10-5",
+    "title": "Wrapper Classes for Primitive Types",
+    "description": "Wrapper classes for primitives",
+    "chapter_id": 10,
+    "chapter_title": "Object-Oriented Thinking"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "15 min",
+    "nextTopicId": "10-6"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's explore how Java treats primitive types like objects! Wrapper classes are your new best friends when you need to work with primitives in an object-oriented way.\n\n• What wrapper classes are and why they exist\n• How to convert between primitives and objects automatically\n• Practical uses of wrapper classes in real code",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a party where everyone speaks different languages. Primitives (like `int`, `double`) speak 'basic data', while objects speak 'fancy Java'. Wrapper classes are like translators that help them communicate!\n\nJava provides wrapper classes for all primitive types:\n• `Integer` for `int`\n• `Double` for `double`\n• `Boolean` for `boolean`\n• And more for all other primitives\n\nThese classes 'wrap' the primitive value in an object, giving you superpowers like:\n• Storing numbers in ArrayLists (which only hold objects)\n• Using methods to convert between types\n• Handling null values safely",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Wrapper Classes work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Primitive to Wrapper",
+          "description": "Java automatically converts a primitive to its wrapper class when needed (called autoboxing)",
+          "code": "int num = 42;\nInteger wrappedNum = num; // Autoboxing happens here!"
+        },
+        {
+          "step": 2,
+          "title": "Wrapper to Primitive",
+          "description": "Java also converts back automatically when you need the primitive value (called unboxing)",
+          "code": "Integer wrappedNum = 42;\nint num = wrappedNum; // Unboxing happens here!"
+        },
+        {
+          "step": 3,
+          "title": "Using Wrapper Methods",
+          "description": "Wrapper classes provide useful methods like converting strings to numbers",
+          "code": "String numberStr = \"123\";\nint num = Integer.parseInt(numberStr); // Converts string to int"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Wrapper classes turn primitives into objects (e.g., `int` → `Integer`)",
+        "✓ Autoboxing converts primitives to wrappers automatically",
+        "✓ Unboxing converts wrappers back to primitives automatically",
+        "✓ Wrapper classes provide useful methods like `parseInt()`",
+        "✓ All wrapper classes are immutable (can't change their value)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use wrapper classes when you need to store primitives in collections",
+        "Take advantage of wrapper methods like `valueOf()` and `parseXxx()`",
+        "Remember that wrapper objects can be `null` (unlike primitives)"
+      ],
+      "donts": [
+        "Don't compare wrapper objects with `==` (use `.equals()` instead)",
+        "Don't create unnecessary wrapper objects (let autoboxing handle it)",
+        "Don't forget that wrapper classes are immutable"
+      ],
+      "protip": "Use `Integer.valueOf()` instead of `new Integer()` - it's more memory efficient because it caches common values!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where are wrapper classes used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Database Operations",
+          "how": "When reading numbers from a database, they often come as wrapper objects (like `Integer`) because database fields can be null"
+        },
+        {
+          "app": "Collections Framework",
+          "how": "ArrayLists and HashMaps can only store objects, so you need wrapper classes to store numbers (e.g., `ArrayList<Integer>`)"
+        },
+        {
+          "app": "Configuration Files",
+          "how": "When reading settings from files, you often parse strings into numbers using wrapper methods like `Integer.parseInt()`"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a method that takes an ArrayList of Integer objects and returns the sum of all even numbers. Handle null values safely (treat them as 0).",
+        "starterCode": "import java.util.ArrayList;\n\npublic class WrapperPractice {\n    public static int sumEvenNumbers(ArrayList<Integer> numbers) {\n        // Your code here\n    }\n\n    public static void main(String[] args) {\n        ArrayList<Integer> nums = new ArrayList<>();\n        nums.add(3);\n        nums.add(4);\n        nums.add(null);\n        nums.add(6);\n        nums.add(7);\n        \n        System.out.println(sumEvenNumbers(nums)); // Should print 10\n    }\n}",
+        "hints": [
+          "Use a for-each loop to iterate through the list",
+          "Check for null values before unboxing",
+          "Use the modulus operator (%) to check for even numbers"
+        ],
+        "solution": "import java.util.ArrayList;\n\npublic class WrapperPractice {\n    public static int sumEvenNumbers(ArrayList<Integer> numbers) {\n        int sum = 0;\n        for (Integer num : numbers) {\n            if (num != null && num % 2 == 0) {\n                sum += num;\n            }\n        }\n        return sum;\n    }\n}",
+        "explanation": "We iterate through each Integer in the list. We first check if it's not null, then check if it's even using the modulus operator. If both conditions are true, we add it to our sum."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Wrapper classes bridge the gap between primitives and objects",
+        "📌 Autoboxing and unboxing make conversions automatic and painless",
+        "📌 Always handle null values when working with wrapper objects",
+        "📌 Practice using wrapper methods like `parseInt()` and `valueOf()`",
+        "📌 You're now ready to use primitives in object-oriented contexts!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:50:57.285878",
+  "_topic_id": "10-5"
+}

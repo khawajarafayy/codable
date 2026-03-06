@@ -1,0 +1,125 @@
+{
+  "topic": {
+    "id": "3-6",
+    "title": "Common Errors in Selection Statements",
+    "description": "Avoiding mistakes with if statements",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "7 min",
+    "nextTopicId": "3-7"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s tackle those sneaky mistakes that trip up even experienced coders when using if statements!\n\n• How to spot the most common if-statement errors\n• Why your code might not run as expected\n• Simple fixes to make your logic bulletproof",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're a traffic light controller. If the light is red, cars stop. If it's green, they go. But what if you forget to handle yellow? Or worse - what if you mix up red and green? That’s exactly how if-statement errors feel!\n\nMost if-statement mistakes fall into these categories:\n\n• **Missing braces**: Like forgetting to close a door - your code might still run, but not how you intended\n• **Logic errors**: The code runs, but gives wrong results (like saying 2+2=5)\n• **Condition mistakes**: Using = instead of ==, or confusing && with ||\n\nHere’s the golden rule: *Always test your if statements with different inputs* - especially edge cases!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Let’s debug this common mistake step-by-step:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "The Problem Code",
+          "description": "This looks correct but has a classic error:",
+          "code": "if (age = 18)\n    System.out.println(\"You're an adult!\");"
+        },
+        {
+          "step": 2,
+          "title": "The Mistake",
+          "description": "Using = (assignment) instead of == (comparison). The code will always print because age=18 returns 18 (truthy)!",
+          "code": "// Should be:\nif (age == 18)"
+        },
+        {
+          "step": 3,
+          "title": "Fixed Version",
+          "description": "Now it works correctly - only prints when age is exactly 18:",
+          "code": "if (age == 18) {\n    System.out.println(\"You're an adult!\");\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Always use == for comparisons, = for assignment",
+        "✓ Braces {} protect your code from logic errors",
+        "✓ Test with edge cases (0, negative numbers, empty strings)",
+        "✓ Indentation helps readability but doesn’t affect execution",
+        "✓ Boolean variables should have clear names (isAdult, hasPermission)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use IDE warnings to catch = vs == errors",
+        "Add comments explaining complex conditions",
+        "Test one condition at a time when debugging"
+      ],
+      "donts": [
+        "Don’t forget braces for multi-line if blocks",
+        "Don’t nest if statements too deeply (3 levels max)",
+        "Don’t use == for floating-point comparisons"
+      ],
+      "protip": "Enable 'show whitespace' in your IDE to spot missing braces or semicolons instantly!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where you’ll see these errors in real apps:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Login Systems",
+          "how": "Checking if (username == storedUsername && password == storedPassword) - one wrong = and everyone gets access!"
+        },
+        {
+          "app": "E-commerce Discounts",
+          "how": "if (cartTotal > 100 && isPremiumMember) - missing braces could apply discounts incorrectly"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Debug this code that’s supposed to check voting eligibility:",
+      "type": "practice",
+      "problem": {
+        "description": "The following code has 3 errors. Find and fix them so it correctly prints \"Eligible to vote\" only for citizens aged 18+.",
+        "starterCode": "if (age > 18)\n    if (isCitizen = true)\n        System.out.println(\"Eligible to vote\");\n    else\n        System.out.println(\"Not eligible\");",
+        "hints": [
+          "Check the comparison operators",
+          "Look at the braces structure",
+          "Think about the logic flow"
+        ],
+        "solution": "if (age >= 18) {\n    if (isCitizen == true) {\n        System.out.println(\"Eligible to vote\");\n    } else {\n        System.out.println(\"Not eligible\");\n    }\n} else {\n    System.out.println(\"Not eligible\");\n}",
+        "explanation": "Fixed: >= instead of >, == instead of =, and added braces for proper nesting. Now handles all cases correctly!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 If-statement errors often come from small syntax mistakes with big consequences",
+        "📌 Always test with multiple inputs to catch logic errors",
+        "📌 Use == for comparisons, = for assignment - never mix them up!",
+        "📌 You're ready to write bulletproof selection statements!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:13:48.452220",
+  "_topic_id": "3-6"
+}

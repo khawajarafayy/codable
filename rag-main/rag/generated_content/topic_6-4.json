@@ -1,0 +1,128 @@
+{
+  "topic": {
+    "id": "6-4",
+    "title": "void vs. Value-Returning Methods",
+    "description": "Methods with and without return values",
+    "chapter_id": 6,
+    "chapter_title": "Methods"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "11 min",
+    "nextTopicId": "6-5"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s explore the difference between methods that do work and methods that give you answers!\n\n• What `void` methods are (and when to use them)\n• What value-returning methods do (and why they’re useful)\n• How to spot them in real code",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you’re at a fast-food counter:\n\n- A **void method** is like ordering fries. The cashier *does* something (gives you fries), but doesn’t *tell* you anything back.\n- A **value-returning method** is like asking ‘How much?’. The cashier *calculates* the total and *gives* you the answer.\n\nNow let’s see how this works in code!\n\n• **Void methods** perform actions but don’t return data. Example:\n  ```java\n  System.out.println(\"Hello!\"); // Prints text (action), returns nothing\n  ```\n\n• **Value-returning methods** compute and *give back* a result. Example:\n  ```java\n  int sum = add(2, 3); // Returns 5, which we store in 'sum'\n  ```\n\nKey difference: Void methods end with `void`. Value-returning methods specify a type (like `int`, `double`, `String`).",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how void vs. Value-Returning Methods works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Calling a Void Method",
+          "description": "The method runs its code and finishes. No value comes back.",
+          "code": "public static void greet() {\n  System.out.println(\"Hi!\");\n}\n// Call it:\ngreet(); // Output: Hi!"
+        },
+        {
+          "step": 2,
+          "title": "Calling a Value-Returning Method",
+          "description": "The method calculates a result and sends it back to where it was called.",
+          "code": "public static int add(int a, int b) {\n  return a + b;\n}\n// Call it:\nint result = add(2, 3); // result = 5"
+        },
+        {
+          "step": 3,
+          "title": "Using the Returned Value",
+          "description": "The returned value can be stored, printed, or used in calculations.",
+          "code": "System.out.println(\"2 + 3 = \" + add(2, 3)); // Output: 2 + 3 = 5"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `void` = ‘do this action, no answer needed’",
+        "✓ Value-returning = ‘calculate this and give me the answer’",
+        "✓ Return types: `int`, `double`, `String`, etc. (not `void`)",
+        "✓ Use `return` to send back a value (only in value-returning methods)",
+        "✓ Void methods can still print/output things—they just don’t return data"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `void` for actions (like printing or saving data)",
+        "Use value-returning methods for calculations or getting data",
+        "Store returned values in variables to use them later"
+      ],
+      "donts": [
+        "Don’t use `return` in a `void` method (it’s a syntax error!)",
+        "Don’t ignore returned values (they’re there for a reason!)",
+        "Don’t forget the return type (e.g., `int` instead of `void`)"
+      ],
+      "protip": "If your method’s job is to *answer a question* (like ‘what’s the sum?’), it should return a value!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is void vs. Value-Returning Methods used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Apps",
+          "how": "Void methods update your balance (action). Value-returning methods calculate interest (answer)."
+        },
+        {
+          "app": "Games",
+          "how": "Void methods move a character (action). Value-returning methods check if you won (answer)."
+        },
+        {
+          "app": "Weather Apps",
+          "how": "Void methods display the forecast (action). Value-returning methods fetch the temperature (answer)."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write two methods for a pizza order system:\n1. A `void` method that prints the order summary (e.g., ‘2 large pizzas’).\n2. A value-returning method that calculates the total cost (e.g., returns `25.98`).\nCall both methods in `main`.",
+        "starterCode": "public class PizzaOrder {\n  public static void main(String[] args) {\n    // Call your methods here\n  }\n  \n  // Write your void method here\n  \n  // Write your value-returning method here\n}",
+        "hints": [
+          "Void method: Use `System.out.println` to print the order.",
+          "Value-returning method: Use `return` to send back the total cost."
+        ],
+        "solution": "public class PizzaOrder {\n  public static void main(String[] args) {\n    printOrder();\n    double total = calculateTotal();\n    System.out.println(\"Total: $\" + total);\n  }\n  \n  public static void printOrder() {\n    System.out.println(\"Order: 2 large pizzas\");\n  }\n  \n  public static double calculateTotal() {\n    return 25.98;\n  }\n}",
+        "explanation": "The `printOrder` method prints the order (void). The `calculateTotal` method returns the cost (value-returning). We store and print the returned value in `main`."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 `void` = do an action, `return type` = give an answer",
+        "📌 Use `return` only in value-returning methods",
+        "📌 Practice writing both types of methods",
+        "📌 Ready to learn about method parameters next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:32:19.056280",
+  "_topic_id": "6-4"
+}

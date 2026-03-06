@@ -28,6 +28,27 @@ try:
 except Exception as e:
     print(f"⚠️ Warning: Could not load vector store: {e}")
 
+# Directory for pre-generated content
+GENERATED_CONTENT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generated_content")
+
+
+def get_pregenerated_content(topic_id):
+    """Load pre-generated content for a topic (instant!)"""
+    import json
+    filepath = os.path.join(GENERATED_CONTENT_DIR, f"topic_{topic_id}.json")
+    
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = json.load(f)
+                print(f"   ⚡ Loaded pre-generated content instantly!")
+                return content
+        except Exception as e:
+            print(f"   ⚠️ Error loading pre-generated content: {e}")
+    
+    return None
+
+
 # Chapter subtopics structure - Detailed topic definitions
 CHAPTER_TOPICS = {
     1: {
@@ -936,6 +957,47 @@ def get_topic_constraints(topic_id, topic_title):
     return constraints.get(topic_id, default)
 
 
+def get_topic_metadata(topic_id):
+    """Get difficulty, estimated time, and next topic for a given topic"""
+    # Parse chapter and topic number
+    parts = topic_id.split('-')
+    chapter = int(parts[0]) if parts else 1
+    topic_num = int(parts[1]) if len(parts) > 1 else 1
+    
+    # Difficulty based on chapter progression
+    if chapter <= 2:
+        difficulty = "Beginner"
+    elif chapter <= 5:
+        difficulty = "Intermediate"
+    elif chapter <= 8:
+        difficulty = "Advanced"
+    else:
+        difficulty = "Expert"
+    
+    # Estimated time (5-15 mins based on complexity)
+    base_time = 5 + (chapter - 1) + (topic_num % 3)
+    estimated_time = f"{min(base_time, 15)} min"
+    
+    # Calculate next topic
+    next_topic_id = None
+    if topic_id in CHAPTER_TOPICS.get(chapter, {}).get('topics', []):
+        topics = CHAPTER_TOPICS[chapter]['topics']
+        for i, t in enumerate(topics):
+            if t['id'] == topic_id and i + 1 < len(topics):
+                next_topic_id = topics[i + 1]['id']
+                break
+        if not next_topic_id and chapter + 1 in CHAPTER_TOPICS:
+            next_topics = CHAPTER_TOPICS[chapter + 1].get('topics', [])
+            if next_topics:
+                next_topic_id = next_topics[0]['id']
+    
+    return {
+        "difficulty": difficulty,
+        "estimatedTime": estimated_time,
+        "nextTopicId": next_topic_id
+    }
+
+
 def format_content_with_ai(raw_content, topic_info):
     """Use Mistral AI to organize and structure the raw book content into attractive learning material"""
     from mistralai import Mistral
@@ -953,93 +1015,127 @@ def format_content_with_ai(raw_content, topic_info):
     not_allowed_concepts = ', '.join(constraints['not_allowed'])
     topic_focus = constraints['focus']
     
-    prompt = f"""You are an expert educational content designer. Transform raw textbook content into engaging learning material.
+    # Get metadata
+    metadata = get_topic_metadata(topic_id)
+    
+    prompt = f"""You are a friendly programming tutor creating bite-sized learning content.
 
 📚 TOPIC: {topic_title}
 📝 DESCRIPTION: {topic_info.get('description', '')}
 🎯 TOPIC ID: {topic_id}
 
-⚠️ CRITICAL TOPIC RESTRICTIONS - READ CAREFULLY:
-✅ ONLY USE THESE CONCEPTS: {allowed_concepts}
-❌ DO NOT USE THESE CONCEPTS (they are taught LATER): {not_allowed_concepts}
+⚠️ TOPIC RESTRICTIONS:
+✅ ALLOWED: {allowed_concepts}
+❌ NOT ALLOWED (taught later): {not_allowed_concepts}
 🎯 FOCUS: {topic_focus}
-
-This is a sequential learning curriculum. Students have NOT learned concepts that come later.
-If this topic is about "Simple Java Program" or "Hello World", you can ONLY use:
-- System.out.println() for output
-- Basic class structure
-- main method
-- NO Scanner, NO user input, NO if-else, NO loops, NO arrays!
 
 RAW TEXTBOOK CONTENT:
 ---
 {raw_content[:6000]}
 ---
 
+✍️ WRITING STYLE RULES (VERY IMPORTANT):
+• Maximum 2-3 lines per paragraph
+• Use bullet points frequently
+• Include simple examples and analogies
+• Friendly, conversational tone
+• NO long academic explanations
+• Talk like a helpful friend teaching
+
 📋 OUTPUT FORMAT - Return ONLY this JSON array:
 [
   {{
     "title": "🎯 What You'll Learn",
-    "content": "Write 2-3 engaging paragraphs introducing THIS specific topic. Why is {topic_title} important?",
+    "content": "Short intro (2-3 lines max).\n\n• Bullet point 1\n• Bullet point 2\n• Bullet point 3",
     "type": "introduction"
   }},
   {{
-    "title": "💡 Understanding the Concept",
-    "content": "Explain {topic_title} using simple language. Use real-world analogies. Stay STRICTLY within the allowed concepts. 3-4 paragraphs.",
+    "title": "💡 Concept Explanation",
+    "content": "Explain using a real-world analogy first.\n\nThen 2-3 short paragraphs with bullet points. Keep it simple!",
     "type": "explanation"
   }},
   {{
-    "title": "⚡ Key Points to Remember",
+    "title": "📊 Visual Simulation",
+    "content": "Step-by-step visualization of how {topic_title} works:",
+    "type": "visual",
+    "steps": [
+      {{"step": 1, "title": "Step Title", "description": "What happens", "code": "relevant code snippet"}},
+      {{"step": 2, "title": "Step Title", "description": "What happens next", "code": "next code snippet"}},
+      {{"step": 3, "title": "Step Title", "description": "Final result", "code": "final code"}}
+    ]
+  }},
+  {{
+    "title": "⚡ Key Points",
     "content": "",
     "type": "keypoints",
     "points": [
-      "**Key Point 1**: Explanation relevant to {topic_title}",
-      "**Key Point 2**: Another important concept",
-      "**Key Point 3**: Common pattern or rule",
-      "**Key Point 4**: What students often forget",
-      "**Key Point 5**: Pro tip for this topic"
+      "✓ Key point 1 - keep it short",
+      "✓ Key point 2 - one line each",
+      "✓ Key point 3 - easy to scan",
+      "✓ Key point 4 - memorable tips",
+      "✓ Key point 5 - practical advice"
     ]
   }},
   {{
-    "title": "🖥️ Code in Action",
-    "content": "Examples demonstrating {topic_title}:",
-    "type": "code",
+    "title": "🔥 Tips & Mistakes",
+    "content": "",
+    "type": "tips",
+    "sidebar": true,
+    "dos": [
+      "Short tip 1",
+      "Short tip 2",
+      "Short tip 3"
+    ],
+    "donts": [
+      "Common mistake 1",
+      "Common mistake 2",
+      "Common mistake 3"
+    ],
+    "protip": "One golden tip for {topic_title}"
+  }},
+  {{
+    "title": "🌍 Real World Use",
+    "content": "Where is {topic_title} used in real apps?",
+    "type": "realworld",
     "examples": [
-      "// Example showing ONLY {topic_title} concepts\\n// NO concepts from the not-allowed list!\\npublic class Example {{\\n    public static void main(String[] args) {{\\n        // Code using ONLY allowed concepts\\n    }}\\n}}"
+      {{"app": "Example App/Use", "how": "How it uses this concept"}},
+      {{"app": "Another Example", "how": "How it applies here"}}
     ]
   }},
   {{
-    "title": "🔥 Pro Tips & Common Mistakes",
-    "content": "Tips and mistakes specific to {topic_title}. No advanced concepts!",
-    "type": "tips"
+    "title": "🧪 Practice Problem",
+    "content": "Try this challenge:",
+    "type": "practice",
+    "problem": {{
+      "description": "Clear problem statement (2-3 lines)",
+      "starterCode": "// Starter code here",
+      "hints": ["Hint 1", "Hint 2"],
+      "solution": "// Complete solution code",
+      "explanation": "Brief explanation of solution (2-3 lines)"
+    }}
   }},
   {{
-    "title": "🧪 Try It Yourself",
-    "content": "Simple challenges using ONLY {topic_title} concepts. NO Scanner, NO input if not allowed!",
-    "type": "practice"
-  }},
-  {{
-    "title": "📝 Quick Summary",
+    "title": "📝 Summary",
     "content": "",
     "type": "summary",
     "points": [
-      "Summary of {topic_title}",
-      "Most important rule",
-      "When to use this",
-      "What comes next"
+      "📌 Main takeaway in one line",
+      "📌 Most important rule",
+      "📌 What to practice",
+      "📌 Ready for next topic!"
     ]
   }}
 ]
 
-🚨 ABSOLUTE RULES:
-1. Stay STRICTLY within allowed concepts for topic {topic_id}
-2. DO NOT include: {not_allowed_concepts}
-3. Code examples must ONLY use allowed concepts
-4. Practice challenges must be solvable with ONLY what's been taught
-5. If topic is about printing/Hello World - NO Scanner, NO user input!
-6. Output ONLY valid JSON - no markdown wrapper
+🚨 RULES:
+1. ONLY use allowed concepts for topic {topic_id}
+2. Keep paragraphs SHORT (2-3 lines max)
+3. Use bullet points everywhere
+4. Include analogies and examples
+5. Friendly tone - like a tutor talking
+6. Output ONLY valid JSON
 
-Generate topic-appropriate content NOW:"""
+Generate content now:"""
 
     try:
         print(f"   🤖 Sending to Mistral AI for content organization...")
@@ -1196,55 +1292,116 @@ def format_content_basic(cleaned, topic_info):
     if not sentences:
         return generate_fallback_content(topic_info)
     
+    topic_title = topic_info.get('title', 'the Topic')
+    topic_id = topic_info.get('id', '1-1')
+    metadata = get_topic_metadata(topic_id)
     sections = []
     
-    # Introduction - first few substantial sentences
-    intro_sentences = sentences[:4]
-    intro_text = create_clean_paragraph(intro_sentences)
+    # 🎯 What You'll Learn - Introduction
+    intro_sentences = sentences[:3]
+    intro_bullets = '\n'.join([f"• {s}" for s in intro_sentences]) if intro_sentences else f"• Learn about {topic_title}"
     sections.append({
-        "title": f"Introduction to {topic_info.get('title', 'the Topic')}",
-        "content": intro_text if intro_text else f"This section covers {topic_info.get('title', 'this topic')}. {topic_info.get('description', '')}",
+        "title": "🎯 What You'll Learn",
+        "content": f"Hey! 👋 Let's explore **{topic_title}**.\n\n{intro_bullets}",
         "type": "introduction"
     })
     
-    # Core Concepts - next batch of sentences
-    if len(sentences) > 4:
-        concept_sentences = sentences[4:12]
-        concept_text = create_clean_paragraph(concept_sentences)
+    # 💡 Concept Explanation
+    if len(sentences) > 3:
+        concept_sentences = sentences[3:8]
+        # Format as short paragraphs with bullets
+        concept_content = f"Think of **{topic_title}** as a building block for your programs.\n\n"
+        concept_content += '\n'.join([f"• {s}" for s in concept_sentences[:3]])
+        if len(concept_sentences) > 3:
+            concept_content += f"\n\n{' '.join(concept_sentences[3:5])}"
         sections.append({
-            "title": "Understanding the Concepts",
-            "content": concept_text,
+            "title": "💡 Concept Explanation",
+            "content": concept_content,
             "type": "explanation"
         })
     
-    # Code Examples
-    if code_examples:
-        sections.append({
-            "title": "Code Examples",
-            "content": "Here are practical examples demonstrating these concepts:",
-            "type": "code",
-            "examples": code_examples
-        })
+    # 📊 Visual Simulation
+    sections.append({
+        "title": "📊 Visual Simulation",
+        "content": f"Here's how {topic_title} works step by step:",
+        "type": "visual",
+        "steps": [
+            {"step": 1, "title": "Setup", "description": "Start with basic structure", "code": code_examples[0] if code_examples else "// Start here"},
+            {"step": 2, "title": "Execute", "description": "Code runs line by line", "code": "// Processing..."},
+            {"step": 3, "title": "Result", "description": "See the output", "code": "// Output appears!"}
+        ]
+    })
     
-    # Important Notes - remaining content
-    if len(sentences) > 12:
-        notes_sentences = sentences[12:18]
-        notes_text = create_clean_paragraph(notes_sentences)
-        sections.append({
-            "title": "Tips and Best Practices",
-            "content": notes_text,
-            "type": "details"
-        })
-    
-    # Key Takeaways
+    # ⚡ Key Points
     key_points = generate_key_points(sentences, topic_info)
-    if key_points:
-        sections.append({
-            "title": "Key Takeaways",
-            "content": "",
-            "type": "summary",
-            "points": key_points
-        })
+    sections.append({
+        "title": "⚡ Key Points",
+        "content": "",
+        "type": "keypoints",
+        "points": [f"✓ {p}" for p in key_points] if key_points else [
+            f"✓ {topic_title} is essential for Java",
+            "✓ Practice with examples",
+            "✓ Build on these basics",
+            "✓ Used in real applications"
+        ]
+    })
+    
+    # 🔥 Tips & Mistakes (sidebar)
+    sections.append({
+        "title": "🔥 Tips & Mistakes",
+        "content": "",
+        "type": "tips",
+        "sidebar": True,
+        "dos": [
+            "Read code carefully",
+            "Test small changes",
+            "Understand before moving on"
+        ],
+        "donts": [
+            "Skip fundamentals",
+            "Copy without understanding",
+            "Rush through errors"
+        ],
+        "protip": "Small steps lead to big progress! 🚀"
+    })
+    
+    # 🌍 Real World Use
+    sections.append({
+        "title": "🌍 Real World Use",
+        "content": f"Where is {topic_title} used?",
+        "type": "realworld",
+        "examples": [
+            {"app": "Apps & Software", "how": "Building features users interact with"},
+            {"app": "Backend Systems", "how": "Processing and managing data"}
+        ]
+    })
+    
+    # 🧪 Practice Problem
+    sections.append({
+        "title": "🧪 Practice Problem",
+        "content": "Try this challenge:",
+        "type": "practice",
+        "problem": {
+            "description": f"Use {topic_title} to create your own example. Modify the code below!",
+            "starterCode": code_examples[0] if code_examples else f"// Practice {topic_title}\npublic class Practice {{\n    public static void main(String[] args) {{\n        // Your code here\n    }}\n}}",
+            "hints": ["Start simple", "Test after each change"],
+            "solution": code_examples[0] if code_examples else "// Your solution will vary!",
+            "explanation": "The goal is understanding, not perfection. Keep experimenting!"
+        }
+    })
+    
+    # 📝 Summary
+    sections.append({
+        "title": "📝 Summary",
+        "content": "",
+        "type": "summary",
+        "points": [
+            f"📌 Learned: {topic_title}",
+            f"📌 Key skill: {topic_info.get('description', 'Core concept')}",
+            "📌 Next: Practice and move forward!",
+            "📌 You're making progress! 🎉"
+        ]
+    })
     
     return sections
 
@@ -1511,37 +1668,223 @@ def extract_key_points(text, keywords):
     return points[:5]
 
 
+def get_topic_code_example(topic_id, topic_title):
+    """Get appropriate code examples for each topic"""
+    
+    code_examples = {
+        # Chapter 1 - Introduction
+        "1-1": [
+            "// Welcome to Java Programming!\n// This course will teach you to write programs\n\npublic class Welcome {\n    public static void main(String[] args) {\n        System.out.println(\"Welcome to Java!\");\n        System.out.println(\"Let's start learning!\");\n    }\n}"
+        ],
+        "1-2": [
+            "// Understanding Computer Hardware\n// CPU, Memory, Storage, I/O Devices\n\n// The CPU processes instructions\n// Memory (RAM) stores data temporarily\n// Storage (HDD/SSD) stores data permanently\n// Input: Keyboard, Mouse | Output: Monitor"
+        ],
+        "1-3": [
+            "// Types of Programming Languages\n\n// Machine Language: 10110000 01100001\n// Assembly: MOV AL, 61h\n// High-Level (Java):\n\npublic class HighLevel {\n    public static void main(String[] args) {\n        System.out.println(\"Much easier!\");\n    }\n}"
+        ],
+        "1-4": [
+            "// Operating Systems\n// Windows, macOS, Linux\n\n// The OS manages:\n// - Hardware resources\n// - Running programs\n// - File system\n// - User interface"
+        ],
+        "1-5": [
+            "// Java History\n// Created by James Gosling at Sun Microsystems (1995)\n// \"Write Once, Run Anywhere\"\n\n// Java runs on JVM (Java Virtual Machine)\n// Platform independent - works on Windows, Mac, Linux"
+        ],
+        "1-6": [
+            "// Java Development Kit (JDK)\n// Contains: compiler (javac), JVM, libraries\n\n// IDEs for Java:\n// - Eclipse\n// - IntelliJ IDEA\n// - NetBeans\n// - VS Code with Java extensions"
+        ],
+        "1-7": [
+            "// Your First Java Program!\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
+            "// Print multiple lines\npublic class Welcome {\n    public static void main(String[] args) {\n        System.out.println(\"Welcome to Java!\");\n        System.out.println(\"Programming is fun!\");\n    }\n}"
+        ],
+        "1-8": [
+            "// How to compile and run:\n// 1. Save as HelloWorld.java\n// 2. Open terminal\n// 3. javac HelloWorld.java  (compile)\n// 4. java HelloWorld  (run)\n\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Compiled!\");\n    }\n}"
+        ],
+        "1-9": [
+            "// Good Programming Style\n\n// Use comments to explain code\n// This is a single-line comment\n\n/* This is a\n   multi-line comment */\n\n/** This is JavaDoc\n *  for documentation */\n\npublic class GoodStyle {\n    public static void main(String[] args) {\n        // Use meaningful names\n        System.out.println(\"Clean code!\");\n    }\n}"
+        ],
+        "1-10": [
+            "// Types of Errors\n\n// 1. Syntax Error (compile-time)\n// System.out.println(\"Missing semicolon\")\n\n// 2. Runtime Error\n// int result = 10 / 0;  // Division by zero!\n\n// 3. Logic Error\n// int sum = a - b;  // Should be a + b"
+        ],
+        # Chapter 2 - Elementary Programming
+        "2-1": [
+            "// Elementary Programming\n// Learning variables, data types, and operators\n\npublic class Elementary {\n    public static void main(String[] args) {\n        int number = 10;\n        System.out.println(\"Number: \" + number);\n    }\n}"
+        ],
+        "2-2": [
+            "// Computing Area of a Circle\npublic class ComputeArea {\n    public static void main(String[] args) {\n        double radius = 5.0;\n        double area = radius * radius * 3.14159;\n        System.out.println(\"Area: \" + area);\n    }\n}"
+        ],
+        "2-3": [
+            "// Reading Input from User\nimport java.util.Scanner;\n\npublic class UserInput {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        \n        System.out.print(\"Enter your name: \");\n        String name = input.nextLine();\n        \n        System.out.println(\"Hello, \" + name);\n    }\n}"
+        ],
+        "2-4": [
+            "// Valid Identifiers in Java\n\n// Valid names:\nint age = 25;\nint myAge = 25;\nint _count = 10;\nint $price = 100;\n\n// Invalid names:\n// int 2fast = 10;  // Can't start with number\n// int my-var = 5;  // No hyphens allowed"
+        ],
+        "2-5": [
+            "// Declaring Variables\npublic class Variables {\n    public static void main(String[] args) {\n        int age = 25;\n        double price = 19.99;\n        String name = \"Java\";\n        boolean isActive = true;\n        \n        System.out.println(\"Age: \" + age);\n        System.out.println(\"Price: $\" + price);\n    }\n}"
+        ],
+        "2-6": [
+            "// Assignment Statements\npublic class Assignment {\n    public static void main(String[] args) {\n        int x = 10;        // Assign 10 to x\n        x = x + 5;         // Add 5 to x\n        System.out.println(x);  // 15\n        \n        int y = x = 20;    // Chain assignment\n        System.out.println(y);  // 20\n    }\n}"
+        ],
+        "2-7": [
+            "// Named Constants\npublic class Constants {\n    public static void main(String[] args) {\n        final double PI = 3.14159;\n        final int MAX_SIZE = 100;\n        \n        double area = PI * 5 * 5;\n        System.out.println(\"Area: \" + area);\n        \n        // PI = 3.14;  // Error! Cannot change\n    }\n}"
+        ],
+        "2-8": [
+            "// Naming Conventions\n\n// Variables: camelCase\nint studentAge = 20;\nString firstName = \"John\";\n\n// Constants: UPPER_SNAKE_CASE\nfinal double TAX_RATE = 0.08;\n\n// Classes: PascalCase\n// public class MyClassName {}"
+        ],
+        "2-9": [
+            "// Numeric Operations\npublic class NumericOps {\n    public static void main(String[] args) {\n        int a = 10, b = 3;\n        \n        System.out.println(\"Add: \" + (a + b));      // 13\n        System.out.println(\"Subtract: \" + (a - b)); // 7\n        System.out.println(\"Multiply: \" + (a * b)); // 30\n        System.out.println(\"Divide: \" + (a / b));   // 3\n        System.out.println(\"Remainder: \" + (a % b)); // 1\n    }\n}"
+        ],
+        "2-10": [
+            "// Numeric Literals\npublic class Literals {\n    public static void main(String[] args) {\n        int decimal = 42;       // Decimal\n        int binary = 0b101010;  // Binary (0b prefix)\n        int hex = 0x2A;         // Hexadecimal (0x)\n        \n        double d1 = 3.14;\n        double d2 = 3.14e2;     // Scientific: 314.0\n        float f = 3.14f;        // Float needs 'f'\n    }\n}"
+        ],
+        "2-11": [
+            "// Expression Evaluation\npublic class Expressions {\n    public static void main(String[] args) {\n        // Order: () > * / % > + -\n        int result = 10 + 5 * 2;  // 20, not 30\n        int grouped = (10 + 5) * 2;  // 30\n        \n        System.out.println(result);\n        System.out.println(grouped);\n    }\n}"
+        ],
+        "2-12": [
+            "// Augmented Assignment\npublic class AugmentedOps {\n    public static void main(String[] args) {\n        int x = 10;\n        \n        x += 5;  // x = x + 5 = 15\n        x -= 3;  // x = x - 3 = 12\n        x *= 2;  // x = x * 2 = 24\n        x /= 4;  // x = x / 4 = 6\n        x %= 4;  // x = x % 4 = 2\n        \n        System.out.println(x);  // 2\n    }\n}"
+        ],
+        "2-13": [
+            "// Increment and Decrement\npublic class IncDec {\n    public static void main(String[] args) {\n        int x = 5;\n        \n        System.out.println(x++);  // 5, then x becomes 6\n        System.out.println(++x);  // 7 (increment first)\n        System.out.println(x--);  // 7, then x becomes 6\n        System.out.println(--x);  // 5 (decrement first)\n    }\n}"
+        ],
+        "2-14": [
+            "// Type Casting\npublic class Casting {\n    public static void main(String[] args) {\n        // Widening (automatic)\n        int i = 100;\n        double d = i;  // int to double\n        \n        // Narrowing (explicit)\n        double pi = 3.14159;\n        int rounded = (int) pi;  // 3\n        \n        System.out.println(d);       // 100.0\n        System.out.println(rounded); // 3\n    }\n}"
+        ],
+        # Chapter 3 - Selections
+        "3-1": [
+            "// Selection Statements\n// Make decisions in your code\n\npublic class Selection {\n    public static void main(String[] args) {\n        int score = 85;\n        \n        if (score >= 60) {\n            System.out.println(\"You passed!\");\n        }\n    }\n}"
+        ],
+        "3-2": [
+            "// Boolean Data Type\npublic class BooleanDemo {\n    public static void main(String[] args) {\n        boolean isJavaFun = true;\n        boolean isFishTasty = false;\n        \n        int x = 10, y = 5;\n        boolean result = x > y;  // true\n        \n        System.out.println(result);  // true\n    }\n}"
+        ],
+        "3-3": [
+            "// Simple if Statement\npublic class IfStatement {\n    public static void main(String[] args) {\n        int score = 85;\n        \n        if (score >= 60) {\n            System.out.println(\"You passed!\");\n            System.out.println(\"Congratulations!\");\n        }\n    }\n}"
+        ],
+        "3-4": [
+            "// if-else Statement\npublic class IfElse {\n    public static void main(String[] args) {\n        int score = 55;\n        \n        if (score >= 60) {\n            System.out.println(\"You passed!\");\n        } else {\n            System.out.println(\"You failed.\");\n            System.out.println(\"Try again!\");\n        }\n    }\n}"
+        ],
+        "3-5": [
+            "// Nested if and else-if\npublic class NestedIf {\n    public static void main(String[] args) {\n        int score = 85;\n        \n        if (score >= 90) {\n            System.out.println(\"Grade: A\");\n        } else if (score >= 80) {\n            System.out.println(\"Grade: B\");\n        } else if (score >= 70) {\n            System.out.println(\"Grade: C\");\n        } else {\n            System.out.println(\"Grade: F\");\n        }\n    }\n}"
+        ],
+        # Chapter 5 - Loops
+        "5-1": [
+            "// Introduction to Loops\n// Repeat code multiple times\n\npublic class LoopIntro {\n    public static void main(String[] args) {\n        // Print 5 times\n        for (int i = 1; i <= 5; i++) {\n            System.out.println(\"Hello!\");\n        }\n    }\n}"
+        ],
+        "5-2": [
+            "// while Loop\npublic class WhileLoop {\n    public static void main(String[] args) {\n        int count = 1;\n        \n        while (count <= 5) {\n            System.out.println(\"Count: \" + count);\n            count++;\n        }\n    }\n}"
+        ],
+        "5-3": [
+            "// do-while Loop\npublic class DoWhileLoop {\n    public static void main(String[] args) {\n        int count = 1;\n        \n        do {\n            System.out.println(\"Count: \" + count);\n            count++;\n        } while (count <= 5);\n        \n        // Executes at least once!\n    }\n}"
+        ],
+        "5-4": [
+            "// for Loop\npublic class ForLoop {\n    public static void main(String[] args) {\n        // for (init; condition; update)\n        for (int i = 1; i <= 5; i++) {\n            System.out.println(\"i = \" + i);\n        }\n        \n        // Count down\n        for (int j = 5; j >= 1; j--) {\n            System.out.println(\"j = \" + j);\n        }\n    }\n}"
+        ],
+        # Chapter 7 - Arrays
+        "7-1": [
+            "// Introduction to Arrays\n// Store multiple values of same type\n\npublic class ArrayIntro {\n    public static void main(String[] args) {\n        // Array declaration and initialization\n        int[] numbers = {10, 20, 30, 40, 50};\n        \n        System.out.println(numbers[0]);  // 10\n        System.out.println(numbers.length);  // 5\n    }\n}"
+        ],
+        "7-2": [
+            "// Array Basics\npublic class ArrayBasics {\n    public static void main(String[] args) {\n        // Create array\n        int[] nums = new int[5];\n        nums[0] = 10;\n        nums[1] = 20;\n        \n        // Or initialize directly\n        String[] names = {\"Alice\", \"Bob\", \"Charlie\"};\n        \n        // Loop through array\n        for (int i = 0; i < names.length; i++) {\n            System.out.println(names[i]);\n        }\n    }\n}"
+        ],
+    }
+    
+    # Return specific examples or generate generic one
+    if topic_id in code_examples:
+        return code_examples[topic_id]
+    else:
+        return [
+            f"// Example for {topic_title}\npublic class Example {{\n    public static void main(String[] args) {{\n        // Your code here\n        System.out.println(\"Learning {topic_title}\");\n    }}\n}}"
+        ]
+
+
 def generate_fallback_content(topic_info):
     """Generate attractive fallback content when RAG doesn't return relevant results"""
     topic_title = topic_info.get('title', 'this topic')
     description = topic_info.get('description', 'Key programming concepts')
+    topic_id = topic_info.get('id', '1-1')
+    
+    # Get appropriate code examples
+    code_examples = get_topic_code_example(topic_id, topic_title)
+    metadata = get_topic_metadata(topic_id)
     
     return [
         {
             "title": "🎯 What You'll Learn",
-            "content": f"Welcome to **{topic_title}**! This is an exciting part of your Java journey.\n\n{description}\n\nBy the end of this section, you'll have a solid understanding of these concepts and be ready to apply them in your own programs. Let's dive in!",
+            "content": f"Hey there! 👋 Ready to learn **{topic_title}**?\n\nHere's what we'll cover:\n\n• {description}\n• Why this matters for your coding journey\n• Hands-on examples you can try",
             "type": "introduction"
         },
         {
-            "title": "💡 Understanding the Concept",
-            "content": f"**{topic_title}** is a fundamental concept in Java programming.\n\nThink of it this way: every great program is built from small, understandable pieces. This topic teaches you one of those essential building blocks.\n\nAs you learn, remember that practice makes perfect. Don't worry if it doesn't click immediately - that's completely normal!",
+            "title": "💡 Concept Explanation",
+            "content": f"Think of **{topic_title}** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
             "type": "explanation"
+        },
+        {
+            "title": "📊 Visual Simulation",
+            "content": f"Let's see how {topic_title} works step by step:",
+            "type": "visual",
+            "steps": [
+                {"step": 1, "title": "Start Here", "description": "Begin with the basic structure", "code": code_examples[0] if code_examples else "// Your code starts here"},
+                {"step": 2, "title": "Add Logic", "description": "Build on the foundation", "code": "// Add your logic"},
+                {"step": 3, "title": "See Results", "description": "Run and observe output", "code": "// Check the output!"}
+            ]
         },
         {
             "title": "⚡ Key Points",
             "content": "",
             "type": "keypoints", 
             "points": [
-                f"**Core Concept**: {description}",
-                "**Why It Matters**: This is foundational for more advanced topics",
-                "**Practice Tip**: Try writing code examples yourself",
-                "**Common Use**: You'll use this frequently in real programs"
+                f"✓ {description}",
+                "✓ Foundation for advanced topics",
+                "✓ Practice by writing code yourself",
+                "✓ Used frequently in real programs",
+                "✓ Understanding this = easier future topics"
             ]
         },
         {
-            "title": "🧪 Try It Yourself",
-            "content": "Ready to practice? Try modifying the examples above and see what happens!\n\n**Quick Challenge**: Write your own version of the code examples. Change some values and observe the output.\n\n*Remember: Making mistakes is part of learning. Each error teaches you something new!*",
-            "type": "practice"
+            "title": "🔥 Tips & Mistakes",
+            "content": "",
+            "type": "tips",
+            "sidebar": True,
+            "dos": [
+                "Read code carefully first",
+                "Modify examples to learn",
+                "Focus on understanding"
+            ],
+            "donts": [
+                "Skip the basics",
+                "Copy-paste blindly",
+                "Give up on errors"
+            ],
+            "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
+        },
+        {
+            "title": "🌍 Real World Use",
+            "content": f"Where do we use {topic_title} in real life?",
+            "type": "realworld",
+            "examples": [
+                {"app": "Mobile Apps", "how": "Building user interfaces and handling data"},
+                {"app": "Web Services", "how": "Processing requests and managing information"}
+            ]
+        },
+        {
+            "title": "🧪 Practice Problem",
+            "content": "Try this challenge:",
+            "type": "practice",
+            "problem": {
+                "description": f"Create a simple program using {topic_title}. Start with the example code and modify it!",
+                "starterCode": code_examples[0] if code_examples else f"// Practice {topic_title} here",
+                "hints": ["Start with the basic structure", "Run your code after each change"],
+                "solution": code_examples[0] if code_examples else "// Solution will vary based on your approach",
+                "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
+            }
+        },
+        {
+            "title": "📝 Summary",
+            "content": "",
+            "type": "summary",
+            "points": [
+                f"📌 {topic_title} - {description}",
+                "📌 Master basics before advancing",
+                "📌 Practice with the examples",
+                "📌 Builds foundation for what's next!"
+            ]
         }
     ]
 
@@ -1636,6 +1979,26 @@ def get_topic_content(topic_id):
         if not topic_info:
             return jsonify({'success': False, 'error': 'Topic not found'}), 404
         
+        # Get topic metadata (difficulty, time, next topic)
+        metadata = get_topic_metadata(topic_id)
+        
+        # ========================================
+        # STEP 1: Try to load pre-generated content (INSTANT!)
+        # ========================================
+        pregenerated = get_pregenerated_content(topic_id)
+        if pregenerated:
+            # Add metadata to pregenerated content
+            pregenerated['metadata'] = metadata
+            return jsonify({
+                'success': True,
+                **pregenerated
+            })
+        
+        # ========================================
+        # STEP 2: If no pre-generated content, generate on-the-fly
+        # ========================================
+        print(f"   ⚠️ No pre-generated content found, generating on-the-fly...")
+        
         # Query RAG for specific topic content
         query = topic_info.get('query', topic_info['title'])
         print(f"   Query: {query}")
@@ -1656,8 +2019,7 @@ def get_topic_content(topic_id):
         
         print(f"   Generated {len(sections)} sections")
         
-        return jsonify({
-            'success': True,
+        response_data = {
             'topic': {
                 'id': topic_id,
                 'title': topic_info['title'],
@@ -1665,8 +2027,25 @@ def get_topic_content(topic_id):
                 'chapter_id': chapter_id,
                 'chapter_title': chapter_data['title']
             },
+            'metadata': metadata,
             'sections': sections,
             'total_pages': len(sections)
+        }
+        
+        # Auto-cache for next time
+        try:
+            import json
+            os.makedirs(GENERATED_CONTENT_DIR, exist_ok=True)
+            filepath = os.path.join(GENERATED_CONTENT_DIR, f"topic_{topic_id}.json")
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(response_data, f, ensure_ascii=False, indent=2)
+            print(f"   💾 Auto-cached for future requests")
+        except Exception as e:
+            print(f"   ⚠️ Could not auto-cache: {e}")
+        
+        return jsonify({
+            'success': True,
+            **response_data
         })
         
     except Exception as e:
@@ -2097,6 +2476,74 @@ def health_check():
         'chapters_loaded': len(CHAPTER_TOPICS),
         'total_topics': sum(len(c['topics']) for c in CHAPTER_TOPICS.values())
     })
+
+
+@app.route('/api/admin/content-status', methods=['GET'])
+def admin_content_status():
+    """Check status of pre-generated content"""
+    import json
+    try:
+        if not os.path.exists(GENERATED_CONTENT_DIR):
+            return jsonify({
+                'success': True,
+                'status': 'not_generated',
+                'generated_count': 0,
+                'total_topics': sum(len(c['topics']) for c in CHAPTER_TOPICS.values())
+            })
+        
+        # Count generated files
+        generated_files = [f for f in os.listdir(GENERATED_CONTENT_DIR) 
+                         if f.startswith('topic_') and f.endswith('.json')]
+        
+        # Load metadata if exists
+        metadata_file = os.path.join(GENERATED_CONTENT_DIR, '_metadata.json')
+        metadata = {}
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+        
+        total_topics = sum(len(c['topics']) for c in CHAPTER_TOPICS.values())
+        
+        return jsonify({
+            'success': True,
+            'status': 'complete' if len(generated_files) >= total_topics else 'partial',
+            'generated_count': len(generated_files),
+            'total_topics': total_topics,
+            'generated_at': metadata.get('generated_at'),
+            'missing_topics': [
+                topic['id'] 
+                for chapter in CHAPTER_TOPICS.values() 
+                for topic in chapter['topics'] 
+                if f"topic_{topic['id']}.json" not in generated_files
+            ][:20]  # Limit to first 20 missing
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/admin/regenerate-topic', methods=['POST'])
+def admin_regenerate_topic():
+    """Admin endpoint to regenerate a specific topic"""
+    try:
+        data = request.json or {}
+        topic_id = data.get('topic_id')
+        
+        if not topic_id:
+            return jsonify({'success': False, 'error': 'topic_id is required'}), 400
+        
+        # Delete existing file
+        filepath = os.path.join(GENERATED_CONTENT_DIR, f"topic_{topic_id}.json")
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            
+        return jsonify({
+            'success': True,
+            'message': f'Topic {topic_id} cache cleared. Next request will regenerate it.'
+        })
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':

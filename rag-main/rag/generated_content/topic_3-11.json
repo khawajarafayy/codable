@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "3-11",
+    "title": "Operator Precedence and Associativity",
+    "description": "Order of evaluation for operators",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "9 min",
+    "nextTopicId": "4-1"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever wondered why 2 + 3 * 4 equals 14 and not 20? Let's crack the code of operator precedence and associativity!\n\n• How Java decides which operation to do first\n• The secret order of math operations (PEMDAS for coders!)\n• How to use parentheses to take control of evaluation",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a buffet with different food stations. The dessert station (parentheses) gets served first, no matter where it's placed in line. Then comes the main course (multiplication/division), and finally the appetizers (addition/subtraction).\n\nJava follows similar rules when evaluating expressions:\n\n• **Parentheses first**: Just like dessert, expressions in parentheses get top priority\n• **Multiplication/Division**: These have higher precedence than addition/subtraction\n• **Left-to-right**: When operators have equal precedence, Java works left to right\n\nFor example: `3 + 4 * 2` equals 11, not 14, because multiplication happens before addition!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Operator Precedence and Associativity works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Parentheses First",
+          "description": "Java looks for parentheses and evaluates them first, starting with the innermost ones.",
+          "code": "3 + 4 * (2 + 3)  // (2 + 3) evaluated first → 5"
+        },
+        {
+          "step": 2,
+          "title": "Multiplication/Division",
+          "description": "Next, Java handles all multiplication and division operations from left to right.",
+          "code": "3 + 4 * 5  // 4 * 5 evaluated next → 20"
+        },
+        {
+          "step": 3,
+          "title": "Addition/Subtraction",
+          "description": "Finally, Java performs addition and subtraction from left to right.",
+          "code": "3 + 20  // Final result → 23"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Parentheses override default precedence - use them to clarify your code",
+        "✓ Multiplication/Division have higher precedence than Addition/Subtraction",
+        "✓ When operators have equal precedence, evaluation goes left-to-right",
+        "✓ PEMDAS (Parentheses, Exponents, Multiplication/Division, Addition/Subtraction) is your friend",
+        "✓ Always double-check complex expressions - better safe than sorry!"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use parentheses to make your intentions clear, even when not strictly needed",
+        "Break complex expressions into smaller parts with intermediate variables",
+        "Test your expressions with different values to verify behavior"
+      ],
+      "donts": [
+        "Don't rely on memorizing precedence - use parentheses when in doubt",
+        "Don't write long chains of operations without testing",
+        "Don't mix too many operators in one expression - it's hard to debug"
+      ],
+      "protip": "When in doubt, add parentheses! They make your code more readable and prevent bugs. Your future self will thank you!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Operator Precedence and Associativity used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Financial Calculators",
+          "how": "Calculating interest with formulas like: `principal * (1 + rate/100)^time` - the division happens before addition due to precedence"
+        },
+        {
+          "app": "Game Physics Engines",
+          "how": "Calculating trajectories with expressions like: `initialVelocity * time + 0.5 * gravity * time^2` - multiplication happens before addition"
+        },
+        {
+          "app": "Shopping Cart Totals",
+          "how": "Computing totals with: `price * quantity + shipping - discount` - multiplication happens before addition/subtraction"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Predict the output of these expressions, then verify by running them in Java. Can you explain why each result occurs?",
+        "starterCode": "// What will these print?\nSystem.out.println(5 + 3 * 2);\nSystem.out.println((5 + 3) * 2);\nSystem.out.println(10 / 2 + 3);\nSystem.out.println(10 / (2 + 3));\nSystem.out.println(2 * 3 + 4 * 5);",
+        "hints": [
+          "Remember PEMDAS - Parentheses first!",
+          "Multiplication and division have equal precedence",
+          "When in doubt, add parentheses to make it clear"
+        ],
+        "solution": "// Answers:\nSystem.out.println(5 + 3 * 2);    // 11 (3*2 first)\nSystem.out.println((5 + 3) * 2);  // 16 (parentheses first)\nSystem.out.println(10 / 2 + 3);    // 8 (10/2 first)\nSystem.out.println(10 / (2 + 3));  // 2 (parentheses first)\nSystem.out.println(2 * 3 + 4 * 5); // 26 (2*3=6, 4*5=20, then 6+20)",
+        "explanation": "Java follows operator precedence rules strictly. Parentheses always win, then multiplication/division, then addition/subtraction. When operators have equal precedence, evaluation goes left-to-right."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Operator precedence determines which operations happen first in expressions",
+        "📌 Parentheses > Multiplication/Division > Addition/Subtraction",
+        "📌 When operators have equal precedence, evaluation goes left-to-right",
+        "📌 Practice with simple examples before tackling complex expressions - you're ready for the next topic!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T04:04:22.199822",
+  "_topic_id": "3-11"
+}

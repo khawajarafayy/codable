@@ -1,0 +1,128 @@
+{
+  "topic": {
+    "id": "5-8",
+    "title": "Keywords break and continue",
+    "description": "Controlling loop execution",
+    "chapter_id": 5,
+    "chapter_title": "Loops"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "11 min",
+    "nextTopicId": "6-1"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever felt stuck in a loop you couldn't escape? Today we'll learn how to control loops like a pro!\n\n• How to exit loops early with `break`\n• How to skip to the next iteration with `continue`\n• When to use each keyword effectively",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're searching for your favorite book in a library:\n\n- `break` is like finding the book and immediately leaving the library\n- `continue` is like skipping a shelf that doesn't have your book and moving to the next one\n\n**The `break` keyword**\n• Immediately exits the current loop\n• Program continues with the next statement after the loop\n• Works with `for`, `while`, and `do-while` loops\n\n**The `continue` keyword**\n• Skips the current iteration and jumps to the next one\n• The loop condition is re-evaluated\n• Only skips the current cycle, doesn't exit the loop",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how `break` and `continue` works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Starting the Loop",
+          "description": "We begin counting from 1 to 5",
+          "code": "for (int i = 1; i <= 5; i++) {\n  System.out.println(i);"
+        },
+        {
+          "step": 2,
+          "title": "Using break",
+          "description": "When i reaches 3, we exit the loop completely",
+          "code": "if (i == 3) {\n  break;\n}"
+        },
+        {
+          "step": 3,
+          "title": "Using continue",
+          "description": "When i is 3, we skip printing it but continue the loop",
+          "code": "if (i == 3) {\n  continue;\n}\nSystem.out.println(i);"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `break` exits the entire loop immediately",
+        "✓ `continue` skips just the current iteration",
+        "✓ Both work with all loop types (for, while, do-while)",
+        "✓ Use `break` when you've found what you're looking for",
+        "✓ Use `continue` when you want to skip specific cases"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `break` to exit loops early when the job is done",
+        "Use `continue` to skip invalid or unwanted data",
+        "Add comments explaining why you're using these keywords"
+      ],
+      "donts": [
+        "Don't use `break` just to exit a loop - make your conditions clear",
+        "Don't nest too many `break`/`continue` statements - it gets confusing",
+        "Don't forget that `break` only exits the innermost loop"
+      ],
+      "protip": "For nested loops, label your loops and use `break labelName;` to exit outer loops!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where are these keywords used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Search Algorithms",
+          "how": "Use `break` when you find the item you're searching for in a list"
+        },
+        {
+          "app": "Data Processing",
+          "how": "Use `continue` to skip invalid or corrupted data entries"
+        },
+        {
+          "app": "Game Development",
+          "how": "Use `break` to exit game loops when the player quits"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that prints numbers from 1 to 10, but:\n- Skips printing 5 using `continue`\n- Stops printing after 8 using `break`",
+        "starterCode": "public class LoopControl {\n  public static void main(String[] args) {\n    for (int i = 1; i <= 10; i++) {\n      // Your code here\n    }\n  }\n}",
+        "hints": [
+          "Use an if statement to check when i equals 5",
+          "Use another if statement to check when i equals 8"
+        ],
+        "solution": "public class LoopControl {\n  public static void main(String[] args) {\n    for (int i = 1; i <= 10; i++) {\n      if (i == 5) {\n        continue;\n      }\n      if (i == 9) {\n        break;\n      }\n      System.out.println(i);\n    }\n  }\n}",
+        "explanation": "The program prints numbers 1-4, skips 5, prints 6-8, then exits before reaching 9. The output will be: 1, 2, 3, 4, 6, 7, 8"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 `break` exits loops completely - use when you're done",
+        "📌 `continue` skips to the next iteration - use to filter data",
+        "📌 Practice using both in simple loops first",
+        "📌 Ready to learn about nested loops next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:30:09.011910",
+  "_topic_id": "5-8"
+}

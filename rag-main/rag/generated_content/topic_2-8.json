@@ -1,0 +1,130 @@
+{
+  "topic": {
+    "id": "2-8",
+    "title": "Naming Conventions",
+    "description": "Standard conventions for naming in Java",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "8 min",
+    "nextTopicId": "2-9"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Naming things in Java isn't just about creativity - it's about clarity! Let's master the rules that make your code speak for itself.\n\n• Why naming conventions matter in Java\n• How to name variables, methods, and classes correctly\n• Common mistakes to avoid (and how to fix them)",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're organizing a toolbox. You wouldn't mix up screwdrivers and wrenches with random labels - you'd use clear, consistent names so you can find what you need instantly. Java naming conventions work the same way!\n\nJava has simple rules to make your code readable:\n\n• **Variables & Methods**: Start with lowercase, then camelCase for multiple words\n  - ✅ `studentName` (good) vs ❌ `StudentName` (bad)\n  - ✅ `calculateTotal()` vs ❌ `CalculateTotal()`\n\n• **Classes**: Start with uppercase, then camelCase\n  - ✅ `StudentRecord` vs ❌ `studentRecord`\n  - ✅ `BankAccount` vs ❌ `bank_account`\n\n• **Constants**: ALL_UPPERCASE with underscores\n  - ✅ `MAX_SIZE` vs ❌ `maxSize`",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Let's see naming conventions in action:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Variable Naming",
+          "description": "A variable for student age - notice the lowercase start and camelCase",
+          "code": "int studentAge = 20;"
+        },
+        {
+          "step": 2,
+          "title": "Method Naming",
+          "description": "A method to calculate grades - starts with verb and uses camelCase",
+          "code": "double calculateGrade() {\n    return totalScore / maxScore;\n}"
+        },
+        {
+          "step": 3,
+          "title": "Class Naming",
+          "description": "A class representing a student - starts with uppercase",
+          "code": "class StudentRecord {\n    String studentName;\n    int studentAge;\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Java is case-sensitive: `age` ≠ `Age` ≠ `AGE`",
+        "✓ Variables/methods: `lowerCamelCase` (e.g., `calculateTotal`)",
+        "✓ Classes: `UpperCamelCase` (e.g., `StudentRecord`)",
+        "✓ Constants: `ALL_UPPERCASE` (e.g., `MAX_SIZE`)",
+        "✓ Avoid $ and _ in regular names (reserved for special cases)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use descriptive names (e.g., `numberOfStudents` vs `num`)",
+        "Keep names short but meaningful (e.g., `avg` vs `averageScore`)",
+        "Be consistent across your project"
+      ],
+      "donts": [
+        "Don't start names with numbers (e.g., `2ndPlace`)",
+        "Don't use Java keywords (e.g., `int class = 5`)",
+        "Don't use spaces or special chars (e.g., `student-name`)"
+      ],
+      "protip": "When in doubt, ask: 'Will someone else understand this name instantly?' If not, rename it!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Naming conventions aren't just academic - they're used everywhere:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Systems",
+          "how": "Uses `AccountHolder` (class), `calculateInterest()` (method), and `MAX_TRANSACTION_LIMIT` (constant) for clarity"
+        },
+        {
+          "app": "Android Apps",
+          "how": "Follows strict naming like `onClickListener()` (method) and `R.layout.activity_main` (resource reference)"
+        },
+        {
+          "app": "Open Source Projects",
+          "how": "Consistent naming makes collaboration easier (e.g., `isValidEmail()` vs `checkEmail()`)"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Fix the naming mess! Identify and correct all naming convention violations in this code:",
+      "type": "practice",
+      "problem": {
+        "description": "This code snippet has 5 naming violations. Can you spot and fix them all?",
+        "starterCode": "// Original code with bad names\nclass student {\n    int Age;\n    final int max_size = 100;\n    \n    void CalculateTotal() {\n        int TotalScore = 95;\n        System.out.println(TotalScore);\n    }\n}",
+        "hints": [
+          "Check class naming first",
+          "Look for method naming issues",
+          "Remember constant naming rules",
+          "Variable names should be lowercase"
+        ],
+        "solution": "// Corrected code\nclass Student {\n    int age;\n    final int MAX_SIZE = 100;\n    \n    void calculateTotal() {\n        int totalScore = 95;\n        System.out.println(totalScore);\n    }\n}",
+        "explanation": "Fixed: class name (`Student`), variable names (`age`, `totalScore`), constant (`MAX_SIZE`), and method name (`calculateTotal`). All now follow Java conventions!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Naming conventions make your code readable and professional",
+        "📌 Variables/methods: `lowerCamelCase` | Classes: `UpperCamelCase` | Constants: `ALL_UPPERCASE`",
+        "📌 Practice by fixing bad names in existing code",
+        "📌 You're now ready to write clean, convention-following Java code!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:04:05.471074",
+  "_topic_id": "2-8"
+}

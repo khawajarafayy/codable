@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "3-9",
+    "title": "switch Statements",
+    "description": "Multi-way branching with switch",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "7 min",
+    "nextTopicId": "3-10"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ever felt like `if-else` chains are getting too messy? Let’s learn a cleaner way to handle multiple choices!\n\n• How `switch` statements simplify multi-way branching\n• When to use `switch` vs `if-else`\n• The magic of `break` and `default` cases",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you’re at a coffee shop with a menu:\n- Press 1 for Espresso\n- Press 2 for Latte\n- Press 3 for Cappuccino\n\nA `switch` statement is like this menu—it checks your choice and serves the right drink instantly!\n\n• Works with `int`, `char`, `String`, and enums (Java 7+)\n• Each case is a possible path your code can take\n• Think of it as a traffic cop directing cars to different roads\n\nExample:\n```java\nint day = 3;\nswitch (day) {\n  case 1: System.out.println(\"Monday\"); break;\n  case 2: System.out.println(\"Tuesday\"); break;\n  case 3: System.out.println(\"Wednesday\"); break;\n  default: System.out.println(\"Weekend!\");\n}\n```",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how `switch` statements work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "🎯 Input Check",
+          "description": "The `switch` checks the variable value (e.g., `day = 3`).",
+          "code": "int day = 3;\nswitch (day) {"
+        },
+        {
+          "step": 2,
+          "title": "🔍 Case Matching",
+          "description": "It jumps to the matching case (like a teleporter!).",
+          "code": "  case 3: System.out.println(\"Wednesday\");"
+        },
+        {
+          "step": 3,
+          "title": "⏹️ Break or Fall Through",
+          "description": "`break` exits the switch. Without it, code ‘falls through’ to the next case!",
+          "code": "    break;\n  default: System.out.println(\"Invalid day\");\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `switch` is cleaner than long `if-else` chains for multiple conditions",
+        "✓ Always include `break` unless you want ‘fall-through’ behavior",
+        "✓ `default` case handles unexpected values (like a safety net)",
+        "✓ Works with `String` in Java 7+ (e.g., `case \"Monday\":`)",
+        "✓ Cases must be constant values (no variables!)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `switch` for 3+ conditions to keep code readable",
+        "Group cases without `break` for shared logic (e.g., weekdays)",
+        "Add `default` to catch errors early"
+      ],
+      "donts": [
+        "Forget `break` (unless intentional fall-through)",
+        "Use non-constant cases (e.g., `case x:` where `x` is a variable)",
+        "Overuse `switch` for simple true/false conditions"
+      ],
+      "protip": "For complex conditions, combine `switch` with enums for type safety!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is `switch` used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Menu Systems",
+          "how": "Handling user input (e.g., ‘Press 1 for Settings’) in CLI apps."
+        },
+        {
+          "app": "Game Development",
+          "how": "Processing keyboard inputs (e.g., `case 'W': moveForward();`)."
+        },
+        {
+          "app": "State Machines",
+          "how": "Managing app states (e.g., `case LOADING: showSpinner();`)."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a `switch` statement that converts a month number (1-12) to its name. Handle invalid numbers with `default`.\nExample: Input `3` → Output `\"March\"`.",
+        "starterCode": "int month = 5; // Test with 1-12\nswitch (month) {\n  // Your code here\n}",
+        "hints": [
+          "Start with `case 1:` for January",
+          "Remember `break` after each case",
+          "Use `default` for numbers outside 1-12"
+        ],
+        "solution": "int month = 5;\nswitch (month) {\n  case 1: System.out.println(\"January\"); break;\n  case 2: System.out.println(\"February\"); break;\n  case 3: System.out.println(\"March\"); break;\n  case 4: System.out.println(\"April\"); break;\n  case 5: System.out.println(\"May\"); break;\n  case 6: System.out.println(\"June\"); break;\n  case 7: System.out.println(\"July\"); break;\n  case 8: System.out.println(\"August\"); break;\n  case 9: System.out.println(\"September\"); break;\n  case 10: System.out.println(\"October\"); break;\n  case 11: System.out.println(\"November\"); break;\n  case 12: System.out.println(\"December\"); break;\n  default: System.out.println(\"Invalid month!\");\n}",
+        "explanation": "Each `case` maps a number to its month name. The `default` catches invalid inputs (e.g., 13). Without `break`, the code would print all months after the match!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 `switch` simplifies multi-way branching with clean syntax",
+        "📌 `break` stops fall-through; `default` handles edge cases",
+        "📌 Practice with real-world menus or game controls",
+        "📌 Ready to combine with loops next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T04:03:25.646880",
+  "_topic_id": "3-9"
+}

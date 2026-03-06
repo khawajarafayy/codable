@@ -1,0 +1,125 @@
+{
+  "topic": {
+    "id": "6-3",
+    "title": "Calling a Method",
+    "description": "How to invoke methods",
+    "chapter_id": 6,
+    "chapter_title": "Methods"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "10 min",
+    "nextTopicId": "6-4"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s demystify how to call methods in Java! Think of methods as little helpers that do specific tasks for you.\n\n• How to invoke (call) a method\n• The role of parentheses and semicolons\n• Practical examples with `System.out.println()` and `Scanner`",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine methods like vending machines. You press a button (call a method), and it gives you what you want—like a soda or a snack!\n\nIn Java, calling a method is just as simple:\n• You write the method’s name\n• Add parentheses `()` (like pressing the button)\n• End with a semicolon `;` (like confirming your choice)\n\nFor example, `System.out.println(\"Hello!\")` tells Java to print \"Hello!\" to the console. The `println` method is like the vending machine’s \"print\" button.",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Calling a Method works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Write the Method Name",
+          "description": "Start with the object (like `System.out`) and the method name (like `println`).",
+          "code": "System.out.println"
+        },
+        {
+          "step": 2,
+          "title": "Add Parentheses",
+          "description": "Parentheses `()` hold the input (like a message or number).",
+          "code": "System.out.println(\"Hello!\")"
+        },
+        {
+          "step": 3,
+          "title": "End with a Semicolon",
+          "description": "The semicolon `;` tells Java you’re done with the statement.",
+          "code": "System.out.println(\"Hello!\");"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Methods are called using `objectName.methodName()`",
+        "✓ Parentheses `()` are required—even if empty!",
+        "✓ Always end with a semicolon `;`",
+        "✓ `System.out.println()` is your go-to for printing",
+        "✓ `Scanner.nextDouble()` reads user input"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Match opening/closing parentheses",
+        "Use descriptive method names (e.g., `calculateTotal()`)",
+        "Test methods with different inputs"
+      ],
+      "donts": [
+        "Forget the semicolon `;`",
+        "Misspell method names (Java is case-sensitive!)",
+        "Call methods without their object (e.g., `println()` alone won’t work)"
+      ],
+      "protip": "If a method isn’t working, check for typos and missing parentheses first!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Calling a Method used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Apps",
+          "how": "Call `calculateInterest()` to compute savings growth or `validatePin()` to check user input."
+        },
+        {
+          "app": "Games",
+          "how": "Call `jump()` or `shoot()` methods when players press buttons."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that asks the user for their name and then prints a greeting. Use `Scanner.nextLine()` to read input and `System.out.println()` to print the message.",
+        "starterCode": "// Starter code\nimport java.util.Scanner;\n\npublic class GreetUser {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        // Your code here\n    }\n}",
+        "hints": [
+          "Call `input.nextLine()` to read the name",
+          "Store the name in a variable (e.g., `String name`)",
+          "Print using `System.out.println(\"Hello, \" + name + \"!\")`"
+        ],
+        "solution": "// Solution\nimport java.util.Scanner;\n\npublic class GreetUser {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        System.out.print(\"Enter your name: \");\n        String name = input.nextLine();\n        System.out.println(\"Hello, \" + name + \"!\");\n    }\n}",
+        "explanation": "We called `input.nextLine()` to read the user’s name and `System.out.println()` to print the greeting. Parentheses and semicolons are key!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Methods are called with `object.methodName()`",
+        "📌 Parentheses `()` and semicolons `;` are non-negotiable",
+        "📌 Practice with `println()` and `Scanner` to build confidence",
+        "📌 Ready to learn about *return values* next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:31:46.389074",
+  "_topic_id": "6-3"
+}

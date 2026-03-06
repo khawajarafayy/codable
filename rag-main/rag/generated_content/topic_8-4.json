@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "8-4",
+    "title": "Passing Two-Dimensional Arrays to Methods",
+    "description": "Using 2D arrays as parameters",
+    "chapter_id": 8,
+    "chapter_title": "Multidimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "13 min",
+    "nextTopicId": "8-5"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s master how to pass 2D arrays to methods like a pro! You’ll learn:\n\n• How to declare method parameters for 2D arrays\n• The difference between passing arrays vs. single values\n• Practical examples to use right away",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine a 2D array like a spreadsheet - rows and columns full of data. When you pass this spreadsheet to a method, you’re giving it the whole grid to work with!\n\n**How it works:**\n• A 2D array is just an array of arrays\n• Methods can accept them as parameters\n• The method can then read or modify the entire grid\n\n**Key syntax:**\n• Method declaration: `void processArray(int[][] arr)`\n• Call the method: `processArray(my2DArray)`\n\nThe method gets access to all elements - no need to pass each value separately!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Passing Two-Dimensional Arrays to Methods works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Declare the 2D Array",
+          "description": "First we create our grid of values",
+          "code": "int[][] matrix = {\n  {1, 2, 3},\n  {4, 5, 6}\n};"
+        },
+        {
+          "step": 2,
+          "title": "Define the Method",
+          "description": "Create a method that accepts a 2D array parameter",
+          "code": "public static void printMatrix(int[][] arr) {\n  for(int[] row : arr) {\n    for(int num : row) {\n      System.out.print(num + \" \");\n    }\n    System.out.println();\n  }\n}"
+        },
+        {
+          "step": 3,
+          "title": "Pass the Array",
+          "description": "Call the method with our 2D array",
+          "code": "printMatrix(matrix); // Outputs:\n// 1 2 3\n// 4 5 6"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ 2D arrays are passed by reference - methods can modify the original",
+        "✓ Method parameters need `[][]` syntax for 2D arrays",
+        "✓ The array size doesn’t need to be specified in the parameter",
+        "✓ Works the same way for all data types (int, String, etc.)",
+        "✓ More efficient than passing individual elements"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use enhanced for loops for cleaner 2D array processing",
+        "Check for null arrays before processing",
+        "Document expected array dimensions in method comments"
+      ],
+      "donts": [
+        "Don’t forget the double brackets `[][]` in parameters",
+        "Don’t assume all rows have the same length",
+        "Don’t modify arrays unless you intend to change the original"
+      ],
+      "protip": "Use `Arrays.deepToString(arr)` for quick debugging of 2D arrays!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Passing Two-Dimensional Arrays to Methods used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Image Processing",
+          "how": "Pixel data is stored in 2D arrays and passed to filters/transform methods"
+        },
+        {
+          "app": "Game Development",
+          "how": "Game boards (like chess or tic-tac-toe) are 2D arrays passed to game logic methods"
+        },
+        {
+          "app": "Spreadsheet Apps",
+          "how": "Cell data is passed as 2D arrays to calculation/formatting methods"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a method `sumDiagonal` that takes a square 2D array and returns the sum of its main diagonal elements (from top-left to bottom-right).",
+        "starterCode": "public class DiagonalSum {\n  public static void main(String[] args) {\n    int[][] matrix = {\n      {1, 2, 3},\n      {4, 5, 6},\n      {7, 8, 9}\n    };\n    System.out.println(sumDiagonal(matrix)); // Should print 15\n  }\n  \n  // Add your method here\n}",
+        "hints": [
+          "The diagonal elements have equal row and column indices (0,0), (1,1), etc.",
+          "Use a single loop that increments both row and column",
+          "Make sure to check the array is square first"
+        ],
+        "solution": "public static int sumDiagonal(int[][] arr) {\n  int sum = 0;\n  for(int i = 0; i < arr.length; i++) {\n    sum += arr[i][i];\n  }\n  return sum;\n}",
+        "explanation": "The method loops through each row and adds the element where row index equals column index. For a 3x3 matrix, this sums elements at positions (0,0), (1,1), and (2,2)."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Passing 2D arrays to methods is just like passing 1D arrays - use `[][]` syntax",
+        "📌 Methods can read and modify the original array since it's passed by reference",
+        "📌 Practice with real examples like matrix operations or game boards",
+        "📌 You're now ready to handle multi-dimensional data in methods!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:41:43.977332",
+  "_topic_id": "8-4"
+}

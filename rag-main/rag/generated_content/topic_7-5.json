@@ -1,0 +1,125 @@
+{
+  "topic": {
+    "id": "7-5",
+    "title": "Returning an Array from a Method",
+    "description": "Methods that return arrays",
+    "chapter_id": 7,
+    "chapter_title": "Single-Dimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "13 min",
+    "nextTopicId": "7-6"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's explore how methods can return arrays—just like a vending machine gives you a whole pack of snacks instead of just one!\n\n• How to declare methods that return arrays\n• The syntax for returning array values\n• Practical examples where this is useful",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a bakery. You ask for 'a dozen cookies,' and the baker hands you a whole tray (an array!) of cookies—not just one. Methods can do the same with arrays!\n\nWhen a method returns an array, it's like getting a whole collection of values packaged together. Here's how it works:\n\n• The method's return type is the array type (e.g., `int[]`)\n• You create and fill an array inside the method\n• Use `return` with the array name\n\nExample: A method that returns the first 5 even numbers would look like this:",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Returning an Array from a Method works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Method Declaration",
+          "description": "The method is declared with an array return type (e.g., `int[]`).",
+          "code": "public static int[] getEvenNumbers() {"
+        },
+        {
+          "step": 2,
+          "title": "Array Creation",
+          "description": "Inside the method, an array is created and filled with values.",
+          "code": "int[] evens = {2, 4, 6, 8, 10};"
+        },
+        {
+          "step": 3,
+          "title": "Return the Array",
+          "description": "The array is returned to the caller, who can now use it.",
+          "code": "return evens;\n}\n\n// Caller uses it like this:\nint[] myEvens = getEvenNumbers();"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Return type must match the array type (e.g., `int[]` for integers)",
+        "✓ The array is created inside the method, not outside",
+        "✓ Use `return arrayName;` to send the array back",
+        "✓ The caller gets the whole array, not just one value",
+        "✓ Arrays are passed by reference (changes affect the original)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Declare the return type correctly (e.g., `String[]`)",
+        "Initialize the array inside the method",
+        "Return the array directly (no need for extra steps)"
+      ],
+      "donts": [
+        "Don’t forget the `[]` in the return type",
+        "Don’t return a single element instead of the array",
+        "Don’t modify the array after returning it (unless intended)"
+      ],
+      "protip": "Use this when you need to return multiple values of the same type—like a list of scores or names!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Returning an Array from a Method used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Weather Apps",
+          "how": "A method returns an array of daily temperatures for the week."
+        },
+        {
+          "app": "Games",
+          "how": "A method returns an array of high scores from a leaderboard."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a method `generateMultiples` that returns an array of the first 10 multiples of a given number (e.g., for 3, return `[3, 6, 9, ..., 30]`).",
+        "starterCode": "public static int[] generateMultiples(int num) {\n    // Your code here\n}",
+        "hints": [
+          "Create an array of size 10 first",
+          "Use a loop to fill the array with multiples",
+          "Return the array at the end"
+        ],
+        "solution": "public static int[] generateMultiples(int num) {\n    int[] multiples = new int[10];\n    for (int i = 0; i < 10; i++) {\n        multiples[i] = num * (i + 1);\n    }\n    return multiples;\n}",
+        "explanation": "The method creates an array, fills it with multiples using a loop, and returns the array. The caller can then use these values!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Methods can return arrays just like they return single values",
+        "📌 Declare the return type with `[]` (e.g., `int[]`)",
+        "📌 Practice by returning lists of numbers, names, or other data",
+        "📌 Ready to learn about passing arrays to methods next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:37:18.989222",
+  "_topic_id": "7-5"
+}

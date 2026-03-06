@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "6-5",
+    "title": "Passing Arguments by Values",
+    "description": "How arguments are passed to methods",
+    "chapter_id": 6,
+    "chapter_title": "Methods"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "12 min",
+    "nextTopicId": "6-6"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s break down how Java handles arguments when you pass them to methods. It’s simpler than you think!\n\n• How Java passes values (not variables) to methods\n• Why changing a parameter inside a method doesn’t affect the original value\n• Common mistakes and how to avoid them",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you’re photocopying a document. The original stays safe, but you can scribble all over the copy. That’s how Java passes arguments!\n\nWhen you pass a variable to a method, Java creates a *copy* of its value. The method works with this copy, leaving the original untouched.\n\n• **Primitive types** (like `int`, `double`) are passed *by value* – a full copy is made\n• **Objects** are passed *by reference value* – the copy points to the same object (but the reference itself is copied!)\n• Changing the copy inside the method won’t affect the original variable",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Passing Arguments by Values works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Before the Method Call",
+          "description": "You have a variable with a value. Java prepares to make a copy.",
+          "code": "int original = 10;\n// original → 10 (stored in memory)"
+        },
+        {
+          "step": 2,
+          "title": "During the Method Call",
+          "description": "Java copies the value and passes it to the method. The method gets its own version.",
+          "code": "void modify(int copy) {\n    copy = 20;  // Only changes the copy!\n}\n\nmodify(original);"
+        },
+        {
+          "step": 3,
+          "title": "After the Method Call",
+          "description": "The original variable remains unchanged. The copy disappears when the method ends.",
+          "code": "System.out.println(original); // Still 10!"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Java *always* passes arguments by value – even for objects!",
+        "✓ Changing a parameter inside a method won’t affect the original variable",
+        "✓ For objects, the *reference* is copied, not the object itself",
+        "✓ Primitive types are copied entirely (like photocopying a number)",
+        "✓ Think of parameters as disposable copies – safe to modify!"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use descriptive parameter names (e.g., `modifyValue(int newValue)`)",
+        "Remember that method parameters are *local* to the method",
+        "For objects, changes to the object’s *state* persist (but reassigning the parameter won’t)"
+      ],
+      "donts": [
+        "Don’t assume changes to parameters affect the original variable",
+        "Don’t create multiple `Scanner` objects for the same input stream (like in the textbook example!)",
+        "Don’t confuse *passing by value* with *passing by reference* – Java doesn’t do the latter!"
+      ],
+      "protip": "If you want a method to modify a variable, *return* the new value instead of trying to change the parameter!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Passing Arguments by Values used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Banking Systems",
+          "how": "When calculating interest, the original balance isn’t changed until the transaction is confirmed. The method works with a copy of the balance value."
+        },
+        {
+          "app": "Game Development",
+          "how": "Player health is passed to a damage-calculation method. The method reduces a *copy* of the health value, then returns the new value to update the original."
+        },
+        {
+          "app": "Form Validation",
+          "how": "User input is passed to validation methods. The original input stays unchanged while the method checks the copy."
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Fix this code so it correctly doubles the value of `number` without changing the original variable directly. The method should return the new value.",
+        "starterCode": "public class DoubleValue {\n    public static void main(String[] args) {\n        int number = 5;\n        // Call your method here\n        System.out.println(\"Original: \" + number);\n        System.out.println(\"Doubled: \" + doubled);\n    }\n    \n    // Write your method here\n}",
+        "hints": [
+          "Remember: Java passes by value, so the method can’t change `number` directly",
+          "The method should return the doubled value",
+          "Assign the method’s return value to a variable in `main`"
+        ],
+        "solution": "public class DoubleValue {\n    public static void main(String[] args) {\n        int number = 5;\n        int doubled = doubleValue(number);\n        System.out.println(\"Original: \" + number);\n        System.out.println(\"Doubled: \" + doubled);\n    }\n    \n    public static int doubleValue(int value) {\n        return value * 2;\n    }\n}",
+        "explanation": "The method `doubleValue` receives a *copy* of `number`. It doubles the copy and returns the result. The original `number` remains unchanged, but we capture the returned value in `doubled`."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Java passes arguments *by value* – always a copy, never the original",
+        "📌 Changing a parameter inside a method won’t affect the original variable",
+        "📌 Practice writing methods that return modified values instead of trying to change parameters",
+        "📌 Ready for next topic: *Passing Objects to Methods* (where things get more interesting!)"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:32:49.982294",
+  "_topic_id": "6-5"
+}

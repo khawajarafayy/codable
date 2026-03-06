@@ -1,0 +1,130 @@
+{
+  "topic": {
+    "id": "5-5",
+    "title": "Which Loop to Use?",
+    "description": "Choosing the right loop type",
+    "chapter_id": 5,
+    "chapter_title": "Loops"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "11 min",
+    "nextTopicId": "5-6"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Choosing the right loop makes your code cleaner and more efficient! Today, you'll master:\n\n• When to use `while`, `do-while`, and `for` loops\n• How to pick the best loop for different scenarios\n• Common pitfalls to avoid when looping",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're a chef in a kitchen:\n\n• **While loop**: Like checking if you have enough ingredients *before* starting to cook. You keep cooking only if you have what you need.\n• **Do-while loop**: Like tasting your dish *after* cooking it once - you always cook at least once!\n• **For loop**: Like following a precise recipe with exact steps - perfect when you know how many times to stir.\n\n**When to use which?**\n\n• Use `while` when you don’t know how many times you’ll loop (e.g., reading user input until they say 'quit')\n• Use `do-while` when you must run the loop at least once (e.g., showing a menu and asking for choice)\n• Use `for` when you know the exact number of iterations (e.g., processing 100 records)",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Which Loop to Use? works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "While Loop Example",
+          "description": "Keep asking for input until user enters 'quit'",
+          "code": "String input = \"\";\nwhile (!input.equals(\"quit\")) {\n    input = scanner.nextLine();\n    System.out.println(\"You entered: \" + input);\n}"
+        },
+        {
+          "step": 2,
+          "title": "Do-While Loop Example",
+          "description": "Show menu and get choice - always shows menu at least once",
+          "code": "int choice;\ndo {\n    System.out.println(\"1. Play\\n2. Settings\\n3. Quit\");\n    choice = scanner.nextInt();\n} while (choice != 3);"
+        },
+        {
+          "step": 3,
+          "title": "For Loop Example",
+          "description": "Process exactly 10 items from an array",
+          "code": "for (int i = 0; i < 10; i++) {\n    System.out.println(\"Processing item \" + i);\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `while`: Check condition first, then loop (0+ times)",
+        "✓ `do-while`: Loop first, then check condition (1+ times)",
+        "✓ `for`: Perfect for counting loops (known iterations)",
+        "✓ Choose `while` for unknown counts, `for` for known counts",
+        "✓ `do-while` is great for menus and input validation"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use `for` when you know how many times to loop",
+        "Use `while` for loops that might not run at all",
+        "Use `do-while` when the loop must run at least once"
+      ],
+      "donts": [
+        "Don't use `for` when you don't know the loop count",
+        "Don't forget to update your loop variable (infinite loops!)",
+        "Don't use `do-while` when the first run might be invalid"
+      ],
+      "protip": "When in doubt, ask: 'Do I need to run this at least once?' If yes, use `do-while`!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Which Loop to Use? used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Game Development",
+          "how": "Use `while` for game loops that run until the player quits"
+        },
+        {
+          "app": "ATM Machines",
+          "how": "Use `do-while` to show menu and process transactions until user exits"
+        },
+        {
+          "app": "Data Processing",
+          "how": "Use `for` to process each record in a database table"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that:\n1. Asks the user to guess a number between 1-10\n2. Keeps asking until they guess correctly (the number is 7)\n3. Counts how many guesses they took\n\nWhich loop would be best for this?",
+        "starterCode": "import java.util.Scanner;\n\npublic class GuessNumber {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        int secretNumber = 7;\n        int guess;\n        int attempts = 0;\n        \n        // Your loop here\n        \n        System.out.println(\"Correct! It took you \" + attempts + \" attempts.\");\n    }\n}",
+        "hints": [
+          "You don't know how many guesses it will take",
+          "You need to check the guess before looping",
+          "Remember to increment the attempts counter"
+        ],
+        "solution": "import java.util.Scanner;\n\npublic class GuessNumber {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        int secretNumber = 7;\n        int guess;\n        int attempts = 0;\n        \n        do {\n            System.out.print(\"Guess a number (1-10): \");\n            guess = scanner.nextInt();\n            attempts++;\n        } while (guess != secretNumber);\n        \n        System.out.println(\"Correct! It took you \" + attempts + \" attempts.\");\n    }\n}",
+        "explanation": "We used a `do-while` loop because:\n1. We need to ask at least once\n2. We don't know how many guesses it will take\n3. We check the condition after each guess"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 `while`: Check first, then loop (0+ times)",
+        "📌 `do-while`: Loop first, then check (1+ times)",
+        "📌 `for`: Best for counting loops",
+        "📌 Practice picking the right loop for different scenarios",
+        "📌 Ready to learn about nested loops next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:28:34.816066",
+  "_topic_id": "5-5"
+}

@@ -1,0 +1,136 @@
+{
+  "topic": {
+    "id": "3-4",
+    "title": "Two-Way if-else Statements",
+    "description": "Choosing between two alternatives",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "8 min",
+    "nextTopicId": "3-5"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Two-way if-else statements help your program make decisions between two options. It's like choosing between two doors - only one path gets taken!\n\n• How to write if-else statements\n• When to use two-way decisions\n• How to handle yes/no situations in code",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a traffic light. If it's green, you go. If it's red, you stop. That's exactly how if-else works!\n\nTwo-way if-else statements let your program choose between two actions based on a condition:\n\n• If the condition is true → do the first action\n• If the condition is false → do the second action\n\nFor example, checking if a number is positive or negative:",
+      "type": "explanation"
+    },
+    {
+      "title": "",
+      "content": "```java\nint number = 7;\nif (number > 0) {\n    System.out.println(\"Positive number\");\n} else {\n    System.out.println(\"Negative number\");\n}\n```\n\n• The condition `number > 0` is checked first\n• Only one branch will execute - never both!\n• The else part is optional but useful for handling the 'other' case",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Two-Way if-else Statements works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Check Condition",
+          "description": "The program evaluates the condition in parentheses",
+          "code": "if (age >= 18) {"
+        },
+        {
+          "step": 2,
+          "title": "True Path",
+          "description": "If condition is true, execute the if block",
+          "code": "    System.out.println(\"Adult\");"
+        },
+        {
+          "step": 3,
+          "title": "False Path",
+          "description": "If condition is false, execute the else block",
+          "code": "} else {\n    System.out.println(\"Minor\");\n}"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Always has one condition and two possible outcomes",
+        "✓ Only one branch executes - never both!",
+        "✓ The else part is optional but handles the 'false' case",
+        "✓ Conditions must be boolean expressions (true/false)",
+        "✓ Braces {} are optional for single statements but recommended"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use clear, simple conditions",
+        "Indent your code for readability",
+        "Test both true and false cases",
+        "Keep if-else blocks short"
+      ],
+      "donts": [
+        "Don't forget the else part when you need it",
+        "Don't nest too many if-else statements",
+        "Don't use = instead of == in conditions",
+        "Don't put semicolons after if/else conditions"
+      ],
+      "protip": "Use meaningful condition names like 'isAdult' instead of 'x > 18'"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Two-Way if-else Statements used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Login Systems",
+          "how": "Check if username/password is correct (valid login) or not (show error)"
+        },
+        {
+          "app": "E-commerce",
+          "how": "Check if item is in stock (show 'Add to Cart') or out of stock (show 'Notify Me')"
+        },
+        {
+          "app": "Games",
+          "how": "Check if player has enough points (level up) or not (keep playing)"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that checks if a number is even or odd. Ask the user to input a number and print 'Even' or 'Odd' using if-else.",
+        "starterCode": "// Starter code\nimport java.util.Scanner;\n\npublic class EvenOdd {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        System.out.print(\"Enter a number: \");\n        int number = input.nextInt();\n        \n        // Add your if-else here\n    }\n}",
+        "hints": [
+          "Use the modulus operator % to check remainder",
+          "A number is even if number % 2 == 0",
+          "Remember to print the result!"
+        ],
+        "solution": "// Solution\nimport java.util.Scanner;\n\npublic class EvenOdd {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        System.out.print(\"Enter a number: \");\n        int number = input.nextInt();\n        \n        if (number % 2 == 0) {\n            System.out.println(\"Even\");\n        } else {\n            System.out.println(\"Odd\");\n        }\n    }\n}",
+        "explanation": "The modulus operator % gives the remainder after division. If a number divided by 2 has no remainder (== 0), it's even. Otherwise, it's odd."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Two-way if-else makes decisions between two options",
+        "📌 Always has one condition and two possible outcomes",
+        "📌 Practice with simple yes/no scenarios first",
+        "📌 Ready to learn about nested if-else next!"
+      ]
+    }
+  ],
+  "total_pages": 9,
+  "_generated_at": "2026-03-06T02:12:45.769631",
+  "_topic_id": "3-4"
+}

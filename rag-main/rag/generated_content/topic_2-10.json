@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "2-10",
+    "title": "Numeric Literals",
+    "description": "How to write numeric values in code",
+    "chapter_id": 2,
+    "chapter_title": "Elementary Programming"
+  },
+  "metadata": {
+    "difficulty": "Beginner",
+    "estimatedTime": "7 min",
+    "nextTopicId": "2-11"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's explore how to write numbers in code like a pro! You'll never look at numbers the same way again.\n\n• How to write different types of numbers (whole, decimal, scientific)\n• The secret codes for extra-large or tiny numbers\n• Why some numbers need special letters (like F or D)",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're writing a recipe. Some ingredients need exact amounts (like 2 eggs), while others need precise measurements (like 1.5 cups of flour). Numeric literals are like these recipe measurements - but for code!\n\nNumbers in code come in different flavors:\n• **Whole numbers** (like 42) - perfect for counting\n• **Decimal numbers** (like 3.14) - for precise measurements\n• **Scientific notation** (like 1.5E3) - for really big or tiny numbers\n\nJava treats numbers differently based on how you write them. For example:\n- `5` is a whole number (int)\n- `5.0` is a decimal number (double)\n- `5F` is a float (smaller decimal)\n- `5E2` is 500 in scientific notation",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Numeric Literals works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Basic Numbers",
+          "description": "Java automatically assigns types to numbers based on how you write them.",
+          "code": "int apples = 5;          // Whole number\ndouble pi = 3.14;       // Decimal number\nfloat temperature = 98.6F; // Float needs 'F'"
+        },
+        {
+          "step": 2,
+          "title": "Scientific Notation",
+          "description": "For very large or small numbers, use E notation. The E means 'times 10 to the power of'.",
+          "code": "double big = 1.5E3;  // 1500.0 (1.5 × 10³)\ndouble small = 1.5E-3; // 0.0015 (1.5 × 10⁻³)"
+        },
+        {
+          "step": 3,
+          "title": "Special Bases",
+          "description": "You can write numbers in different bases using prefixes.",
+          "code": "int binary = 0B1111;  // 15 in binary\nint octal = 07777;    // 4095 in octal\nint hex = 0XFFFF;    // 65535 in hex"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ `5` is an int, `5.0` is a double - same value, different types",
+        "✓ Add `F` for float (3.14F), `D` for double (3.14D)",
+        "✓ Scientific notation uses `E` (1.5E3 = 1500)",
+        "✓ Underscores make big numbers readable (1_000_000)",
+        "✓ Prefixes change number bases (0B for binary, 0X for hex)"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use underscores for readability (1_000_000)",
+        "Prefer double over float for better precision",
+        "Use scientific notation for very large/small numbers"
+      ],
+      "donts": [
+        "Don't forget the F for float (3.14 is double, not float)",
+        "Don't put underscores at start/end (45_ is wrong)",
+        "Don't use commas in numbers (1,000 is invalid)"
+      ],
+      "protip": "When in doubt, use `double` for decimals - it's the most precise and flexible option!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Numeric Literals used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Financial Apps",
+          "how": "Use `double` for precise currency calculations (like 19.99D)"
+        },
+        {
+          "app": "Game Development",
+          "how": "Use scientific notation for physics calculations (like 9.8E0 for gravity)"
+        },
+        {
+          "app": "Data Science",
+          "how": "Use underscores in large numbers (1_000_000 for one million)"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that calculates the area of a circle with radius 5.3. Use the correct numeric literals for:\n1. The radius value\n2. The π constant (use 3.14159)\n3. The final result",
+        "starterCode": "// Calculate circle area\npublic class CircleArea {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
+        "hints": [
+          "Area = π × radius²",
+          "Use double for all values for precision",
+          "Remember: 5.3 is already a double"
+        ],
+        "solution": "// Calculate circle area\npublic class CircleArea {\n    public static void main(String[] args) {\n        double radius = 5.3;\n        double pi = 3.14159;\n        double area = pi * radius * radius;\n        System.out.println(\"Area: \" + area);\n    }\n}",
+        "explanation": "We used `double` for all values to maintain precision. The radius (5.3) is already a double by default. The calculation gives us the precise area of the circle."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Numbers in code can be written in many ways - choose the right one for your needs",
+        "📌 `double` is your best friend for decimal numbers - it's precise and flexible",
+        "📌 Practice writing numbers in different formats (scientific, different bases)",
+        "📌 You're now ready to handle any numeric value in your programs!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:05:03.714190",
+  "_topic_id": "2-10"
+}

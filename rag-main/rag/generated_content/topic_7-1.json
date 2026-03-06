@@ -1,0 +1,135 @@
+{
+  "topic": {
+    "id": "7-1",
+    "title": "Introduction to Arrays",
+    "description": "Overview of arrays",
+    "chapter_id": 7,
+    "chapter_title": "Single-Dimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "12 min",
+    "nextTopicId": "7-2"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Arrays are your first step into organizing data like a pro! Let's explore how they work and why they're essential.\n\n• What arrays are and why we need them\n• How to create and use arrays in code\n• Simple real-world examples to make it click",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine a toolbox with labeled slots - that's an array! Each slot holds one item, and you can access any item instantly by its number.\n\nArrays are like:\n• A row of mailboxes (each with a number)\n• A parking lot (each spot has a number)\n• A classroom (each seat is numbered)\n\nIn programming, arrays let you store multiple values of the same type together. Instead of creating 10 separate variables for 10 numbers, you create one array that holds all 10 numbers!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how arrays work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Creating an Array",
+          "description": "We declare an array that can hold 5 integers. Think of it as reserving 5 parking spots.",
+          "code": "int[] numbers = new int[5];"
+        },
+        {
+          "step": 2,
+          "title": "Storing Values",
+          "description": "We put values into each 'slot' (called an index). Remember: counting starts at 0!",
+          "code": "numbers[0] = 10;\nnumbers[1] = 20;\nnumbers[2] = 30;"
+        },
+        {
+          "step": 3,
+          "title": "Accessing Values",
+          "description": "We can get any value by its index. Here we get the value at index 1 (which is 20).",
+          "code": "int value = numbers[1]; // value is now 20"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Arrays store multiple values of the same type",
+        "✓ Each value has an index (starting at 0)",
+        "✓ Arrays have fixed size once created",
+        "✓ Use square brackets [] to access elements",
+        "✓ Great for organizing related data together"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Start counting array indices at 0",
+        "Check array bounds before accessing",
+        "Use arrays for similar data (like test scores)",
+        "Initialize arrays with values when possible"
+      ],
+      "donts": [
+        "Don't forget arrays start at 0, not 1",
+        "Don't try to store different data types",
+        "Don't access indices outside the array size",
+        "Don't create arrays bigger than needed"
+      ],
+      "protip": "Use array.length to get the size - it's your safety net against out-of-bounds errors!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where are arrays used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Shopping Apps",
+          "how": "Store lists of products, prices, or customer orders in arrays"
+        },
+        {
+          "app": "Games",
+          "how": "Keep track of scores, inventory items, or player positions"
+        },
+        {
+          "app": "Social Media",
+          "how": "Manage lists of posts, friends, or notifications"
+        },
+        {
+          "app": "Weather Apps",
+          "how": "Store temperature readings for different days"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create an array to store 5 of your favorite movies. Then write code to print the third movie in the list.",
+        "starterCode": "// Create an array for 5 movies\nString[] movies = new String[5];\n\n// Add your favorite movies\n// ...\n\n// Print the third movie\n// System.out.println(...);",
+        "hints": [
+          "Remember: array indices start at 0",
+          "The third movie is at index 2",
+          "Use quotes around each movie title"
+        ],
+        "solution": "// Solution\nString[] movies = {\"Inception\", \"Toy Story\", \"Avatar\", \"Matrix\", \"Frozen\"};\nSystem.out.println(\"Third movie: \" + movies[2]);",
+        "explanation": "We created an array with 5 movie titles. The third movie (Avatar) is at index 2 because we start counting at 0. Easy peasy!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Arrays store multiple values in one variable",
+        "📌 Always remember: first element is at index 0",
+        "📌 Practice creating and accessing arrays",
+        "📌 Ready to learn about loops with arrays next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:35:08.735281",
+  "_topic_id": "7-1"
+}

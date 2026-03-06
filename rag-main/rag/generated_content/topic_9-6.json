@@ -1,0 +1,129 @@
+{
+  "topic": {
+    "id": "9-6",
+    "title": "Static Variables, Constants, and Methods",
+    "description": "Class-level members with static",
+    "chapter_id": 9,
+    "chapter_title": "Objects and Classes"
+  },
+  "metadata": {
+    "difficulty": "Expert",
+    "estimatedTime": "13 min",
+    "nextTopicId": "9-7"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let's explore how static members work in Java - they're like shared tools for all objects of a class!\n\n• What static variables, constants, and methods are\n• How they differ from instance members\n• When and how to use them effectively",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine a classroom with a whiteboard. The whiteboard is 'static' - everyone in the class can see and use it. That's exactly how static members work in Java!\n\nStatic members belong to the class itself, not individual objects. Here's what that means:\n\n• **Static Variables**: Shared across all instances (like the classroom whiteboard)\n- Declared with `static` keyword\n- Only one copy exists for the entire class\n\n• **Constants**: Special static variables that never change\n- Declared with `final static`\n- Named in ALL_CAPS_WITH_UNDERSCORES\n- Example: `final static double PI = 3.14159;`\n\n• **Static Methods**: Class-level functions\n- Can be called without creating an object\n- Example: `Math.sqrt(25)` (no Math object needed!)",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how static members work:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Class Definition",
+          "description": "We create a class with static and instance members",
+          "code": "class Counter {\n  static int classCount = 0;  // Shared by all\n  int instanceCount = 0;     // Unique to each\n}"
+        },
+        {
+          "step": 2,
+          "title": "Object Creation",
+          "description": "When we create objects, static variable stays shared",
+          "code": "Counter c1 = new Counter();\nCounter c2 = new Counter();\n// classCount is shared between c1 and c2\n// Each has their own instanceCount"
+        },
+        {
+          "step": 3,
+          "title": "Value Changes",
+          "description": "Modifying static vs instance variables",
+          "code": "c1.instanceCount++;  // Only c1's count changes\nCounter.classCount++;  // Affects ALL Counters\n// c1.classCount and c2.classCount both increment"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Static members belong to the class, not objects",
+        "✓ Only one copy exists for static variables (shared)",
+        "✓ Constants are `final static` and named in ALL_CAPS",
+        "✓ Static methods can be called without objects",
+        "✓ Use `ClassName.staticMember` to access them"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use static for shared configuration values",
+        "Make constants `final static` for safety",
+        "Use static methods for utility functions"
+      ],
+      "donts": [
+        "Don't overuse static - it breaks OOP principles",
+        "Don't modify static variables from instance methods",
+        "Don't name constants in lowercase"
+      ],
+      "protip": "Static members are great for memory efficiency - they prevent duplicate data across objects!"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where you'll see static members in real applications:",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Math Utilities",
+          "how": "Java's Math class uses static methods (Math.sqrt(), Math.PI) so you don't need to create Math objects"
+        },
+        {
+          "app": "Configuration Settings",
+          "how": "Apps use static constants for settings like MAX_USERS or DEFAULT_TIMEOUT that apply everywhere"
+        },
+        {
+          "app": "Counters & Trackers",
+          "how": "Static variables track total objects created or total operations performed across all instances"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create a Circle class with:\n1. A static constant PI (3.14159)\n2. A static method to calculate area (PI * radius²)\n3. An instance variable for radius\n4. An instance method to get circumference (2 * PI * radius)",
+        "starterCode": "class Circle {\n  // Add your code here\n  \n  public static void main(String[] args) {\n    Circle c = new Circle(5);\n    System.out.println(\"Area: \" + Circle.calculateArea(5));\n    System.out.println(\"Circumference: \" + c.getCircumference());\n  }\n}",
+        "hints": [
+          "Remember: static methods can't access instance variables",
+          "Constants should be final static",
+          "Use ClassName.staticMethod() to call static methods"
+        ],
+        "solution": "class Circle {\n  final static double PI = 3.14159;\n  double radius;\n\n  Circle(double radius) {\n    this.radius = radius;\n  }\n\n  static double calculateArea(double radius) {\n    return PI * radius * radius;\n  }\n\n  double getCircumference() {\n    return 2 * PI * radius;\n  }\n}",
+        "explanation": "The static PI constant is shared by all circles. The static calculateArea() method works without a Circle object, while getCircumference() needs an instance to access the radius."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Static members belong to the class, not objects",
+        "📌 Constants are `final static` and named in ALL_CAPS",
+        "📌 Practice using static for shared data and utility methods",
+        "📌 Ready to learn about visibility modifiers next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:46:01.444885",
+  "_topic_id": "9-6"
+}

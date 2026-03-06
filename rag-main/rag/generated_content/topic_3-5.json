@@ -1,0 +1,131 @@
+{
+  "topic": {
+    "id": "3-5",
+    "title": "Nested if and Multi-Way if-else Statements",
+    "description": "Complex decision making with nested conditions",
+    "chapter_id": 3,
+    "chapter_title": "Selections"
+  },
+  "metadata": {
+    "difficulty": "Intermediate",
+    "estimatedTime": "9 min",
+    "nextTopicId": "3-6"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Ready to level up your decision-making in code? Nested if and multi-way if-else statements let you handle complex choices like a pro!\n\n• How to stack conditions inside conditions (nested if)\n• How to create clear decision trees with multi-way if-else\n• When to use each approach for cleaner code",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine you're at a coffee shop with a loyalty program:\n- First, you check if you're a member (if statement)\n- Then, you check what tier you're in (nested if)\n- Finally, you get your discount based on all those conditions\n\nThat's exactly how nested if statements work! They let you ask follow-up questions after the first decision.\n\n**Nested if statements** are like Russian nesting dolls - conditions inside conditions:\n• First check: Are you a member?\n• If yes, check: Gold, Silver, or Bronze tier?\n• Then apply the right discount\n\n**Multi-way if-else** is like a game show with multiple doors:\n• Door 1: Score > 90 → A grade\n• Door 2: Score > 80 → B grade\n• Door 3: Score > 70 → C grade\n• Default: Try again next time!",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Nested if and Multi-Way if-else Statements works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "First Decision Point",
+          "description": "The program checks the first condition (like checking if you're a member)",
+          "code": "if (isMember) {\n   // Nested conditions go here\n}"
+        },
+        {
+          "step": 2,
+          "title": "Nested Check",
+          "description": "Inside the first condition, we check another condition (like membership tier)",
+          "code": "if (tier == 'Gold') {\n   discount = 0.2;\n} else if (tier == 'Silver') {\n   discount = 0.1;\n}"
+        },
+        {
+          "step": 3,
+          "title": "Final Action",
+          "description": "Based on all conditions, the program takes the right action (applies discount)",
+          "code": "System.out.println(\"Your discount is: \" + discount * 100 + \"%\");"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Nested if = conditions inside conditions (like a decision tree)",
+        "✓ Multi-way if-else = multiple mutually exclusive options",
+        "✓ Always indent properly to show nesting levels",
+        "✓ Each 'else' pairs with the nearest 'if'",
+        "✓ Use multi-way when checking the same variable multiple times"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Use clear variable names for conditions",
+        "Keep nesting to 2-3 levels max (or refactor)",
+        "Add comments for complex logic",
+        "Test all possible paths"
+      ],
+      "donts": [
+        "Don't nest too deep (hard to read!)",
+        "Don't forget the 'else' for default cases",
+        "Don't use == for String comparisons (use .equals())",
+        "Don't put unrelated conditions in the same if-else chain"
+      ],
+      "protip": "For multi-way if-else, order your conditions from most specific to least specific (like checking for 'Gold' before 'Silver')"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Nested if and Multi-Way if-else Statements used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "E-commerce Checkout",
+          "how": "Nested ifs check: 1) Is user logged in? 2) Is item in stock? 3) What's their shipping method? 4) Do they have coupons?"
+        },
+        {
+          "app": "Game Development",
+          "how": "Multi-way if-else determines: 1) What level is player? 2) What power-ups do they have? 3) What enemies to spawn?"
+        },
+        {
+          "app": "Banking Apps",
+          "how": "Nested conditions verify: 1) Is account active? 2) Is balance sufficient? 3) Is transaction within daily limit?"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Write a program that determines a student's letter grade based on their score and attendance. Rules:\n• A: 90+ AND attendance ≥ 90%\n• B: 80-89 OR (70-79 AND attendance ≥ 80%)\n• C: 70-79 AND attendance < 80%\n• F: Below 70 OR attendance < 70%",
+        "starterCode": "// Starter code\nimport java.util.Scanner;\n\npublic class GradeCalculator {\n   public static void main(String[] args) {\n      Scanner input = new Scanner(System.in);\n      System.out.print(\"Enter score (0-100): \");\n      int score = input.nextInt();\n      System.out.print(\"Enter attendance percentage: \");\n      int attendance = input.nextInt();\n      \n      // Your code here\n   }\n}",
+        "hints": [
+          "Start with the highest grade condition first",
+          "Use nested if for the B grade condition",
+          "Remember to handle the default case (F grade)"
+        ],
+        "solution": "// Solution\nif (score >= 90 && attendance >= 90) {\n   System.out.println(\"Grade: A\");\n} else if (score >= 80 || (score >= 70 && attendance >= 80)) {\n   System.out.println(\"Grade: B\");\n} else if (score >= 70 && attendance < 80) {\n   System.out.println(\"Grade: C\");\n} else {\n   System.out.println(\"Grade: F\");\n}",
+        "explanation": "We check conditions from most specific to least specific. The B grade uses a nested condition to check both score ranges and attendance. The order matters - if we checked for B first, some A students might get misclassified!"
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Nested if lets you ask follow-up questions after a condition is met",
+        "📌 Multi-way if-else handles multiple exclusive options cleanly",
+        "📌 Always test all possible paths through your conditions",
+        "📌 You're now ready to handle complex decision-making in your programs!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T02:13:19.233575",
+  "_topic_id": "3-5"
+}

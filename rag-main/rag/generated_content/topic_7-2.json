@@ -1,0 +1,135 @@
+{
+  "topic": {
+    "id": "7-2",
+    "title": "Array Basics",
+    "description": "Creating and using arrays",
+    "chapter_id": 7,
+    "chapter_title": "Single-Dimensional Arrays"
+  },
+  "metadata": {
+    "difficulty": "Advanced",
+    "estimatedTime": "13 min",
+    "nextTopicId": "7-3"
+  },
+  "sections": [
+    {
+      "title": "🎯 What You'll Learn",
+      "content": "Let’s dive into arrays - your first step to handling multiple values like a pro!\n\n• What arrays are and why they’re useful\n• How to create and use arrays in Java\n• Common mistakes to avoid when working with arrays",
+      "type": "introduction"
+    },
+    {
+      "title": "💡 Concept Explanation",
+      "content": "Imagine an array like a row of mailboxes at an apartment building. Each mailbox:\n- Has a number (its position/index)\n- Can hold one item (a value)\n- All mailboxes are the same size (same data type)\n\nArrays work the same way! They let you store multiple values of the same type under one name. Instead of creating 10 separate variables for 10 numbers, you can create one array that holds all 10.\n\n• Declare an array with `dataType[] arrayName`\n• Initialize with `new dataType[size]`\n• Access elements using `arrayName[index]` (remember: indexes start at 0!)",
+      "type": "explanation"
+    },
+    {
+      "title": "📊 Visual Simulation",
+      "content": "Step-by-step visualization of how Array Basics works:",
+      "type": "visual",
+      "steps": [
+        {
+          "step": 1,
+          "title": "Declaration",
+          "description": "We declare an array of integers named 'scores'",
+          "code": "int[] scores;"
+        },
+        {
+          "step": 2,
+          "title": "Creation",
+          "description": "We create space for 5 integers in memory",
+          "code": "scores = new int[5];"
+        },
+        {
+          "step": 3,
+          "title": "Initialization",
+          "description": "We assign values to each position (0-4)",
+          "code": "scores[0] = 90;\nscores[1] = 85;\nscores[2] = 78;\nscores[3] = 92;\nscores[4] = 88;"
+        },
+        {
+          "step": 4,
+          "title": "Access",
+          "description": "We print the third score (index 2)",
+          "code": "System.out.println(scores[2]); // Output: 78"
+        }
+      ]
+    },
+    {
+      "title": "⚡ Key Points",
+      "content": "",
+      "type": "keypoints",
+      "points": [
+        "✓ Arrays store multiple values of the same type",
+        "✓ Array indexes start at 0, not 1",
+        "✓ `array.length` gives you the size of the array",
+        "✓ Declare with `type[] name` and create with `new type[size]`",
+        "✓ Initialize values using array indexes"
+      ]
+    },
+    {
+      "title": "🔥 Tips & Mistakes",
+      "content": "",
+      "type": "tips",
+      "sidebar": true,
+      "dos": [
+        "Declare and initialize arrays in one line when possible",
+        "Use meaningful names for arrays (e.g., 'studentScores' instead of 'arr')",
+        "Check array bounds to avoid ArrayIndexOutOfBoundsException"
+      ],
+      "donts": [
+        "Don’t forget that array indexes start at 0",
+        "Don’t try to store different data types in the same array",
+        "Don’t access elements beyond the array size"
+      ],
+      "protip": "Shortcut: Initialize arrays with values directly using `{}` like `int[] nums = {1, 2, 3};`"
+    },
+    {
+      "title": "🌍 Real World Use",
+      "content": "Where is Array Basics used in real apps?",
+      "type": "realworld",
+      "examples": [
+        {
+          "app": "Student Gradebook",
+          "how": "Stores all student scores in one array for easy calculations and sorting"
+        },
+        {
+          "app": "Weather App",
+          "how": "Keeps daily temperatures in an array to display weekly forecasts"
+        },
+        {
+          "app": "Game Leaderboard",
+          "how": "Maintains top scores in an array for quick access and updates"
+        }
+      ]
+    },
+    {
+      "title": "🧪 Practice Problem",
+      "content": "Try this challenge:",
+      "type": "practice",
+      "problem": {
+        "description": "Create an array to store 5 favorite movies. Then:\n1. Print all movies in order\n2. Print just the third movie\n3. Change the second movie to \"The Matrix\"",
+        "starterCode": "// Declare and initialize your array here\n\n// Print all movies\n\n// Print just the third movie\n\n// Change the second movie\n",
+        "hints": [
+          "Remember indexes start at 0!",
+          "Use a for loop to print all elements",
+          "Access elements with arrayName[index]"
+        ],
+        "solution": "String[] movies = {\"Inception\", \"Avatar\", \"Titanic\", \"Jaws\", \"Up\"};\n\n// Print all movies\nfor (int i = 0; i < movies.length; i++) {\n    System.out.println(movies[i]);\n}\n\n// Print just the third movie\nSystem.out.println(\"Third movie: \" + movies[2]);\n\n// Change the second movie\nmovies[1] = \"The Matrix\";",
+        "explanation": "We created an array with 5 movies. The for loop prints each one, then we access the third movie directly. Finally, we update the second movie by assigning a new value to index 1."
+      }
+    },
+    {
+      "title": "📝 Summary",
+      "content": "",
+      "type": "summary",
+      "points": [
+        "📌 Arrays let you store multiple values of the same type together",
+        "📌 Always remember: array indexes start at 0!",
+        "📌 Practice declaring, initializing, and accessing array elements",
+        "📌 You're ready to learn about array operations next!"
+      ]
+    }
+  ],
+  "total_pages": 8,
+  "_generated_at": "2026-03-06T06:35:38.020442",
+  "_topic_id": "7-2"
+}

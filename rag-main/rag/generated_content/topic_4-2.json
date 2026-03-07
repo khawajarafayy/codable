@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let’s explore how to use Java’s built-in math tools to make calculations easier! No need to reinvent the wheel—Java’s `Math` class has you covered.\n\n• How to use `Math.pow()` for exponents (like 2³)\n• Why the `Math` class is your math buddy\n• Common math operations you’ll use daily",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re baking a cake. Instead of measuring ingredients from scratch, you use pre-measured cups—saves time, right? The `Math` class is like those pre-measured cups for programming!\n\nJava’s `Math` class gives you ready-to-use methods for common calculations. No need to write complex logic for exponents, square roots, or rounding—just call a method!\n\n• **Exponents**: `Math.pow(a, b)` calculates `a` raised to the power of `b` (e.g., `2³ = 8`)\n• **Precision**: Works with `double` values (e.g., `Math.pow(4, 0.5) = 2.0`)\n• **Easy to use**: Just write `Math.pow(base, exponent)`—no extra setup needed!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how `Math.pow()` works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Call the Method",
-          "description": "You tell Java what numbers to use. For example, `Math.pow(2, 3)` means \"2 raised to the power of 3.\"",
-          "code": "Math.pow(2, 3);"
-        },
-        {
-          "step": 2,
-          "title": "Calculation Happens",
-          "description": "Java does the math behind the scenes: `2 * 2 * 2 = 8`.",
-          "code": "// Java computes 2³ = 8"
-        },
-        {
-          "step": 3,
-          "title": "Return the Result",
-          "description": "The method gives back the answer as a `double`. Here, it returns `8.0`.",
-          "code": "System.out.println(Math.pow(2, 3)); // Output: 8.0"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "System.out.println(Math.abs(-4.5));    // 4.5\nSystem.out.println(Math.sqrt(16));     // 4.0\nSystem.out.println(Math.pow(2, 10));   // 1024.0\nSystem.out.println(Math.max(3, 7));    // 7\nSystem.out.println(Math.min(3, 7));    // 3\nSystem.out.println(Math.round(3.6));   // 4\nSystem.out.println(Math.ceil(3.1));    // 4.0\nSystem.out.println(Math.floor(3.9));   // 3.0"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `Math.pow(a, b)` = `a` raised to the power of `b` (e.g., `Math.pow(3, 2) = 9.0`)",
-        "✓ Always returns a `double` (even if the result is a whole number like `8.0`)",
-        "✓ Works with decimals (e.g., `Math.pow(4, 0.5) = 2.0` for square roots)",
-        "✓ No need to import—`Math` is built into Java!",
-        "✓ Use it for exponents, roots, and more—no manual loops needed!"
+        "Math.abs() returns the absolute value; Math.sqrt() returns the square root",
+        "Math.pow(a, b) returns a raised to the power of b",
+        "Math.max() and Math.min() return the larger and smaller of two values",
+        "Math.round() rounds to the nearest integer; Math.ceil() rounds up; Math.floor() rounds down",
+        "Math.random() returns a random double between 0.0 (inclusive) and 1.0 (exclusive)"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `Math.pow()` for exponents—it’s cleaner than loops",
-        "Remember the result is a `double` (e.g., `8.0` instead of `8`)",
-        "Try negative exponents (e.g., `Math.pow(2, -1) = 0.5`)"
-      ],
-      "donts": [
-        "Don’t forget the `Math.` prefix (e.g., `pow(2, 3)` won’t work alone)",
-        "Avoid using it for simple multiplication (e.g., `Math.pow(2, 2)` is overkill for `2 * 2`)",
-        "Don’t mix up the order—`Math.pow(3, 2)` is `9`, not `6`!"
-      ],
-      "protip": "For square roots, use `Math.sqrt()` instead of `Math.pow(x, 0.5)`—it’s clearer and faster!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is `Math.pow()` used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Finance Apps",
-          "how": "Calculates compound interest (e.g., `Math.pow(1 + rate, years)`)"
-        },
-        {
-          "app": "Game Development",
-          "how": "Computes distances, physics (e.g., projectile motion), or scaling effects"
-        },
-        {
-          "app": "Scientific Calculators",
-          "how": "Handles exponents, roots, and logarithmic functions"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that calculates the area of a circle using the formula `π * r²`. Use `Math.pow()` to compute `r²` (radius squared).\n\nExample: If the radius is `5`, the area should be `78.53981633974483`.",
-        "starterCode": "// Starter code\npublic class CircleArea {\n    public static void main(String[] args) {\n        double radius = 5.0;\n        double area = 0.0; // Your code here\n        System.out.println(\"Area: \" + area);\n    }\n}",
-        "hints": [
-          "Use `Math.PI` for π (no need to define it yourself!)",
-          "Use `Math.pow(radius, 2)` to square the radius",
-          "Multiply the result by `Math.PI`"
-        ],
-        "solution": "// Solution\npublic class CircleArea {\n    public static void main(String[] args) {\n        double radius = 5.0;\n        double area = Math.PI * Math.pow(radius, 2);\n        System.out.println(\"Area: \" + area); // Output: 78.53981633974483\n    }\n}",
-        "explanation": "We used `Math.pow(radius, 2)` to square the radius and `Math.PI` for π. The formula `π * r²` is now clean and easy to read!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 `Math.pow(a, b)` is your go-to for exponents—no loops needed!",
-        "📌 Always returns a `double` (e.g., `8.0` instead of `8`)",
-        "📌 Practice with real-world formulas (like circle area or compound interest)",
-        "📌 Ready for the next topic: `Math.sqrt()` and rounding methods!"
-      ]
+      "title": "Summary",
+      "content": "`Math.pow(a, b)` is your go-to for exponents—no loops needed. Always returns a `double` (e.g., `8.0` instead of `8`) Practice with real-world formulas (like circle area or compound interest)",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T04:05:46.063855",
   "_topic_id": "4-2"
 }

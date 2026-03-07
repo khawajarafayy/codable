@@ -13,116 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Today, you'll discover how to write conditions in a single line—like a shortcut for decisions!\n\n• What the ternary operator is and how it works\n• How to replace simple if-else statements with it\n• When to use (and not use) this compact syntax",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're at a coffee shop. The barista asks: \"Do you want sugar?\" Instead of saying \"If I want sugar, add it; else, skip it,\" you simply say \"Yes or no?\" The ternary operator works the same way—it’s a quick yes/no decision maker for your code.\n\nHere’s the magic formula:\n`condition ? valueIfTrue : valueIfFalse`\n\n• **Condition**: A true/false check (like `age >= 18`)\n• **?**: The \"decision point\" (like asking \"Is this true?\")\n• **valueIfTrue**: What to do if the condition is true\n• **valueIfFalse**: What to do if the condition is false",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Conditional Expressions works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Check the Condition",
-          "description": "The code evaluates if the condition is true or false. Think of it like a traffic light: green (true) or red (false).",
-          "code": "int age = 20;\nboolean isAdult = age >= 18; // true"
-        },
-        {
-          "step": 2,
-          "title": "Pick the Right Path",
-          "description": "If the condition is true, the code picks the first value after `?`. If false, it picks the value after `:`.",
-          "code": "String message = isAdult ? \"Welcome!\" : \"Too young!\";"
-        },
-        {
-          "step": 3,
-          "title": "Result!",
-          "description": "The ternary operator returns the chosen value. Here, `message` becomes \"Welcome!\" because `isAdult` is true.",
-          "code": "System.out.println(message); // Output: Welcome!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "int x = 10;\n\n// Ternary operator: condition ? value_if_true : value_if_false\nString result = (x > 0) ? \"Positive\" : \"Non-positive\";\nSystem.out.println(result);  // \"Positive\"\n\nint max = (x > 5) ? x : 5;  // max is 10"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Ternary operator = `condition ? valueIfTrue : valueIfFalse`",
-        "✓ It’s a shortcut for simple if-else statements",
-        "✓ Only use it for short, clear decisions—don’t nest them!",
-        "✓ Works with any type: numbers, strings, booleans, etc.",
-        "✓ Always evaluates the condition first"
+        "The ternary operator has the form: condition ? valueIfTrue : valueIfFalse",
+        "It is an expression that returns a value, unlike an if-else statement",
+        "Use it for simple, inline assignments: int max = (a > b) ? a : b",
+        "Avoid nesting ternary operators as it reduces readability",
+        "Both the true and false expressions must be compatible types"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use for simple, one-line decisions",
-        "Keep conditions short and readable",
-        "Assign the result to a variable for clarity"
-      ],
-      "donts": [
-        "Don’t nest ternary operators (it gets messy!)",
-        "Avoid using it for complex logic",
-        "Don’t forget the `:`—it’s easy to miss!"
-      ],
-      "protip": "If your ternary operator spans more than one line, it’s probably better as an if-else statement."
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Conditional Expressions used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "User Interfaces",
-          "how": "Show a \"Login\" button if the user isn’t logged in, or \"Welcome back!\" if they are."
-        },
-        {
-          "app": "E-commerce",
-          "how": "Display \"Free Shipping!\" if the cart total is over $50, or \"Add $X more for free shipping.\""
-        },
-        {
-          "app": "Games",
-          "how": "Set a player’s score multiplier to 2x if they have a power-up, or 1x if they don’t."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a ternary operator to check if a number is even or odd. If it’s even, return \"Even\"; if odd, return \"Odd\".",
-        "starterCode": "int number = 7;\nString result = // Your ternary operator here\nSystem.out.println(result);",
-        "hints": [
-          "Use `%` to check for even/odd (e.g., `number % 2 == 0`)",
-          "Remember the ternary syntax: `condition ? valueIfTrue : valueIfFalse`"
-        ],
-        "solution": "int number = 7;\nString result = number % 2 == 0 ? \"Even\" : \"Odd\";\nSystem.out.println(result); // Output: Odd",
-        "explanation": "The condition `number % 2 == 0` checks if the number is even. If true, it returns \"Even\"; otherwise, \"Odd\"."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Ternary operator = `condition ? valueIfTrue : valueIfFalse`",
-        "📌 Perfect for simple, one-line decisions",
-        "📌 Practice with even/odd checks, user statuses, or discounts",
-        "📌 Next up: Combining conditions with logical operators!"
-      ]
+      "title": "Summary",
+      "content": "Ternary operator = `condition ? valueIfTrue : valueIfFalse`. Perfect for simple, one-line decisions. Practice with even/odd checks, user statuses, or discounts. Next up: Combining conditions with logical operators.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T04:03:53.052024",
   "_topic_id": "3-10"
 }

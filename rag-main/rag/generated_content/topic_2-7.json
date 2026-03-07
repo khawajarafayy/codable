@@ -13,123 +13,47 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever typed the same number over and over in your code? Named constants are here to save you! Let's learn how to make your code cleaner and easier to update.\n\n• What named constants are and why they're awesome\n• How to declare them using the `final` keyword\n• Real-world benefits of using constants in your programs",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're baking cookies and the recipe says 'use 3.14 teaspoons of vanilla'. If you had to write that number 10 times, you might make a typo. Instead, you'd write 'PI_TEASPOONS = 3.14' at the top and just use PI_TEASPOONS everywhere.\n\nThat's exactly what named constants do in programming! They let you:\n\n• Give a meaningful name to important values\n• Use that name everywhere in your code\n• Change the value in just one place if needed\n\nHere's how you declare a constant in Java:",
       "type": "explanation"
     },
     {
-      "title": "📌 The Syntax",
+      "title": "Core Concepts",
       "content": "```java\nfinal double PI = 3.14159;\n```\n\n• `final` - This keyword makes the value permanent\n• `double` - The data type (could be int, String, etc.)\n• `PI` - The constant name (ALL_CAPS by convention)\n• `3.14159` - The value that never changes",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Named Constants works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Without Constants",
-          "description": "You type the same value repeatedly, risking typos and making updates hard.",
-          "code": "double area1 = radius1 * radius1 * 3.14159;\ndouble area2 = radius2 * radius2 * 3.14159;\n// Oops! What if we need 3.1415926535?"
-        },
-        {
-          "step": 2,
-          "title": "Declare Constant",
-          "description": "Create a named constant at the top of your code.",
-          "code": "final double PI = 3.14159;\n// Now PI can be used everywhere!"
-        },
-        {
-          "step": 3,
-          "title": "Use Constant",
-          "description": "Replace all hardcoded values with your constant. Update once, change everywhere!",
-          "code": "double area1 = radius1 * radius1 * PI;\ndouble area2 = radius2 * radius2 * PI;\n// Just change PI's value if needed!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Named constants use the final keyword\nfinal double PI = 3.14159;\nfinal int MAX_SIZE = 100;\n\ndouble radius = 5.0;\ndouble area = PI * radius * radius;\n// PI = 3.0;  // Error: cannot change a constant"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Constants are declared with `final` keyword",
-        "✓ Must be initialized when declared (can't change later)",
-        "✓ Use ALL_CAPS naming convention (e.g., MAX_SIZE)",
-        "✓ Makes code more readable and maintainable",
-        "✓ Prevents magic numbers in your code"
+        "Named constants are declared with the final keyword and cannot be reassigned",
+        "Constants improve readability by giving meaningful names to fixed values",
+        "Convention: name constants in UPPER_SNAKE_CASE (e.g., final double TAX_RATE = 0.07)",
+        "Using constants avoids magic numbers scattered throughout the code",
+        "Attempting to reassign a final variable causes a compilation error"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use constants for values that appear multiple times",
-        "Give constants descriptive names (e.g., SECONDS_IN_HOUR)",
-        "Place constants at the top of your class for easy access"
-      ],
-      "donts": [
-        "Don't use constants for values that change (use variables instead)",
-        "Don't forget to initialize constants when declaring",
-        "Don't use lowercase for constant names (against convention)"
-      ],
-      "protip": "If you find yourself typing the same number more than twice, make it a constant!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Named Constants used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "E-commerce Websites",
-          "how": "Use constants for tax rates, shipping costs, and discount percentages that need to be consistent across the entire application."
-        },
-        {
-          "app": "Game Development",
-          "how": "Use constants for gravity values, character speeds, and screen dimensions that remain constant during gameplay."
-        },
-        {
-          "app": "Scientific Calculations",
-          "how": "Use constants for mathematical values like PI, Planck's constant, or speed of light that never change."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Convert a temperature from Fahrenheit to Celsius. The formula is: Celsius = (Fahrenheit - 32) * 5/9. Your task:\n\n1. Declare a constant for the freezing point of water in Fahrenheit (32)\n2. Declare a constant for the conversion factor (5/9)\n3. Calculate and print the Celsius equivalent of 98.6°F (should be 37°C)",
-        "starterCode": "// Declare your constants here\n\npublic class TempConverter {\n    public static void main(String[] args) {\n        double fahrenheit = 98.6;\n        // Calculate celsius here\n        // Print the result\n    }\n}",
-        "hints": [
-          "Remember to use ALL_CAPS for constant names",
-          "The conversion factor 5/9 should be stored as a double (5.0/9.0)",
-          "Use parentheses in your calculation to ensure correct order of operations"
-        ],
-        "solution": "final double FREEZING_POINT = 32;\nfinal double CONVERSION_FACTOR = 5.0/9.0;\n\npublic class TempConverter {\n    public static void main(String[] args) {\n        double fahrenheit = 98.6;\n        double celsius = (fahrenheit - FREEZING_POINT) * CONVERSION_FACTOR;\n        System.out.println(fahrenheit + \"°F is \" + celsius + \"°C\");\n    }\n}",
-        "explanation": "By using constants, we make the formula more readable and easier to update. If the conversion factor ever changes (unlikely!), we only need to update it in one place."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Named constants make your code more readable and maintainable",
-        "📌 Always declare constants with `final` and ALL_CAPS names",
-        "📌 Use constants for values that appear multiple times or might change",
-        "📌 Practice declaring and using constants in simple calculations",
-        "📌 You're now ready to learn about data types and variables!"
-      ]
+      "title": "Summary",
+      "content": "Named constants make your code more readable and maintainable. Always declare constants with `final` and ALL_CAPS names. Use constants for values that appear multiple times or might change. Practice declaring and using constants in simple calculations.",
+      "type": "summary"
     }
   ],
-  "total_pages": 9,
+  "total_pages": 6,
   "_generated_at": "2026-03-06T02:03:36.704372",
   "_topic_id": "2-7"
 }

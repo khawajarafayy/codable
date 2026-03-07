@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered how your computer runs multiple apps at once? Let’s explore how operating systems (OS) make it all happen!\n\n• How OS manages your computer’s resources like a traffic cop\n• Why your apps can’t run without an OS\n• The magic behind multitasking (multiprogramming, multithreading, multiprocessing)",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine your computer is a busy restaurant. The operating system is like the manager who:\n\n- Assigns tables (memory) to customers (programs)\n- Makes sure chefs (CPU) aren’t idle\n- Prevents fights between customers (programs interfering)\n\n**What does an OS actually do?**\n• **Resource Manager**: Decides who gets CPU time, memory, and devices\n• **Security Guard**: Blocks unauthorized access (like a bouncer)\n• **Traffic Controller**: Schedules tasks to keep everything running smoothly\n\n**Example**: When you’re typing in Word while downloading a file, the OS makes sure both tasks get CPU time without crashing.",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Operating Systems works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "🖥️ User Opens Apps",
-          "description": "You double-click Chrome and Spotify. The OS receives these requests and checks if you have permission to run them.",
-          "code": "// OS checks permissions\nif (user_has_access(app)) {\n  load_into_memory(app);\n}"
-        },
-        {
-          "step": 2,
-          "title": "⚙️ Resource Allocation",
-          "description": "The OS assigns CPU time and memory to both apps. Chrome gets more CPU because it’s active, while Spotify runs in the background.",
-          "code": "// CPU scheduling example\nwhile (true) {\n  run_app(chrome, 60%_cpu);\n  run_app(spotify, 40%_cpu);\n}"
-        },
-        {
-          "step": 3,
-          "title": "🔄 Multitasking Magic",
-          "description": "The OS rapidly switches between apps (hundreds of times per second!) so they *seem* to run at the same time. You see both playing music and loading a webpage.",
-          "code": "// Multiprogramming in action\nfor (each_millisecond) {\n  switch_active_app();\n}"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Operating systems manage hardware resources\n// Examples: Windows, macOS, Linux\n// The OS handles file management, memory allocation,\n// and running multiple programs simultaneously."
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ OS = The ‘boss’ of your computer that manages hardware and software",
-        "✓ Without an OS, apps can’t run (like a restaurant with no manager!)",
-        "✓ Multiprogramming = Multiple apps sharing one CPU (like chefs sharing a kitchen)",
-        "✓ Multithreading = One app doing multiple things at once (e.g., Word saving while you type)",
-        "✓ Multiprocessing = Using multiple CPUs for faster work (like a surgical team)"
+        "An operating system manages hardware resources and provides services to programs",
+        "Multiprogramming allows multiple programs to share CPU time",
+        "Multithreading enables concurrent execution of tasks within a single program",
+        "Common operating systems include Windows, macOS, and Linux",
+        "The OS handles memory management, file systems, and process scheduling"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Update your OS regularly for security and performance",
-        "Use Task Manager (Windows) or Activity Monitor (Mac) to see how the OS manages resources",
-        "Close unused apps to free up memory and CPU"
-      ],
-      "donts": [
-        "Don’t ignore OS updates—they fix critical security holes",
-        "Don’t run too many apps at once if your computer is slow (OS can get overwhelmed)",
-        "Don’t install untrusted software—it can bypass OS security"
-      ],
-      "protip": "Use ‘Ctrl+Shift+Esc’ (Windows) or ‘Command+Option+Esc’ (Mac) to force-quit frozen apps—this tells the OS to free up resources!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Operating Systems used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Smartphones (iOS/Android)",
-          "how": "Manages apps, battery life, and sensors (like GPS) so you can text while listening to music"
-        },
-        {
-          "app": "Cloud Servers (AWS, Google Cloud)",
-          "how": "OS like Linux allocates resources to thousands of virtual machines running websites/apps"
-        },
-        {
-          "app": "Gaming Consoles (PlayStation/Xbox)",
-          "how": "OS balances CPU/GPU power between graphics, physics, and multiplayer networking"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Imagine you’re the OS managing 3 apps: a video editor (high CPU), a music player (low CPU), and a download (high disk usage). How would you schedule them to keep the system smooth?",
-        "starterCode": "// Pseudocode: How would you allocate resources?\napp1 = {name: 'Video Editor', cpu: 'high', disk: 'low'};\napp2 = {name: 'Music Player', cpu: 'low', disk: 'low'};\napp3 = {name: 'Download', cpu: 'low', disk: 'high'};\n\n// Your scheduling logic here...",
-        "hints": [
-          "Hint 1: Prioritize CPU for the video editor (it’s active work)",
-          "Hint 2: Let the download use disk when CPU is idle",
-          "Hint 3: Music player can run in the background with minimal CPU"
-        ],
-        "solution": "// Solution: OS scheduling logic\nwhile (true) {\n  // Give video editor most CPU time\n  run_app(video_editor, 70%_cpu);\n  \n  // Run download when disk is free\n  if (disk_idle) run_app(download, 100%_disk);\n  \n  // Music player gets leftover CPU\n  run_app(music_player, 10%_cpu);\n}",
-        "explanation": "The OS prioritizes the video editor (active work) while letting the download use idle disk time. The music player runs in the background with minimal resources. This keeps everything responsive!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 OS = The invisible manager that makes your computer usable",
-        "📌 Key jobs: Resource allocation, security, and scheduling",
-        "📌 Practice: Use Task Manager to see how your OS juggles apps",
-        "📌 Ready for next topic: Dive into how OS handles memory!"
-      ]
+      "title": "Summary",
+      "content": "OS = The invisible manager that makes your computer usable. Key jobs: Resource allocation, security, and scheduling. Practice: Use Task Manager to see how your OS juggles apps.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T01:57:27.403578",
   "_topic_id": "1-4"
 }

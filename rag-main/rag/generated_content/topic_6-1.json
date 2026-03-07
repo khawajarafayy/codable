@@ -13,118 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Methods are like recipes in programming - they let you reuse code and keep things organized! Here's what we'll cover:\n\n• What methods are and why they're useful\n• How to create and call your own methods\n• The parts that make up a method (name, parameters, return type)\n• How methods help you write cleaner code",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're baking cookies. Instead of writing the same instructions every time you want cookies, you create a recipe card (method) that you can use again and again.\n\nMethods work the same way in programming! They let you:\n\n• **Package code** into reusable blocks\n• **Avoid repetition** - write once, use many times\n• **Organize your program** into logical pieces\n\nHere's a simple method that says hello:\n```java\nvoid sayHello() {\n    System.out.println(\"Hello!\");\n}\n```\n\n• `void` means it doesn't return anything\n• `sayHello` is the method name\n• The curly braces `{}` contain the code to run",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how methods work:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Writing the Method",
-          "description": "First, you create the method (like writing a recipe). It sits there waiting to be used.",
-          "code": "void greet() {\n    System.out.println(\"Hi there!\");\n}"
-        },
-        {
-          "step": 2,
-          "title": "Calling the Method",
-          "description": "When you call the method, the program jumps to execute its code.",
-          "code": "public static void main(String[] args) {\n    greet(); // This calls the method\n}"
-        },
-        {
-          "step": 3,
-          "title": "Executing the Code",
-          "description": "The method runs its code, then returns to where it was called. Output appears!",
-          "code": "// Output: Hi there!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// A method bundles code into a reusable block\npublic static int max(int num1, int num2) {\n    if (num1 > num2)\n        return num1;\n    else\n        return num2;\n}\n\n// Calling the method\nint larger = max(3, 7);\nSystem.out.println(larger);  // 7"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Methods are reusable blocks of code",
-        "✓ They help avoid repeating the same code",
-        "✓ Every method has a name and body (code inside {})",
-        "✓ You 'call' a method to make it run",
-        "✓ Methods can take inputs (parameters) and give back results (return values)"
+        "A method is a named block of code that performs a specific task and can be reused",
+        "Methods promote code reuse, organization, and stepwise refinement",
+        "A method header specifies the return type, method name, and parameter list",
+        "The method body contains the statements that execute when the method is called",
+        "Methods reduce code duplication and make programs easier to maintain"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Give methods clear, descriptive names (like `calculateTax` instead of `doStuff`)",
-        "Keep methods focused on doing one thing well",
-        "Test your methods separately before using them in bigger programs"
-      ],
-      "donts": [
-        "Don't make methods too long (aim for < 20 lines)",
-        "Don't forget the parentheses () when calling a method",
-        "Don't create methods that do too many different things"
-      ],
-      "protip": "Start with simple methods, then gradually add parameters and return values as you get comfortable!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Methods are everywhere in real apps! Here's how they're used:",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Apps",
-          "how": "Use methods like `calculateInterest()`, `processTransaction()`, and `validatePassword()` to organize financial operations"
-        },
-        {
-          "app": "Video Games",
-          "how": "Methods control character actions (`jump()`, `attack()`, `takeDamage()`) and game logic"
-        },
-        {
-          "app": "Social Media",
-          "how": "Methods handle posting (`createPost()`), liking (`addLike()`), and notifications (`sendAlert()`)"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a method called `printGreeting` that takes a name as input and prints a personalized greeting. Then call it from main with your name!",
-        "starterCode": "// Write your method here\n\npublic static void main(String[] args) {\n    // Call your method here\n}",
-        "hints": [
-          "Your method should have one parameter of type String",
-          "Use System.out.println() to print the greeting",
-          "Remember to include the name in your greeting!"
-        ],
-        "solution": "public static void printGreeting(String name) {\n    System.out.println(\"Hello, \" + name + \"! Welcome to Java!\");\n}\n\npublic static void main(String[] args) {\n    printGreeting(\"Alex\");\n}",
-        "explanation": "The method takes a String parameter, combines it with a greeting message, and prints the result. When called with \"Alex\", it outputs: \"Hello, Alex! Welcome to Java!\""
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Methods help you organize and reuse code",
-        "📌 Every method has a name, parameters (optional), and a body",
-        "📌 Call methods by using their name followed by parentheses",
-        "📌 Practice creating simple methods before moving to more complex ones",
-        "📌 You're ready to learn about parameters and return values next!"
-      ]
+      "title": "Summary",
+      "content": "Methods help you organize and reuse code. Every method has a name, parameters (optional), and a body. Call methods by using their name followed by parentheses. Practice creating simple methods before moving to more complex ones.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:30:38.803749",
   "_topic_id": "6-1"
 }

@@ -13,112 +13,43 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Hey there! 👋 Ready to learn **The while Loop**?\n\nHere's what we'll cover:\n\n• Repeating code with while\n• Why this matters for your coding journey\n• Hands-on examples you can try",
+      "title": "What You'll Learn",
+      "content": "Ready to learn **The while Loop**?\n\nHere's what we'll cover:\n\n• Repeating code with while\n• Why this matters for your coding journey\n• Hands-on examples you can try",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
-      "content": "Think of **The while Loop** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
+      "title": "Core Concepts",
+      "content": "Think of **The while Loop** like building blocks. \n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Let's see how The while Loop works step by step:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Start Here",
-          "description": "Begin with the basic structure",
-          "code": "// Your code starts here"
-        },
-        {
-          "step": 2,
-          "title": "Add Logic",
-          "description": "Build on the foundation",
-          "code": "// Add your logic"
-        },
-        {
-          "step": 3,
-          "title": "See Results",
-          "description": "Run and observe output",
-          "code": "// Check the output!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Sum numbers from 1 to 10 using while\nint sum = 0;\nint i = 1;\nwhile (i <= 10) {\n    sum += i;\n    i++;\n}\nSystem.out.println(\"Sum = \" + sum);  // Sum = 55",
+        "// Sentinel-controlled loop\nimport java.util.Scanner;\nScanner input = new Scanner(System.in);\nint total = 0;\nSystem.out.print(\"Enter a number (0 to stop): \");\nint num = input.nextInt();\nwhile (num != 0) {\n    total += num;\n    System.out.print(\"Enter a number (0 to stop): \");\n    num = input.nextInt();\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Repeating code with while",
-        "✓ Foundation for advanced topics",
-        "✓ Practice by writing code yourself",
-        "✓ Used frequently in real programs",
-        "✓ Understanding this = easier future topics"
+        "The while loop checks its condition before each iteration",
+        "If the condition is initially false, the loop body never executes",
+        "A sentinel value is a special input that signals the loop to stop",
+        "Always ensure the loop variable changes within the body to avoid infinite loops",
+        "The while loop is best when the number of iterations is not known in advance"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Read code carefully first",
-        "Modify examples to learn",
-        "Focus on understanding"
-      ],
-      "donts": [
-        "Skip the basics",
-        "Copy-paste blindly",
-        "Give up on errors"
-      ],
-      "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where do we use The while Loop in real life?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Mobile Apps",
-          "how": "Building user interfaces and handling data"
-        },
-        {
-          "app": "Web Services",
-          "how": "Processing requests and managing information"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a simple program using The while Loop. Start with the example and modify it!",
-        "starterCode": "// Practice The while Loop here\npublic class Practice {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Start with the basic structure",
-          "Run your code after each change"
-        ],
-        "solution": "// Solution will vary based on your approach",
-        "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 The while Loop - Repeating code with while",
-        "📌 Master basics before advancing",
-        "📌 Practice with the examples",
-        "📌 Builds foundation for what's next!"
-      ]
+      "title": "Summary",
+      "content": "The while Loop - Repeating code with while. Master basics before advancing. Practice with the examples. Builds foundation for what's next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:25:13.131873",
   "_topic_id": "5-2"
 }

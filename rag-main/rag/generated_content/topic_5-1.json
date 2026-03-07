@@ -13,112 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Hey there! 👋 Ready to learn **Introduction to Loops**?\n\nHere's what we'll cover:\n\n• Overview of loop structures\n• Why this matters for your coding journey\n• Hands-on examples you can try",
+      "title": "What You'll Learn",
+      "content": "Ready to learn **Introduction to Loops**?\n\nHere's what we'll cover:\n\n• Overview of loop structures\n• Why this matters for your coding journey\n• Hands-on examples you can try",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
-      "content": "Think of **Introduction to Loops** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
+      "title": "Core Concepts",
+      "content": "Think of **Introduction to Loops** like building blocks. \n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Let's see how Introduction to Loops works step by step:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Start Here",
-          "description": "Begin with the basic structure",
-          "code": "// Your code starts here"
-        },
-        {
-          "step": 2,
-          "title": "Add Logic",
-          "description": "Build on the foundation",
-          "code": "// Add your logic"
-        },
-        {
-          "step": 3,
-          "title": "See Results",
-          "description": "Run and observe output",
-          "code": "// Check the output!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "int count = 0;\nwhile (count < 5) {\n    System.out.println(\"Count is: \" + count);\n    count++;\n}\n// Prints 0, 1, 2, 3, 4"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Overview of loop structures",
-        "✓ Foundation for advanced topics",
-        "✓ Practice by writing code yourself",
-        "✓ Used frequently in real programs",
-        "✓ Understanding this = easier future topics"
+        "A loop repeats a block of code while a condition remains true",
+        "Java provides three loop types: while, do-while, and for",
+        "Loops are essential for processing repeated tasks, collections, and user input",
+        "Every loop needs a condition that eventually becomes false to avoid infinite loops",
+        "The loop body is the block of code that executes on each iteration"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Read code carefully first",
-        "Modify examples to learn",
-        "Focus on understanding"
-      ],
-      "donts": [
-        "Skip the basics",
-        "Copy-paste blindly",
-        "Give up on errors"
-      ],
-      "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where do we use Introduction to Loops in real life?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Mobile Apps",
-          "how": "Building user interfaces and handling data"
-        },
-        {
-          "app": "Web Services",
-          "how": "Processing requests and managing information"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a simple program using Introduction to Loops. Start with the example and modify it!",
-        "starterCode": "// Practice Introduction to Loops here\npublic class Practice {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Start with the basic structure",
-          "Run your code after each change"
-        ],
-        "solution": "// Solution will vary based on your approach",
-        "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Introduction to Loops - Overview of loop structures",
-        "📌 Master basics before advancing",
-        "📌 Practice with the examples",
-        "📌 Builds foundation for what's next!"
-      ]
+      "title": "Summary",
+      "content": "Introduction to Loops - Overview of loop structures. Master basics before advancing. Practice with the examples. Builds foundation for what's next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:25:08.108522",
   "_topic_id": "5-1"
 }

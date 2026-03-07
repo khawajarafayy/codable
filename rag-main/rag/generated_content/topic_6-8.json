@@ -13,124 +13,47 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered why some variables work everywhere in your code while others don't? Let's explore variable scope!\n\n• What variable scope really means\n• Where variables can (and can't) be used\n• How to avoid common scope mistakes",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine your variable is like a house guest:\n- Some guests (variables) can visit your whole house (program)\n- Others are only allowed in certain rooms (methods/blocks)\n- If you try to talk to a guest who isn't in the room, you'll get an error!\n\nVariables have boundaries where they can be used. These boundaries are called 'scope'.\n\n• **Local variables**: Only exist inside the method where they're declared\n• **Class variables**: Can be used anywhere in the class\n• **Block variables**: Only exist inside { } braces where they're created\n\nExample:",
       "type": "explanation"
     },
     {
-      "title": "",
+      "title": "Core Concepts",
       "content": "```java\npublic class Test {\n    int classVar = 10; // Can be used anywhere in class\n\n    public void myMethod() {\n        int localVar = 5; // Only exists in myMethod\n        if (true) {\n            int blockVar = 3; // Only exists in this if block\n        }\n    }\n}\n```\n\n• Variables must be declared before use\n• They only exist within their scope\n• Trying to use a variable outside its scope causes errors",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how variable scope works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Variable Declaration",
-          "description": "When you declare a variable, it gets its own 'room' (scope). The variable k doesn't exist yet, so this would cause an error.",
-          "code": "public static void main(String[] args) {\n    int i = k + 2; // Error: k not declared\n}"
-        },
-        {
-          "step": 2,
-          "title": "Correct Scope",
-          "description": "Now k is declared in the same scope as i, so it works. Both variables exist in the main method's 'room'.",
-          "code": "public static void main(String[] args) {\n    int k = 5;\n    int i = k + 2; // Works fine\n}"
-        },
-        {
-          "step": 3,
-          "title": "Nested Scope",
-          "description": "Variables declared in inner blocks can't be used outside. The outer block can't see blockVar.",
-          "code": "public static void main(String[] args) {\n    if (true) {\n        int blockVar = 3;\n    }\n    System.out.println(blockVar); // Error!\n}"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "public static void main(String[] args) {\n    int x = 10;  // x is in scope for entire main\n\n    if (x > 5) {\n        int y = 20;  // y is only in scope inside this block\n        System.out.println(x + y);  // OK: both visible\n    }\n    // System.out.println(y);  // Error: y is out of scope\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Scope determines where a variable can be used",
-        "✓ Variables must be declared before use",
-        "✓ Local variables only exist in their method/block",
-        "✓ Class variables can be used anywhere in the class",
-        "✓ Trying to use a variable outside its scope causes errors"
+        "A variable's scope is the region of the program where it can be accessed",
+        "A local variable is declared inside a method or block and exists only within that scope",
+        "Variables declared in a for loop header are scoped to the loop body",
+        "Two variables with the same name can exist in non-overlapping scopes without conflict",
+        "Accessing a variable outside its scope results in a compilation error"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Declare variables in the smallest scope needed",
-        "Initialize variables when you declare them",
-        "Use descriptive names for variables",
-        "Check variable scope when you get 'not found' errors"
-      ],
-      "donts": [
-        "Don't use variables before declaring them",
-        "Don't declare variables in large scopes if they're only needed locally",
-        "Don't forget to initialize variables before use",
-        "Don't assume variables from one method exist in another"
-      ],
-      "protip": "When in doubt, ask: 'Where was this variable declared?' That's its scope!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is variable scope used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Systems",
-          "how": "Transaction variables only exist in their transaction methods, while account balance variables exist at the class level"
-        },
-        {
-          "app": "Game Development",
-          "how": "Player health might be a class variable, while temporary power-up effects are local variables in methods"
-        },
-        {
-          "app": "Web Applications",
-          "how": "Request-specific variables exist only during the request, while configuration variables exist for the whole application"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Find and fix all scope-related errors in this code. The program should calculate the area of a circle (πr²) and print it.",
-        "starterCode": "public class CircleArea {\n    public static void main(String[] args) {\n        double radius = 5.0;\n        calculateArea();\n        System.out.println(\"Area is: \" + area);\n    }\n    \n    public static void calculateArea() {\n        double area = 3.14 * radius * radius;\n    }\n}",
-        "hints": [
-          "Which variables can be seen by which methods?",
-          "Where should the area variable be declared?",
-          "What's the scope of the radius variable?"
-        ],
-        "solution": "public class CircleArea {\n    public static void main(String[] args) {\n        double radius = 5.0;\n        double area = calculateArea(radius);\n        System.out.println(\"Area is: \" + area);\n    }\n    \n    public static double calculateArea(double radius) {\n        return 3.14 * radius * radius;\n    }\n}",
-        "explanation": "The original code had two scope issues: radius wasn't visible in calculateArea(), and area wasn't visible in main(). The solution passes radius as a parameter and returns the calculated area."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Variable scope defines where a variable can be used",
-        "📌 Always declare variables before using them",
-        "📌 Practice identifying scope by looking at { } braces",
-        "📌 Ready to learn about method parameters next!"
-      ]
+      "title": "Summary",
+      "content": "Variable scope defines where a variable can be used. Always declare variables before using them. Practice identifying scope by looking at { } braces. Ready to learn about method parameters next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 9,
+  "total_pages": 6,
   "_generated_at": "2026-03-06T06:34:27.467810",
   "_topic_id": "6-8"
 }

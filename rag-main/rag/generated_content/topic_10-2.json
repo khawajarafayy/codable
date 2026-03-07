@@ -13,119 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let's explore how to hide the messy details of your code while keeping it powerful and easy to use!\n\n• What class abstraction and encapsulation really mean\n• How to protect your data like a pro\n• Why these concepts make your code cleaner and safer",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine a coffee machine. You press a button and get coffee - you don't need to know how the beans are ground or how the water is heated. That's abstraction!\n\n**Abstraction** hides complex details while showing only what's necessary.\n\n• Think of a car's steering wheel - you don't need to know how the engine works to drive\n• In code, abstraction means exposing simple methods while hiding complex logic\n\n**Encapsulation** is like putting your data in a protective capsule.\n\n• It bundles data and methods that work on that data\n• It restricts direct access to some components (like private variables)\n• It prevents accidental modification of important data",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Class Abstraction and Encapsulation works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "The Problem",
-          "description": "Without encapsulation, anyone can mess with your data directly.",
-          "code": "class BankAccount {\n  public double balance; // Anyone can change this!\n}\n\n// Bad usage:\nbankAccount.balance = -1000; // Negative balance?!"
-        },
-        {
-          "step": 2,
-          "title": "Adding Encapsulation",
-          "description": "Protect the data by making it private and adding controlled access.",
-          "code": "class BankAccount {\n  private double balance;\n\n  public void deposit(double amount) {\n    if (amount > 0) balance += amount;\n  }\n\n  public double getBalance() {\n    return balance;\n  }\n}"
-        },
-        {
-          "step": 3,
-          "title": "Using Abstraction",
-          "description": "Now users only see simple methods, not the internal workings.",
-          "code": "// Good usage:\nBankAccount account = new BankAccount();\naccount.deposit(100); // Simple interface\nSystem.out.println(account.getBalance()); // 100.0"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Abstraction: hide implementation, expose interface\npublic class BMI {\n    private double weight;\n    private double height;\n\n    public BMI(double weight, double height) {\n        this.weight = weight;\n        this.height = height;\n    }\n\n    public double getBMI() {\n        return weight / (height * height) * 703;\n    }\n\n    public String getStatus() {\n        double bmi = getBMI();\n        if (bmi < 18.5) return \"Underweight\";\n        else if (bmi < 25) return \"Normal\";\n        else return \"Overweight\";\n    }\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Abstraction = Show only what's necessary, hide the rest",
-        "✓ Encapsulation = Protect your data like a treasure chest",
-        "✓ Use private fields with public getters/setters",
-        "✓ Methods should do one thing well (Single Responsibility)",
-        "✓ Think 'what' not 'how' when designing classes"
+        "Class abstraction separates the class interface (what it does) from its implementation (how)",
+        "Users of a class interact through its public methods without knowing internal details",
+        "Encapsulation hides data fields and implementation methods behind a public API",
+        "A well-designed class can change its implementation without affecting code that uses it",
+        "Abstraction reduces complexity by letting each class focus on its own responsibility"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Make fields private by default",
-        "Validate data in setters",
-        "Keep methods focused on one task",
-        "Use clear method names that describe what they do"
-      ],
-      "donts": [
-        "Don't expose internal data directly",
-        "Don't create 'god objects' that do everything",
-        "Don't ignore access modifiers",
-        "Don't make getters that return mutable objects directly"
-      ],
-      "protip": "When designing a class, ask: 'What should users of this class NOT need to know?' - that's what to abstract away!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Class Abstraction and Encapsulation used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "ATM Machines",
-          "how": "You interact with simple buttons (abstraction) while your account data is protected (encapsulation)"
-        },
-        {
-          "app": "Social Media APIs",
-          "how": "You post content through simple methods while the platform handles all the complex storage and distribution"
-        },
-        {
-          "app": "Game Development",
-          "how": "Character classes expose simple move() methods while handling complex physics and collision detection internally"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a Temperature class that stores temperature in Celsius but provides methods to get/set in both Celsius and Fahrenheit. The internal storage should remain in Celsius only.",
-        "starterCode": "class Temperature {\n  private double celsius;\n\n  // Add your methods here\n}",
-        "hints": [
-          "Remember: Fahrenheit = (Celsius × 9/5) + 32",
-          "Make sure to validate temperature values",
-          "Think about what methods users would need"
-        ],
-        "solution": "class Temperature {\n  private double celsius;\n\n  public void setCelsius(double celsius) {\n    this.celsius = celsius;\n  }\n\n  public double getCelsius() {\n    return celsius;\n  }\n\n  public void setFahrenheit(double fahrenheit) {\n    this.celsius = (fahrenheit - 32) * 5/9;\n  }\n\n  public double getFahrenheit() {\n    return (celsius * 9/5) + 32;\n  }\n}",
-        "explanation": "This solution encapsulates the celsius field while providing a clean interface for both temperature scales. Users don't need to know the internal storage format."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Abstraction = Hide complexity, show simplicity",
-        "📌 Encapsulation = Protect your data like a fortress",
-        "📌 Always use private fields with public methods",
-        "📌 You're now ready to design cleaner, safer classes!"
-      ]
+      "title": "Summary",
+      "content": "Abstraction = Hide complexity, show simplicity. Encapsulation = Protect your data like a fortress. Always use private fields with public methods.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:49:13.859200",
   "_topic_id": "10-2"
 }

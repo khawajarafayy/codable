@@ -13,123 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Passing arrays to methods lets you work with whole collections of data at once - no more copying values one by one!\n\n• How to send an entire array to a method\n• Why arrays are passed differently than single variables\n• Practical examples you can use right away",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're moving houses. Instead of carrying each book one by one, you pack them all in a box and hand the whole box to your friend. That's exactly how passing arrays to methods works!\n\nWhen you pass an array to a method, you're giving the method access to the entire 'box' of values at once. The method can then read or modify any element inside.\n\n• Arrays are passed by reference (they point to the same memory location)\n• This means changes inside the method affect the original array\n• It's super efficient - no need to copy all the data",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Passing Arrays to Methods works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Declare and Initialize Array",
-          "description": "First, we create an array in our main program",
-          "code": "int[] numbers = {1, 2, 3, 4, 5};"
-        },
-        {
-          "step": 2,
-          "title": "Pass Array to Method",
-          "description": "We call a method and pass our array as an argument",
-          "code": "doubleTheValues(numbers);"
-        },
-        {
-          "step": 3,
-          "title": "Method Receives Array",
-          "description": "The method gets access to the original array and can modify it",
-          "code": "public static void doubleTheValues(int[] arr) {\n  for(int i = 0; i < arr.length; i++) {\n    arr[i] *= 2;\n  }\n}"
-        },
-        {
-          "step": 4,
-          "title": "Changes Persist",
-          "description": "After the method call, the original array has been modified",
-          "code": "System.out.println(Arrays.toString(numbers)); // [2, 4, 6, 8, 10]"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "public static void printArray(int[] arr) {\n    for (int val : arr)\n        System.out.print(val + \" \");\n    System.out.println();\n}\n\npublic static void main(String[] args) {\n    int[] nums = {1, 2, 3, 4, 5};\n    printArray(nums);  // 1 2 3 4 5\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Arrays are passed by reference - methods work with the original array",
-        "✓ Changes made inside the method affect the original array",
-        "✓ No need to return the array - modifications are automatic",
-        "✓ Method parameters use array type syntax: `int[] arr`",
-        "✓ This is different from primitive types which are passed by value"
+        "When an array is passed to a method, the reference is passed by value",
+        "The method can modify the array elements through the reference",
+        "Changes to array elements inside the method are visible to the caller",
+        "The method cannot change which array the caller's variable references",
+        "The for-each loop (for (type var : array)) simplifies reading all elements"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use descriptive parameter names like `int[] scores` instead of `int[] arr`",
-        "Check for null arrays before working with them",
-        "Document whether your method modifies the input array"
-      ],
-      "donts": [
-        "Don't assume the array has a specific length",
-        "Don't forget arrays can be null",
-        "Don't try to return the array - it's already modified"
-      ],
-      "protip": "If you want to preserve the original array, create a copy before passing it to methods that modify arrays"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Passing Arrays to Methods used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Data Analysis Tools",
-          "how": "Pass arrays of sensor data to methods that calculate averages, find peaks, or detect anomalies"
-        },
-        {
-          "app": "Game Development",
-          "how": "Pass arrays of game objects to methods that update positions, check collisions, or render graphics"
-        },
-        {
-          "app": "Financial Software",
-          "how": "Pass arrays of transaction data to methods that calculate totals, apply fees, or generate reports"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a method called `reverseArray` that takes an integer array and reverses its elements. The method should modify the original array (no need to return anything).",
-        "starterCode": "public class ArrayReverser {\n  public static void main(String[] args) {\n    int[] numbers = {1, 2, 3, 4, 5};\n    reverseArray(numbers);\n    System.out.println(Arrays.toString(numbers)); // Should print [5, 4, 3, 2, 1]\n  }\n  \n  // Your method here\n}",
-        "hints": [
-          "You'll need to swap elements from the start and end moving towards the center",
-          "Use a temporary variable to help with swapping",
-          "Only need to loop through half the array"
-        ],
-        "solution": "public static void reverseArray(int[] arr) {\n  for(int i = 0; i < arr.length / 2; i++) {\n    int temp = arr[i];\n    arr[i] = arr[arr.length - 1 - i];\n    arr[arr.length - 1 - i] = temp;\n  }\n}",
-        "explanation": "The method swaps the first element with the last, the second with the second-last, and so on until it reaches the middle. This efficiently reverses the array in place."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Arrays are passed to methods by reference - changes affect the original",
-        "📌 Method parameters use array syntax: `type[] parameterName`",
-        "📌 Practice by writing methods that modify arrays in place",
-        "📌 You're ready to learn about returning arrays from methods next!"
-      ]
+      "title": "Summary",
+      "content": "Arrays are passed to methods by reference - changes affect the original. Method parameters use array syntax: `type[] parameterName`. Practice by writing methods that modify arrays in place.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:36:42.024616",
   "_topic_id": "7-4"
 }

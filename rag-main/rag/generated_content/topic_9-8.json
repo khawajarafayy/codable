@@ -13,120 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered how to keep your code's data safe from accidental changes? Let's explore data field encapsulation!\n\n• Why hiding data is a good thing\n• How getters and setters work like bouncers\n• How to protect your class's private parts (data!)",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine your class is a VIP nightclub. The data fields are the VIP guests inside. You wouldn't let just anyone walk in and mess with them, right?\n\nThat's where encapsulation comes in - it's like having bouncers (getters/setters) who control who gets access to what.\n\n• **Private fields**: The VIP guests (data) that stay hidden\n• **Public methods**: The bouncers (getters/setters) who control access\n• **Validation**: The guest list that checks who's allowed in\n\nHere's a simple example:",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Data Field Encapsulation works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "The Problem",
-          "description": "Without encapsulation, anyone can mess with your data directly. This is like letting strangers into the VIP section!",
-          "code": "public class Person {\n  public String name; // Anyone can change this!\n}"
-        },
-        {
-          "step": 2,
-          "title": "Adding Protection",
-          "description": "Make the field private and add controlled access points. Now only approved changes get through!",
-          "code": "public class Person {\n  private String name; // Hidden from outside\n  \n  public String getName() { // Getter\n    return name;\n  }\n  \n  public void setName(String newName) { // Setter with validation\n    if(newName != null && !newName.isEmpty()) {\n      name = newName;\n    }\n  }\n}"
-        },
-        {
-          "step": 3,
-          "title": "Using It Safely",
-          "description": "Now the data is protected, and we can add rules like validation. The VIP guests are safe!",
-          "code": "Person p = new Person();\np.setName(\"Alice\"); // Works\np.setName(\"\"); // Ignored - validation!\nSystem.out.println(p.getName()); // Safe access"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "public class BankAccount {\n    private double balance;  // encapsulated field\n\n    public double getBalance() {\n        return balance;\n    }\n\n    public void deposit(double amount) {\n        if (amount > 0)\n            balance += amount;\n    }\n\n    public void withdraw(double amount) {\n        if (amount > 0 && amount <= balance)\n            balance -= amount;\n    }\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Private fields hide data from outside access",
-        "✓ Getters let you read data safely",
-        "✓ Setters let you modify data with control",
-        "✓ Always validate data in setters",
-        "✓ Encapsulation = data + methods that work on it"
+        "Encapsulation means making data fields private and providing public getter/setter methods",
+        "A getter (accessor) returns the value of a private field",
+        "A setter (mutator) sets the value of a private field with optional validation",
+        "Encapsulation protects data integrity by controlling how fields are accessed and modified",
+        "Convention: getFieldName() for getters, setFieldName(value) for setters"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Make fields private by default",
-        "Add getters for all fields you need to read",
-        "Add setters only when you need to modify",
-        "Validate all inputs in setters"
-      ],
-      "donts": [
-        "Don't make fields public - ever!",
-        "Don't create setters for everything",
-        "Don't forget to validate in setters",
-        "Don't return mutable objects directly"
-      ],
-      "protip": "Use your IDE's 'Generate Getters/Setters' feature to save time, but always review the generated code!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Data Field Encapsulation used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Systems",
-          "how": "Account balances are private - you can't just change them! Only specific methods (like deposit/withdraw) can modify them with proper validation."
-        },
-        {
-          "app": "User Profiles",
-          "how": "User data like passwords are private. Setters validate new passwords meet security requirements before changing them."
-        },
-        {
-          "app": "Game Development",
-          "how": "Player health is private - you can't just set it to 1000! Only specific game events (like healing potions) can modify it."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a `BankAccount` class with encapsulation. It should have a private `balance` field that can't be accessed directly. Add methods to deposit, withdraw, and check balance. Withdrawals should fail if there's not enough money.",
-        "starterCode": "public class BankAccount {\n  // Add your private field here\n  \n  // Add constructor\n  \n  // Add deposit method\n  \n  // Add withdraw method\n  \n  // Add getBalance method\n}",
-        "hints": [
-          "Make the balance field private",
-          "Add validation in withdraw to check balance",
-          "Deposit should add to balance",
-          "getBalance should just return the current balance"
-        ],
-        "solution": "public class BankAccount {\n  private double balance;\n  \n  public BankAccount(double initialBalance) {\n    this.balance = initialBalance;\n  }\n  \n  public void deposit(double amount) {\n    if(amount > 0) {\n      balance += amount;\n    }\n  }\n  \n  public boolean withdraw(double amount) {\n    if(amount > 0 && balance >= amount) {\n      balance -= amount;\n      return true;\n    }\n    return false;\n  }\n  \n  public double getBalance() {\n    return balance;\n  }\n}",
-        "explanation": "The balance is protected from direct access. Deposits only work with positive amounts. Withdrawals check for sufficient funds. The balance can only be read, not modified directly."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Encapsulation hides data and exposes controlled access points",
-        "📌 Always make fields private and add getters/setters as needed",
-        "📌 Use setters to validate data before changing it",
-        "📌 Practice by encapsulating real-world objects like bank accounts!"
-      ]
+      "title": "Summary",
+      "content": "Encapsulation hides data and exposes controlled access points. Always make fields private and add getters/setters as needed. Use setters to validate data before changing it. Practice by encapsulating real-world objects like bank accounts.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:47:11.080464",
   "_topic_id": "9-8"
 }

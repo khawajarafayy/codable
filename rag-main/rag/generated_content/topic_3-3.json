@@ -13,116 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let’s make your code smarter! Today, you’ll learn how to make decisions in Java using `if` statements.\n\n• How to check conditions and run code only when they’re true\n• Simple syntax that’s easy to remember\n• Real examples you can try right now",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
-      "content": "Imagine you’re a traffic light. 🚦\n- **Green light?** Cars go (`if` condition is true → run code).\n- **Red light?** Cars stop (`if` condition is false → skip code).\n\n`if` statements work the same way! They let your program choose what to do based on conditions.\n\n• **Basic structure**: `if (condition) { do this }`\n• **Example**: `if (age >= 18) { System.out.println(\"You can vote!\"); }`\n• **Key idea**: The code inside `{}` only runs if the condition is `true`.",
+      "title": "Core Concepts",
+      "content": "Imagine you’re a traffic light. \n- **Green light?** Cars go (`if` condition is true → run code).\n- **Red light?** Cars stop (`if` condition is false → skip code).\n\n`if` statements work the same way! They let your program choose what to do based on conditions.\n\n• **Basic structure**: `if (condition) { do this }`\n• **Example**: `if (age >= 18) { System.out.println(\"You can vote!\"); }`\n• **Key idea**: The code inside `{}` only runs if the condition is `true`.",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how `if` statements work:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Check the Condition",
-          "description": "Java looks at the condition inside `if ( )`. Is it `true` or `false`?",
-          "code": "if (temperature > 30) {"
-        },
-        {
-          "step": 2,
-          "title": "Decision Time!",
-          "description": "If `true`, run the code inside `{ }`. If `false`, skip it entirely.",
-          "code": "   System.out.println(\"It's hot!\");\n}"
-        },
-        {
-          "step": 3,
-          "title": "Move On",
-          "description": "After the `if` block, the program continues normally.",
-          "code": "System.out.println(\"Done!\");"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "int number = 15;\n\nif (number > 0) {\n    System.out.println(number + \" is positive\");\n}\n\nif (number % 2 == 0) {\n    System.out.println(number + \" is even\");\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `if` statements = decision-makers in code",
-        "✓ Conditions must be `true` or `false` (e.g., `x > 5`)",
-        "✓ Curly braces `{ }` group code to run (or skip)",
-        "✓ No semicolon after `if (condition)`!",
-        "✓ Indent code inside `{ }` for readability"
+        "An if statement executes its body only when the condition evaluates to true",
+        "The condition must be a boolean expression enclosed in parentheses",
+        "Use braces {} for the body even with a single statement to avoid errors",
+        "If the condition is false, the body is skipped and execution continues after it",
+        "Nested if statements can be used but should be kept simple for readability"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use clear conditions (e.g., `if (score >= 50)`)",
-        "Indent code inside `{ }` for clarity",
-        "Test both `true` and `false` cases"
-      ],
-      "donts": [
-        "Forget the parentheses `()` around conditions",
-        "Put a semicolon after `if (condition)`",
-        "Use `=` (assignment) instead of `==` (comparison)"
-      ],
-      "protip": "Add comments like `// Check if user is an adult` to explain your `if` statements!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where are `if` statements used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Login Systems",
-          "how": "Check if username/password match: `if (loginSuccess) { grantAccess(); }`"
-        },
-        {
-          "app": "E-commerce",
-          "how": "Apply discounts: `if (isPremiumMember) { price *= 0.9; }`"
-        },
-        {
-          "app": "Games",
-          "how": "Detect collisions: `if (player.hits(enemy)) { loseLife(); }`"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that checks if a number is positive, negative, or zero. Print a message for each case!",
-        "starterCode": "// Starter code\nint number = 7; // Try changing this value!\n\nif (number > 0) {\n    // Your code here\n}\n// Add more conditions...",
-        "hints": [
-          "Use `if`, `else if`, and `else` for all 3 cases",
-          "Test with `number = 0`, `number = 5`, and `number = -3`"
-        ],
-        "solution": "// Solution\nint number = 7;\n\nif (number > 0) {\n    System.out.println(\"Positive number!\");\n} else if (number < 0) {\n    System.out.println(\"Negative number!\");\n} else {\n    System.out.println(\"Zero!\");\n}",
-        "explanation": "We check `number > 0` first. If false, we check `number < 0`. If both are false, the number must be zero!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 `if` statements let your code make decisions",
-        "📌 Conditions must evaluate to `true` or `false`",
-        "📌 Practice with real examples (like checking grades or ages)",
-        "📌 Ready for `else` and `else if` next!"
-      ]
+      "title": "Summary",
+      "content": "`if` statements let your code make decisions. Conditions must evaluate to `true` or `false`. Practice with real examples (like checking grades or ages)",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:12:17.527746",
   "_topic_id": "3-3"
 }

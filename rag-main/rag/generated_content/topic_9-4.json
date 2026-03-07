@@ -13,112 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered how Java remembers where your objects live in memory? Let's explore reference variables!\n\n• What reference variables really are\n• How they point to objects in memory\n• The difference between objects and references\n• Common pitfalls to avoid",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine reference variables like sticky notes on a fridge. The fridge is your computer's memory, and the sticky note (reference variable) tells you where to find the milk (object).\n\nWhen you create an object in Java, it lives somewhere in memory. A reference variable is just a name that points to that memory location.\n\n• Think of it like a phone number - the number isn't the person, but it lets you reach them\n• Multiple reference variables can point to the same object\n• A reference variable with value 'null' points to nothing (like a blank sticky note)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Accessing Objects via Reference Variables works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Creating an Object",
-          "description": "When you create an object, Java allocates memory for it and gives you a reference.",
-          "code": "Person john = new Person(\"John\");"
-        },
-        {
-          "step": 2,
-          "title": "Reference Assignment",
-          "description": "The reference variable 'john' now points to the Person object in memory.",
-          "code": "Person friend = john; // Both point to same object!"
-        },
-        {
-          "step": 3,
-          "title": "Modifying Through Reference",
-          "description": "Changes made through either reference affect the same object.",
-          "code": "friend.setName(\"Johnny\");\nSystem.out.println(john.getName()); // Prints \"Johnny\""
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "Circle c1 = new Circle();\nc1.radius = 5;\n\n// c2 references the same object as c1\nCircle c2 = c1;\nc2.radius = 10;\nSystem.out.println(c1.radius);  // 10 (same object!)\n\n// null reference\nCircle c3 = null;\n// c3.radius = 1;  // NullPointerException!"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Reference variables store memory addresses, not objects themselves",
-        "✓ Multiple references can point to the same object",
-        "✓ Changing an object through one reference affects all references to it",
-        "✓ 'null' means the reference points to nothing",
-        "✓ The '==' operator compares references, not object contents"
+        "A reference variable stores the memory address of an object, not the object itself",
+        "Multiple reference variables can point to the same object",
+        "Assigning one reference to another makes both refer to the same object",
+        "The null value indicates that a reference variable does not point to any object",
+        "Accessing a member through a null reference throws a NullPointerException"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Initialize reference variables to avoid NullPointerException",
-        "Use .equals() to compare object contents, not '=='",
-        "Set references to null when done to help garbage collection"
-      ],
-      "donts": [
-        "Don't assume two references point to different objects",
-        "Don't forget to check for null before calling methods",
-        "Don't confuse reference assignment with object copying"
-      ],
-      "protip": "When you pass objects to methods, you're passing references - changes inside the method affect the original object!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Accessing Objects via Reference Variables used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Social Media Apps",
-          "how": "User objects are passed around via references - when you update your profile, all parts of the app see the changes"
-        },
-        {
-          "app": "Game Development",
-          "how": "Game entities (players, enemies) are referenced throughout the game - moving one reference updates all views"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a simple BankAccount class with balance. Then:\n1. Create two reference variables pointing to the same account\n2. Deposit money through one reference\n3. Check balance through the other reference\n4. What do you observe?",
-        "starterCode": "class BankAccount {\n    private double balance;\n    \n    public BankAccount(double initialBalance) {\n        this.balance = initialBalance;\n    }\n    \n    public void deposit(double amount) {\n        balance += amount;\n    }\n    \n    public double getBalance() {\n        return balance;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Remember: both references point to the same object!",
-          "Try printing the balance after each operation"
-        ],
-        "solution": "public class Main {\n    public static void main(String[] args) {\n        BankAccount account1 = new BankAccount(100.0);\n        BankAccount account2 = account1; // Both reference same object\n        \n        account1.deposit(50.0);\n        System.out.println(account2.getBalance()); // Prints 150.0\n    }\n}",
-        "explanation": "Both account1 and account2 reference the same BankAccount object. When you modify the object through one reference, the change is visible through all references to that object."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Reference variables are like pointers to objects in memory",
-        "📌 Multiple references can point to the same object",
-        "📌 Practice creating and using reference variables to understand object sharing",
-        "📌 Ready to learn about object copying and cloning next!"
-      ]
+      "title": "Summary",
+      "content": "Reference variables are like pointers to objects in memory. Multiple references can point to the same object. Practice creating and using reference variables to understand object sharing. Ready to learn about object copying and cloning next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:44:45.669678",
   "_topic_id": "9-4"
 }

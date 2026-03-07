@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wished you could add or subtract 1 from a variable with just one character? That’s exactly what increment and decrement operators do!\n\n• How `++` and `--` make your code shorter and cleaner\n• The difference between `i++` and `++i` (it’s sneaky!)\n• Where these operators shine in real programs",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re counting apples in a basket. Every time you add one apple, you could say `apples = apples + 1`. But what if you could just say `apples++`? That’s the magic of these operators!\n\nThese operators come in two flavors:\n• **Postfix** (`i++`, `i--`): Use the value first, then change it\n• **Prefix** (`++i`, `--i`): Change the value first, then use it\n\nThey might look similar, but they behave differently when used in expressions. Let’s break it down:",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Increment and Decrement Operators works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Postfix Increment (i++)",
-          "description": "The original value is used first, then incremented. Like taking a photo before adding an apple to the basket.",
-          "code": "int i = 3;\nint j = i++; // j gets 3, then i becomes 4"
-        },
-        {
-          "step": 2,
-          "title": "Prefix Increment (++i)",
-          "description": "The value is incremented first, then used. Like adding an apple before taking the photo.",
-          "code": "int i = 3;\nint j = ++i; // i becomes 4, then j gets 4"
-        },
-        {
-          "step": 3,
-          "title": "Standalone Use",
-          "description": "When used alone, both forms do the same thing. It’s only in expressions where the difference matters!",
-          "code": "i++; // i becomes 4\n++i; // i becomes 5 (same effect)"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "int x = 5;\nx++;                             // x is now 6 (postfix)\n++x;                             // x is now 7 (prefix)\n\nint a = 5;\nint b = a++;  // b = 5, a = 6 (use then increment)\nint c = ++a;  // c = 7, a = 7 (increment then use)"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `i++` = use first, then increment (postfix)",
-        "✓ `++i` = increment first, then use (prefix)",
-        "✓ `--i` and `i--` work the same way but subtract 1",
-        "✓ Standalone use? Both forms are identical!",
-        "✓ Avoid using them in complex expressions - it gets messy fast!"
+        "++x (prefix): increments x first, then returns the new value",
+        "x++ (postfix): returns the current value of x, then increments",
+        "--x and x-- decrement in the same prefix/postfix pattern",
+        "In standalone statements (x++;), prefix and postfix have the same effect",
+        "In expressions (y = x++), the difference in evaluation order matters"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `i++` when you need the original value first",
-        "Use `++i` when you want the new value immediately",
-        "Keep it simple - one operator per line is clearer"
-      ],
-      "donts": [
-        "Don’t use `i++ + ++i` - it’s confusing and error-prone",
-        "Don’t mix them in long expressions",
-        "Don’t forget they modify the variable permanently!"
-      ],
-      "protip": "When in doubt, split it into two lines: `int j = i; i++;` is clearer than `int j = i++;`"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Increment and Decrement Operators used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Loops (for, while)",
-          "how": "Counting iterations: `for (int i = 0; i < 10; i++)`"
-        },
-        {
-          "app": "Game Scores",
-          "how": "Quickly updating points: `score++` when a player collects a coin"
-        },
-        {
-          "app": "Array Indexing",
-          "how": "Moving to next element: `array[i++]`"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "What will this code print? Try to guess before running it!\n\nThen, modify the code to use prefix operators instead of postfix and see how the output changes.",
-        "starterCode": "int a = 5;\nint b = a++;\nSystem.out.println(\"a: \" + a + \", b: \" + b);\n\na = 5;\nb = ++a;\nSystem.out.println(\"a: \" + a + \", b: \" + b);",
-        "hints": [
-          "Remember: postfix uses the value first, then increments",
-          "Prefix increments first, then uses the value",
-          "The value of `a` changes in both cases!"
-        ],
-        "solution": "int a = 5;\nint b = a++; // b=5, a=6\nSystem.out.println(\"a: 6, b: 5\");\n\na = 5;\nb = ++a; // a=6, b=6\nSystem.out.println(\"a: 6, b: 6\");",
-        "explanation": "The first case uses postfix, so `b` gets the original value of `a` (5) before `a` increments to 6. The second case uses prefix, so `a` increments to 6 first, then `b` gets that new value."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 `i++` and `++i` both add 1, but behave differently in expressions",
-        "📌 Postfix (`i++`): use first, then change. Prefix (`++i`): change first, then use",
-        "📌 Practice with simple examples to master the difference",
-        "📌 Ready to use these in loops and counters next!"
-      ]
+      "title": "Summary",
+      "content": "`i++` and `++i` both add 1, but behave differently in expressions. Postfix (`i++`): use first, then change. Prefix (`++i`): change first, then use. Practice with simple examples to master the difference. Ready to use these in loops and counters next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:09:10.353455",
   "_topic_id": "2-13"
 }

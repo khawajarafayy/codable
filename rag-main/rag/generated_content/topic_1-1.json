@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Welcome to Java programming! This chapter is your first step into the world of coding. You'll get a taste of what Java can do and how it works.\n\n• How Java connects to the web and why it's so popular\n• The tools you need to write Java programs (JDK, IDEs, etc.)\n• How to write, run, and debug your first Java program",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Think of Java like a recipe book. The *Java Language Specification* is the rulebook (like grammar for a language). The *JDK* is your kitchen (tools to cook). The *IDE* is your smart kitchen assistant (helps you write recipes faster).\n\nJava is special because:\n• It runs on almost any device (like a universal recipe that works everywhere)\n• It’s secure (your recipes won’t accidentally poison anyone)\n• It’s used everywhere—from phones to banks!\n\nHere’s what makes Java tick:\n• **Syntax**: The grammar rules of Java (like how to write a sentence)\n• **Compilation**: Turning your code into something the computer understands (like translating your recipe into machine language)\n• **Execution**: Running your program (like following the recipe to bake a cake)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how a Java program works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Write the Code",
-          "description": "You write a simple program in an IDE (like NetBeans or Eclipse). This is your recipe!",
-          "code": "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}"
-        },
-        {
-          "step": 2,
-          "title": "Compile the Code",
-          "description": "The Java compiler (javac) checks for errors and translates your code into bytecode (a .class file). Think of it as proofreading your recipe.",
-          "code": "javac HelloWorld.java"
-        },
-        {
-          "step": 3,
-          "title": "Run the Program",
-          "description": "The Java Virtual Machine (JVM) executes the bytecode. Your program runs, and you see the output!",
-          "code": "java HelloWorld\n// Output: Hello, World!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "public class Welcome {\n    public static void main(String[] args) {\n        System.out.println(\"Welcome to Java!\");\n    }\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Java is platform-independent: 'Write once, run anywhere'",
-        "✓ JDK = Java Development Kit (your toolbox)",
-        "✓ IDE = Integrated Development Environment (your coding assistant)",
-        "✓ Compilation turns code into bytecode (.class files)",
-        "✓ JVM runs bytecode on any device"
+        "Java is a high-level, object-oriented programming language developed by Sun Microsystems",
+        "The chapter covers computer hardware, software, programming languages, and Java basics",
+        "Java programs are compiled to bytecode and run on the Java Virtual Machine (JVM)",
+        "JDK, JRE, and IDE are the essential tools for Java development",
+        "Understanding the compilation-execution cycle is fundamental before writing programs"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Install the latest JDK before starting",
-        "Use an IDE (like IntelliJ or Eclipse) to write code faster",
-        "Save your files with the same name as your class (e.g., `HelloWorld.java`)"
-      ],
-      "donts": [
-        "Don’t forget semicolons (`;`) at the end of statements",
-        "Don’t mix uppercase/lowercase in filenames (Java is case-sensitive!)",
-        "Don’t skip error messages—read them carefully!"
-      ],
-      "protip": "Bookmark the Java API docs (https://docs.oracle.com/javase/8/docs/api/). It’s your cheat sheet for built-in Java tools!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Java used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Android Apps",
-          "how": "Most Android apps are built using Java (or Kotlin, which runs on the JVM)."
-        },
-        {
-          "app": "Banking Systems",
-          "how": "Java’s security and reliability make it perfect for handling transactions."
-        },
-        {
-          "app": "Minecraft",
-          "how": "The original version of Minecraft was written in Java!"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a Java program that prints your name and a fun fact about you. Example: `Hello! I'm Alex, and I love pizza!`",
-        "starterCode": "public class MyInfo {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Use `System.out.println()` to print text",
-          "Put your name and fact inside quotes (`\" \")",
-          "Don’t forget the semicolon (`;`)!"
-        ],
-        "solution": "public class MyInfo {\n    public static void main(String[] args) {\n        System.out.println(\"Hello! I'm Alex, and I love pizza!\");\n    }\n}",
-        "explanation": "This program uses `System.out.println()` to print a message to the console. The text inside quotes is called a *string*."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Java is a powerful, versatile programming language",
-        "📌 You need the JDK to write and run Java programs",
-        "📌 Start with simple programs like `HelloWorld` to practice",
-        "📌 Ready for the next topic: Variables and Data Types!"
-      ]
+      "title": "Summary",
+      "content": "Java is a powerful, versatile programming language. You need the JDK to write and run Java programs. Start with simple programs like `HelloWorld` to practice.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T01:55:52.312055",
   "_topic_id": "1-1"
 }

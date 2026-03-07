@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let's learn how to create methods in Java - your code's superheroes! Methods help you organize and reuse code like LEGO blocks.\n\n• What methods are and why they're useful\n• How to define your own methods\n• The basic structure of a method\n• How to call methods to make them work",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine methods as little robots that do specific jobs for you. Need to calculate something? There's a robot for that. Need to display a message? Another robot!\n\nMethods are like these robots - they:\n• Have a specific job to do\n• Can be called whenever you need that job done\n• Can take inputs and give outputs\n\nHere's the simplest method structure:\n```java\npublic static void methodName() {\n    // Code to execute\n}\n```\n• `public static` - We'll learn these later (just include them for now)\n• `void` - Means the method doesn't return anything\n• `methodName()` - Your custom name for the method\n• `{}` - The method's code goes between these braces",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Defining a Method works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Define the Method",
-          "description": "First, we create our method (our little robot) with a specific job - in this case, saying hello.",
-          "code": "public static void sayHello() {\n    System.out.println(\"Hello!\");\n}"
-        },
-        {
-          "step": 2,
-          "title": "Call the Method",
-          "description": "Now we tell our robot to do its job by calling its name. The method runs and prints \"Hello!\".",
-          "code": "public static void main(String[] args) {\n    sayHello(); // This calls our method\n}"
-        },
-        {
-          "step": 3,
-          "title": "See the Result",
-          "description": "When we run the program, it executes the main method which calls sayHello(), and we see the output.",
-          "code": "Hello!\n// This is what appears in the console"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Method definition\npublic static double computeArea(double radius) {\n    return Math.PI * radius * radius;\n}\n\n// Method with no return and no parameters\npublic static void printGreeting() {\n    System.out.println(\"Hello!\");\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Methods are blocks of code that perform specific tasks",
-        "✓ They help organize code and avoid repetition",
-        "✓ Method definition includes: modifiers, return type, name, and body",
-        "✓ You call a method by using its name followed by parentheses",
-        "✓ Every Java program starts with the main method"
+        "A method definition includes modifiers, return type, name, parameter list, and body",
+        "The return type specifies the type of value the method returns (void if none)",
+        "Parameters are variables declared in the method header that receive argument values",
+        "The method name should describe what the method does using camelCase",
+        "A return statement sends a value back to the caller and exits the method"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Give methods descriptive names (like calculateTax instead of calc)",
-        "Keep methods small - one job per method",
-        "Use consistent naming (camelCase for method names)"
-      ],
-      "donts": [
-        "Don't create methods that do too many things",
-        "Don't forget the parentheses when calling methods",
-        "Don't mix up method definition and method call"
-      ],
-      "protip": "Start with simple methods that do one thing well - you can always combine them later!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Defining a Method used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Apps",
-          "how": "Methods calculate interest, validate transactions, and generate account statements"
-        },
-        {
-          "app": "Games",
-          "how": "Methods handle player movement, collision detection, and scoring systems"
-        },
-        {
-          "app": "E-commerce Websites",
-          "how": "Methods process payments, apply discounts, and calculate shipping costs"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a method called printGreeting that prints \"Welcome to Java Programming!\" to the console. Then call this method from your main method.",
-        "starterCode": "public class Greeting {\n    public static void main(String[] args) {\n        // Call your method here\n    }\n    \n    // Define your method here\n}",
-        "hints": [
-          "Remember the basic method structure: public static void methodName()",
-          "Don't forget the curly braces {} for the method body",
-          "Call the method by writing its name followed by ()"
-        ],
-        "solution": "public class Greeting {\n    public static void main(String[] args) {\n        printGreeting(); // Calling the method\n    }\n    \n    public static void printGreeting() {\n        System.out.println(\"Welcome to Java Programming!\");\n    }\n}",
-        "explanation": "We defined printGreeting() to print our message, then called it from main(). When the program runs, main() executes first and calls our method, which prints the greeting."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Methods are reusable blocks of code that perform specific tasks",
-        "📌 Every method has a name, body, and can be called when needed",
-        "📌 Practice defining and calling simple methods to build confidence",
-        "📌 You're now ready to learn about method parameters and return values!"
-      ]
+      "title": "Summary",
+      "content": "Methods are reusable blocks of code that perform specific tasks. Every method has a name, body, and can be called when needed. Practice defining and calling simple methods to build confidence.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:31:08.932841",
   "_topic_id": "6-2"
 }

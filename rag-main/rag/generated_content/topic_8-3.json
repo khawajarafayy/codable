@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Let's dive into processing 2D arrays! Think of them like spreadsheets or game boards where you can work with rows and columns.\n\n• How to access and modify elements in 2D arrays\n• Ways to loop through all elements efficiently\n• Practical examples like finding sums or patterns",
+      "title": "What You'll Learn",
+      "content": "Think of them like spreadsheets or game boards where you can work with rows and columns.\n\n• How to access and modify elements in 2D arrays\n• Ways to loop through all elements efficiently\n• Practical examples like finding sums or patterns",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine a chessboard. Each square has a row and column number, right? A 2D array works the same way!\n\n• It's just an array of arrays (rows containing columns)\n• You use two indices: `array[row][column]`\n• Great for grids, tables, or any data with two dimensions\n\nFor example, a 3x3 tic-tac-toe board would be a 2D array where you can check each cell for X, O, or empty. Simple!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Processing Two-Dimensional Arrays works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Initialize a 2D Array",
-          "description": "Create a 2D array with 2 rows and 3 columns. Think of it like a small spreadsheet.",
-          "code": "int[][] grid = {\n  {1, 2, 3},\n  {4, 5, 6}\n};"
-        },
-        {
-          "step": 2,
-          "title": "Access an Element",
-          "description": "Get the value at row 1, column 2 (which is 6). Remember: indices start at 0!",
-          "code": "int value = grid[1][2]; // value = 6"
-        },
-        {
-          "step": 3,
-          "title": "Loop Through All Elements",
-          "description": "Use nested loops to visit every cell. The outer loop goes through rows, the inner loop through columns.",
-          "code": "for (int row = 0; row < grid.length; row++) {\n  for (int col = 0; col < grid[row].length; col++) {\n    System.out.print(grid[row][col] + \" \");\n  }\n  System.out.println();\n}"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Traverse all elements with nested loops\nint[][] matrix = {{1, 2}, {3, 4}, {5, 6}};\n\nfor (int i = 0; i < matrix.length; i++) {\n    for (int j = 0; j < matrix[i].length; j++) {\n        System.out.printf(\"%4d\", matrix[i][j]);\n    }\n    System.out.println();\n}\n\n// Sum all elements\nint total = 0;\nfor (int[] row : matrix)\n    for (int val : row)\n        total += val;\nSystem.out.println(\"Sum: \" + total);  // 21"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ 2D arrays are arrays of arrays (rows and columns)",
-        "✓ Use `array[row][column]` to access elements",
-        "✓ Nested loops are perfect for processing all elements",
-        "✓ Great for grids, tables, and game boards",
-        "✓ Remember: indices start at 0, not 1!"
+        "Use nested for loops to traverse all elements of a 2D array",
+        "The outer loop iterates over rows; the inner loop iterates over columns",
+        "Common operations include summing elements, finding max/min, and printing the matrix",
+        "The enhanced for loop can also traverse 2D arrays: for (int[] row : matrix)",
+        "Row-by-row processing is the standard pattern for 2D array algorithms"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `array.length` for row count",
-        "Use `array[row].length` for column count in that row",
-        "Initialize with values for clarity"
-      ],
-      "donts": [
-        "Don't assume all rows have the same number of columns",
-        "Don't forget to check array bounds",
-        "Don't confuse row and column order"
-      ],
-      "protip": "For large 2D arrays, consider using enhanced for-loops for cleaner code!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Processing Two-Dimensional Arrays used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Spreadsheet Software (Excel, Google Sheets)",
-          "how": "Each cell is an element in a 2D array. Formulas process rows/columns to calculate sums, averages, etc."
-        },
-        {
-          "app": "Image Processing",
-          "how": "Pixels are stored in 2D arrays. Filters (like blur) process each pixel and its neighbors."
-        },
-        {
-          "app": "Game Development",
-          "how": "Game boards (chess, tic-tac-toe) or maps use 2D arrays to track positions and movements."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a method that finds the sum of all elements in a 2D array. For example, given `{{1, 2}, {3, 4}}`, it should return `10`.",
-        "starterCode": "public static int sum2DArray(int[][] array) {\n  // Your code here\n}",
-        "hints": [
-          "Use nested loops to visit every element",
-          "Add each element to a running total",
-          "Don't forget to initialize the total to 0!"
-        ],
-        "solution": "public static int sum2DArray(int[][] array) {\n  int total = 0;\n  for (int row = 0; row < array.length; row++) {\n    for (int col = 0; col < array[row].length; col++) {\n      total += array[row][col];\n    }\n  }\n  return total;\n}",
-        "explanation": "We loop through each row and column, adding every element to `total`. The outer loop handles rows, and the inner loop handles columns."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 2D arrays are grids with rows and columns",
-        "📌 Use nested loops to process all elements",
-        "📌 Practice with real-world examples like spreadsheets or games",
-        "📌 Ready to move on to passing 2D arrays to methods!"
-      ]
+      "title": "Summary",
+      "content": "2D arrays are grids with rows and columns. Use nested loops to process all elements. Practice with real-world examples like spreadsheets or games. Ready to move on to passing 2D arrays to methods.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:41:06.183123",
   "_topic_id": "8-3"
 }

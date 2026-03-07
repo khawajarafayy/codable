@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Selections let your programs make decisions—just like you do every day! Here’s what we’ll cover:\n\n• How to use `if` statements to choose different actions\n• Ways to handle multiple conditions with `else` and `else if`\n• How to avoid common mistakes that trip up beginners",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re at a traffic light. You don’t just drive blindly—you check the color and decide:\n- Green? Go!\n- Yellow? Slow down.\n- Red? Stop!\n\nSelections work the same way in code. They let your program check conditions and pick the right path.\n\n• **Basic `if` statement**: Do something only if a condition is true\n  ```java\n  if (hungry) {\n      eatSnack();\n  }\n  ```\n\n• **`if-else`**: Choose between two options\n  ```java\n  if (raining) {\n      takeUmbrella();\n  } else {\n      wearSunglasses();\n  }\n  ```\n\n• **Multiple conditions**: Handle more complex decisions\n  ```java\n  if (temperature > 30) {\n      System.out.println(\"Hot!\");\n  } else if (temperature > 20) {\n      System.out.println(\"Warm\");\n  } else {\n      System.out.println(\"Cold\");\n  }\n  ```",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how selections work:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Check Condition",
-          "description": "The program evaluates a condition (like `radius < 0`). This is like asking: \"Is the radius negative?\"",
-          "code": "if (radius < 0) {"
-        },
-        {
-          "step": 2,
-          "title": "Take Action",
-          "description": "If the condition is true, the code inside the `if` block runs. If false, it skips or goes to `else`.",
-          "code": "    System.out.println(\"Incorrect input\");"
-        },
-        {
-          "step": 3,
-          "title": "Alternative Path",
-          "description": "With `else`, the program has a backup plan. If the condition is false, it executes the `else` block.",
-          "code": "} else {\n    area = radius * radius * 3.14159;\n    System.out.println(\"Area is \" + area);\n}"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Selection allows different paths based on conditions\nint score = 85;\nif (score >= 60) {\n    System.out.println(\"Pass\");\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Selections = decision-making in code (like a flowchart)",
-        "✓ `if` checks a condition—if true, it runs the code inside",
-        "✓ `else` gives a fallback option when the condition is false",
-        "✓ Conditions must be `boolean` (true/false) expressions",
-        "✓ Indentation matters for readability (but doesn’t affect execution)"
+        "Selection statements allow programs to execute different code based on conditions",
+        "Java supports if, if-else, multi-way if-else, and switch for decision making",
+        "Conditions are boolean expressions that evaluate to true or false",
+        "Selection is essential for making programs respond differently to different inputs",
+        "Control flow determines the order in which statements are executed"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `==` for equality (not `=`—that’s for assignment!)",
-        "Indent your code inside `if`/`else` blocks for clarity",
-        "Test all possible paths (true *and* false conditions)"
-      ],
-      "donts": [
-        "Forget the curly braces `{}` for multi-line blocks",
-        "Write conditions like `if (x = 5)` instead of `if (x == 5)`",
-        "Assume `else` is optional—it’s not always needed!"
-      ],
-      "protip": "Use `else if` to chain multiple conditions neatly. It’s cleaner than nested `if` statements!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Selections are everywhere in real apps! Here’s how they’re used:",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Login Systems",
-          "how": "Checks if username/password match. If true, grants access; else, shows an error."
-        },
-        {
-          "app": "E-commerce Websites",
-          "how": "Uses selections to apply discounts: \"If cart total > $100, apply 10% off.\""
-        },
-        {
-          "app": "Games",
-          "how": "Decides what happens when a player collides with an object: \"If player touches coin, add points.\""
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge: Write a program that checks if a number is positive, negative, or zero.",
-      "type": "practice",
-      "problem": {
-        "description": "Create a program that asks the user for a number and prints:\n- \"Positive\" if the number is > 0\n- \"Negative\" if the number is < 0\n- \"Zero\" if the number is 0",
-        "starterCode": "// Starter code\nimport java.util.Scanner;\n\npublic class NumberChecker {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        System.out.print(\"Enter a number: \");\n        int number = input.nextInt();\n        \n        // Your code here\n    }\n}",
-        "hints": [
-          "Use `if`, `else if`, and `else` to cover all cases",
-          "Remember: `0` is neither positive nor negative!",
-          "Test with 5, -3, and 0 to verify"
-        ],
-        "solution": "// Solution\nif (number > 0) {\n    System.out.println(\"Positive\");\n} else if (number < 0) {\n    System.out.println(\"Negative\");\n} else {\n    System.out.println(\"Zero\");\n}",
-        "explanation": "The program checks the number in order: first for positivity, then negativity, and defaults to zero if neither condition is met. This covers all possible cases!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Selections let your program make decisions using `if`, `else if`, and `else`",
-        "📌 Conditions must be `boolean` (true/false) expressions",
-        "📌 Practice writing conditions for real-world scenarios (like login checks)",
-        "📌 Ready for next topic: combining conditions with logical operators!"
-      ]
+      "title": "Summary",
+      "content": "Selections let your program make decisions using `if`, `else if`, and `else`. Conditions must be `boolean` (true/false) expressions. Practice writing conditions for real-world scenarios (like login checks)",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:11:23.119799",
   "_topic_id": "3-1"
 }

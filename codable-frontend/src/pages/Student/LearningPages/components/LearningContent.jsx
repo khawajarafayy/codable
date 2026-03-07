@@ -225,10 +225,11 @@ export function LearningContent({ onStartPractice, chapterId }) {
   };
 
   // Separate sections into main content and sidebar
-  const mainSectionTypes = ['introduction', 'explanation', 'code', 'details', 'practice'];
-  const sidebarSectionTypes = ['keypoints', 'tips', 'summary'];
+  const mainSectionOrder = ['introduction', 'explanation', 'code', 'summary'];
+  const sidebarSectionTypes = ['keypoints'];
   
-  const mainSections = sections.filter(s => mainSectionTypes.includes(s.type));
+  const mainSections = mainSectionOrder
+    .flatMap(type => sections.filter(s => s.type === type));
   const sidebarSections = sections.filter(s => sidebarSectionTypes.includes(s.type));
 
   const getSectionStyle = (type) => {
@@ -498,9 +499,9 @@ export function LearningContent({ onStartPractice, chapterId }) {
                 </div>
               </div>
 
-              {/* Sidebar - Key Points, Tips, Summary */}
+              {/* Sidebar - Key Points */}
               {sidebarSections.length > 0 && (
-                <div className="w-80 flex-shrink-0 space-y-4 sticky top-[180px] self-start max-h-[calc(100vh-220px)] overflow-y-auto">
+                <div className="w-80 flex-shrink-0 space-y-4 sticky top-[180px] self-start max-h-[calc(100vh-220px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent pr-1">
                   {sidebarSections.map((section, index) => (
                     <div 
                       key={index}

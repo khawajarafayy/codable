@@ -13,113 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Ever wondered how programmers name their variables, methods, or classes? Let's dive into the rules of identifiers!\n\n• What identifiers are and why they matter\n• The dos and don'ts of naming things in Java\n• How to make your code readable and professional",
+      "title": "What You'll Learn",
+      "content": "Ever wondered how programmers name their variables, methods, or classes? • What identifiers are and why they matter\n• The dos and don'ts of naming things in Java\n• How to make your code readable and professional",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're labeling boxes in a warehouse. Each box needs a unique, clear name so workers know what's inside. Identifiers are like those labels for your code!\n\nIn Java, identifiers are names you give to:\n• Variables (like `age` or `totalPrice`)\n• Methods (like `calculateTax()`)\n• Classes (like `Student` or `BankAccount`)\n\n**Rules to follow:**\n• Must start with a letter (a-z, A-Z), underscore (`_`), or dollar sign (`$`)\n• Can include letters, digits, underscores, or dollar signs after the first character\n• Cannot be a Java keyword (like `int`, `class`, or `public`)\n• Case-sensitive (`age` ≠ `Age` ≠ `AGE`)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Identifiers work:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Valid Identifiers",
-          "description": "These names follow all the rules:",
-          "code": "int _count = 5;\nString userName = \"Alice\";\nclass CarModel { }"
-        },
-        {
-          "step": 2,
-          "title": "Invalid Identifiers",
-          "description": "These break the rules (see why below):",
-          "code": "int 2ndPlace = 2;  // Starts with digit\nString class = \"CS101\";  // Reserved word\ndouble total-price = 9.99;  // Contains hyphen"
-        },
-        {
-          "step": 3,
-          "title": "Case Sensitivity",
-          "description": "These are all different variables:",
-          "code": "int score = 100;\nint Score = 200;\nint SCORE = 300;"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Valid identifiers\nint age = 25;\ndouble totalAmount = 99.5;\nString firstName = \"Ali\";\n\n// Invalid identifiers\n// int 2ndPlace = 2;   // cannot start with digit\n// double my-var = 1;  // hyphens not allowed\n// String class = \"x\"; // reserved keyword"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Identifiers are names for variables, methods, and classes",
-        "✓ Must start with a letter, `_`, or `$` (no digits!)",
-        "✓ Can include letters, digits, `_`, or `$` after the first character",
-        "✓ Cannot be Java keywords (like `int`, `class`)",
-        "✓ Java is case-sensitive (`age` ≠ `Age`)"
+        "Identifiers are names for variables, methods, classes, and other program elements",
+        "Identifiers must start with a letter, underscore, or dollar sign (not a digit)",
+        "Java identifiers are case-sensitive: myVar and myvar are different identifiers",
+        "Reserved words (if, class, int, etc.) cannot be used as identifiers",
+        "Choose descriptive identifiers that convey the purpose of the element"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use descriptive names (e.g., `studentAge` instead of `sa`)",
-        "Follow Java naming conventions (camelCase for variables/methods, PascalCase for classes)",
-        "Keep names short but meaningful"
-      ],
-      "donts": [
-        "Don’t start with digits (e.g., `2ndPlace`)",
-        "Don’t use spaces or special characters (e.g., `total price` or `total-price`)",
-        "Don’t use Java keywords (e.g., `int int = 5;`)"
-      ],
-      "protip": "Avoid `$` in names—it’s reserved for generated code (like in IDEs)."
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where are identifiers used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Apps",
-          "how": "Use identifiers like `accountBalance`, `transactionDate`, and `Customer` class to organize financial data."
-        },
-        {
-          "app": "Social Media Platforms",
-          "how": "Identifiers like `userName`, `postContent`, and `LikeButton` class help manage user interactions."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Which of these are valid Java identifiers? Fix the invalid ones:\n1. `2ndAttempt`\n2. `user_name`\n3. `class`\n4. `totalAmount`\n5. `void`\n6. `$price`",
-        "starterCode": "// Write your answers here!",
-        "hints": [
-          "Check if it starts with a letter, `_`, or `$`.",
-          "Make sure it’s not a Java keyword.",
-          "Remember: No spaces or special characters!"
-        ],
-        "solution": "// Valid: user_name, totalAmount, $price\n// Fixed invalid:\n// 2ndAttempt → secondAttempt\n// class → studentClass (or any non-keyword)\n// void → methodVoid (or any non-keyword)",
-        "explanation": "Valid identifiers must follow the rules: start with a letter/underscore/dollar sign, avoid keywords, and use only allowed characters."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Identifiers are names for variables, methods, and classes",
-        "📌 Must start with a letter, `_`, or `$` (no digits or keywords!)",
-        "📌 Practice naming things clearly and consistently",
-        "📌 Ready to learn about variables next!"
-      ]
+      "title": "Summary",
+      "content": "Identifiers are names for variables, methods, and classes. Must start with a letter, `_`, or `$` (no digits or keywords!) Practice naming things clearly and consistently. Ready to learn about variables next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:02:07.696573",
   "_topic_id": "2-4"
 }

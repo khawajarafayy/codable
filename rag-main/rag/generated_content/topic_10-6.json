@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever tried to calculate something huge—like the number of atoms in the universe—and Java just gave up? Let’s fix that!\n\n• How to handle numbers bigger than `long` can hold\n• Why `BigInteger` and `BigDecimal` are your new best friends\n• When to use them (and when to stick with `int`/`double`)",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re counting grains of sand on a beach. A regular calculator (like `int` or `double`) would run out of digits fast—just like you’d run out of fingers!\n\n`BigInteger` and `BigDecimal` are like super-powered calculators that never run out of space. They handle:\n\n• **`BigInteger`**: Whole numbers of *any* size (even 1000 digits long!)\n  - Perfect for cryptography, factorials, or counting stars\n\n• **`BigDecimal`**: Precise decimal numbers (no more `0.1 + 0.2 = 0.30000000000000004` nonsense!)\n  - Essential for money, scientific calculations, or exact measurements\n\n**Why not just use `double`?**\n- `double` is like a rubber ruler—it stretches but loses accuracy\n- `BigDecimal` is like a metal ruler—precise but slower (trade-off!)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step: How `BigInteger` and `BigDecimal` work under the hood:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Creating a Big Number",
-          "description": "`BigInteger` stores numbers as *strings* internally (no size limit!). Here’s how you make one:",
-          "code": "BigInteger atoms = new BigInteger(\"12345678901234567890\");\n// No more \"integer too large\" errors!"
-        },
-        {
-          "step": 2,
-          "title": "Math Without Limits",
-          "description": "Add two `BigInteger`s. Java breaks the numbers into chunks (like adding on paper) and combines them:",
-          "code": "BigInteger a = new BigInteger(\"10000000000000000000\");\nBigInteger b = new BigInteger(\"20000000000000000000\");\nBigInteger sum = a.add(b); // 30000000000000000000"
-        },
-        {
-          "step": 3,
-          "title": "Precision Matters",
-          "description": "`BigDecimal` avoids floating-point errors by tracking *scale* (decimal places). Here’s exact money math:",
-          "code": "BigDecimal price = new BigDecimal(\"19.99\");\nBigDecimal tax = new BigDecimal(\"0.07\");\nBigDecimal total = price.multiply(tax).add(price); // 21.3893 → 21.39"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "import java.math.BigInteger;\nimport java.math.BigDecimal;\n\nBigInteger a = new BigInteger(\"9999999999999999999\");\nBigInteger b = a.multiply(a);\nSystem.out.println(b);\n\nBigDecimal x = new BigDecimal(\"1.0\");\nBigDecimal y = new BigDecimal(\"3.0\");\nBigDecimal result = x.divide(y, 20, BigDecimal.ROUND_HALF_UP);\nSystem.out.println(result);  // 0.33333333333333333333"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `BigInteger` = Whole numbers with *no size limit* (use for cryptography, huge counts)",
-        "✓ `BigDecimal` = Precise decimals (use for money, science, or exact math)",
-        "✓ Both are *immutable*—every operation returns a new object (like `String`)",
-        "✓ Slower than `int`/`double` (trade speed for accuracy/size)",
-        "✓ Methods like `.add()` and `.multiply()` replace `+` and `*`"
+        "BigInteger handles integers of arbitrary size beyond the range of long",
+        "BigDecimal provides arbitrary-precision decimal arithmetic without rounding errors",
+        "Arithmetic uses methods: add(), subtract(), multiply(), divide() instead of operators",
+        "BigDecimal is essential for financial calculations where precision is critical",
+        "Specify a rounding mode and scale when dividing with BigDecimal"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `BigDecimal` for money—never `double`!",
-        "Initialize with *strings* to avoid precision loss (e.g., `\"0.1\"` not `0.1`)",
-        "Use `.compareTo()` to compare `BigDecimal` (not `==` or `.equals()`)"
-      ],
-      "donts": [
-        "Don’t use `+` or `*` with `BigInteger`/`BigDecimal` (they’re objects!)",
-        "Don’t assume `BigDecimal` is always precise (set scale for rounding!)",
-        "Don’t use `BigInteger` for small numbers (overkill!)"
-      ],
-      "protip": "For `BigDecimal`, always set a *scale* and *rounding mode* (e.g., `setScale(2, RoundingMode.HALF_UP)`) to avoid surprises!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where you’ll see these in action:",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Systems",
-          "how": "`BigDecimal` ensures $10.00 - $0.01 = $9.99 (not $9.999999999999998)"
-        },
-        {
-          "app": "Cryptography (RSA Encryption)",
-          "how": "`BigInteger` handles 2048-bit keys (numbers with 600+ digits!)"
-        },
-        {
-          "app": "Scientific Computing",
-          "how": "`BigDecimal` calculates π to 1000 decimal places without rounding errors"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that calculates the factorial of 50 (50!). Regular `int` or `long` will overflow—use `BigInteger` instead!\n\nBonus: Format the output to group digits (e.g., 3,041,409...).",
-        "starterCode": "import java.math.BigInteger;\n\npublic class Factorial {\n    public static void main(String[] args) {\n        int n = 50;\n        // Your code here\n    }\n}",
-        "hints": [
-          "Start with `BigInteger.ONE` and multiply in a loop",
-          "Use `.multiply()` for multiplication",
-          "For formatting, use `String.format(\"%,d\", bigNumber)`"
-        ],
-        "solution": "import java.math.BigInteger;\n\npublic class Factorial {\n    public static void main(String[] args) {\n        BigInteger result = BigInteger.ONE;\n        for (int i = 1; i <= 50; i++) {\n            result = result.multiply(BigInteger.valueOf(i));\n        }\n        System.out.println(\"50! = \" + String.format(\"%,d\", result));\n    }\n}",
-        "explanation": "We start with `1` (as a `BigInteger`) and multiply it by every number from 1 to 50. The `String.format` adds commas for readability—just like a calculator!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 `BigInteger` = Unlimited-size whole numbers (no overflow!)",
-        "📌 `BigDecimal` = Precise decimals (no floating-point errors!)",
-        "📌 Use them for money, science, or huge numbers—otherwise, stick to `int`/`double`",
-        "📌 Ready to tackle real-world math problems without limits!"
-      ]
+      "title": "Summary",
+      "content": "`BigInteger` = Unlimited-size whole numbers (no overflow!) `BigDecimal` = Precise decimals (no floating-point errors!) Use them for money, science, or huge numbers—otherwise, stick to `int`/`double`. Ready to tackle real-world math problems without limits.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:51:55.345921",
   "_topic_id": "10-6"
 }

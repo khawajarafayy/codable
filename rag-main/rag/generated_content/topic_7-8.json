@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wished arrays had superpowers? The `Arrays` class is here to save the day! It’s like a Swiss Army knife for arrays in Java.\n\n• How to sort, search, and compare arrays effortlessly\n• Ways to fill, copy, and convert arrays in one line\n• Practical tricks to make your code cleaner and faster",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re organizing a bookshelf. You could manually sort each book by title, but wouldn’t it be easier if someone handed you a magic wand to do it instantly? That’s what the `Arrays` class does for your arrays!\n\nThe `Arrays` class is a **utility class** in Java’s `java.util` package. It provides static methods to perform common operations on arrays—like sorting, searching, and filling—without writing loops or complex logic.\n\n• **No need to reinvent the wheel**: Why write a sorting algorithm when `Arrays.sort()` exists?\n• **Works with all array types**: Primitives (`int[]`, `double[]`) and objects (`String[]`, `Integer[]`).\n• **Saves time and reduces bugs**: Less code = fewer mistakes.",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how The Arrays Class works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Before Sorting",
-          "description": "An unsorted array of numbers looks messy, like a pile of shuffled cards.",
-          "code": "int[] numbers = {5, 2, 9, 1, 5};"
-        },
-        {
-          "step": 2,
-          "title": "Apply `Arrays.sort()`",
-          "description": "The `Arrays.sort()` method rearranges the elements in ascending order—like magic!",
-          "code": "Arrays.sort(numbers); // Now: {1, 2, 5, 5, 9}"
-        },
-        {
-          "step": 3,
-          "title": "Search with `Arrays.binarySearch()`",
-          "description": "Find the position of a value (e.g., `5`) in the sorted array. Returns `-1` if not found.",
-          "code": "int index = Arrays.binarySearch(numbers, 5); // Returns 2"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "import java.util.Arrays;\n\nint[] arr = {5, 2, 8, 1, 9};\n\nArrays.sort(arr);\nSystem.out.println(Arrays.toString(arr));  // [1, 2, 5, 8, 9]\n\nint idx = Arrays.binarySearch(arr, 5);     // 2 (after sort)\n\nint[] copy = Arrays.copyOf(arr, arr.length);\nSystem.out.println(Arrays.equals(arr, copy));  // true\n\nArrays.fill(arr, 0);\nSystem.out.println(Arrays.toString(arr));  // [0, 0, 0, 0, 0]"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `Arrays.sort()`: Sorts arrays in ascending order (primitives or objects).",
-        "✓ `Arrays.binarySearch()`: Finds an element in a **sorted** array (faster than linear search).",
-        "✓ `Arrays.fill()`: Fills an array with a specific value (e.g., `Arrays.fill(arr, 0)`).",
-        "✓ `Arrays.equals()`: Checks if two arrays have the same elements in the same order.",
-        "✓ `Arrays.toString()`: Converts an array to a readable string (e.g., `[1, 2, 3]`)."
+        "Arrays.sort() sorts an array in ascending order in place",
+        "Arrays.binarySearch() finds an element in a sorted array and returns its index",
+        "Arrays.toString() returns a human-readable string representation of the array",
+        "Arrays.equals() compares two arrays element by element for equality",
+        "Arrays.fill() sets every element in the array to a specified value"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `Arrays.toString()` for debugging—no more manual loops!",
-        "Always sort before using `binarySearch()` (it won’t work on unsorted arrays).",
-        "For large arrays, use `Arrays.parallelSort()` for faster sorting."
-      ],
-      "donts": [
-        "Don’t use `==` to compare arrays—it checks references, not content!",
-        "Don’t forget to import `java.util.Arrays` (or use `java.util.*`).",
-        "Don’t modify arrays while iterating (e.g., sorting during a loop)."
-      ],
-      "protip": "Combine `Arrays.copyOf()` with `Arrays.sort()` to create a sorted copy without changing the original array!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is The Arrays Class used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "E-commerce Search",
-          "how": "Sorts product IDs or prices to display results quickly using `Arrays.sort()`."
-        },
-        {
-          "app": "Game Development",
-          "how": "Fills a game board with default values (e.g., `Arrays.fill(board, ' ')`)."
-        },
-        {
-          "app": "Data Analysis",
-          "how": "Compares datasets with `Arrays.equals()` to check for duplicates."
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a method that takes an array of integers and returns a **new sorted array** with all duplicates removed. Use the `Arrays` class to simplify your code!",
-        "starterCode": "import java.util.Arrays;\n\npublic class RemoveDuplicates {\n    public static int[] removeDuplicates(int[] arr) {\n        // Your code here\n    }\n    \n    public static void main(String[] args) {\n        int[] input = {3, 1, 2, 3, 4, 2};\n        int[] result = removeDuplicates(input);\n        System.out.println(Arrays.toString(result)); // Expected: [1, 2, 3, 4]\n    }\n}",
-        "hints": [
-          "First, sort the array to group duplicates together.",
-          "Use a loop to skip duplicates and copy unique elements to a new array.",
-          "Try `Arrays.copyOf()` to resize the array at the end."
-        ],
-        "solution": "import java.util.Arrays;\n\npublic class RemoveDuplicates {\n    public static int[] removeDuplicates(int[] arr) {\n        if (arr.length == 0) return arr;\n        \n        Arrays.sort(arr);\n        int uniqueCount = 1;\n        for (int i = 1; i < arr.length; i++) {\n            if (arr[i] != arr[i - 1]) {\n                uniqueCount++;\n            }\n        }\n        \n        int[] result = new int[uniqueCount];\n        result[0] = arr[0];\n        int index = 1;\n        for (int i = 1; i < arr.length; i++) {\n            if (arr[i] != arr[i - 1]) {\n                result[index++] = arr[i];\n            }\n        }\n        return result;\n    }\n}",
-        "explanation": "1. Sort the array to group duplicates. 2. Count unique elements by comparing adjacent values. 3. Copy unique elements to a new array. The `Arrays` class handles sorting for you!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 The `Arrays` class is your shortcut for common array operations—no loops needed!",
-        "📌 Always sort before searching (`binarySearch` only works on sorted arrays).",
-        "📌 Practice with `sort()`, `fill()`, and `equals()` to write cleaner code.",
-        "📌 Ready for the next topic? Let’s dive into **multidimensional arrays** next!"
-      ]
+      "title": "Summary",
+      "content": "The `Arrays` class is your shortcut for common array operations—no loops needed. Always sort before searching (`binarySearch` only works on sorted arrays). Practice with `sort()`, `fill()`, and `equals()` to write cleaner code.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:39:02.927730",
   "_topic_id": "7-8"
 }

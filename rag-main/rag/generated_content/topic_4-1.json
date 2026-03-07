@@ -13,112 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let’s explore the building blocks of Java programming! Today, we’ll cover:\n\n• How computers handle numbers and math\n• The difference between characters and strings\n• Why these concepts matter in real code",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you’re building a digital recipe app. Math helps calculate ingredient quantities, while characters and strings let users type their favorite recipes.\n\n**Numbers in Java**\n• Java has different number types (like `int` for whole numbers, `double` for decimals)\n• Example: `int eggs = 12;` stores how many eggs you have\n\n**Characters vs Strings**\n• A *character* is a single letter/symbol (`'A'`, `'$'`, `'7'`) \n• A *string* is a sequence of characters (`\"Hello!\"`, `\"12 eggs\"`)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step: How Java stores data",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Math Operations",
-          "description": "Java calculates like a super-fast calculator",
-          "code": "int result = 5 + 3 * 2;  // result = 11 (PEMDAS rules!)"
-        },
-        {
-          "step": 2,
-          "title": "Storing Characters",
-          "description": "Single quotes for characters, double for strings",
-          "code": "char grade = 'A';\nString message = \"You got an \" + grade;"
-        },
-        {
-          "step": 3,
-          "title": "Combining Them",
-          "description": "Math + strings = dynamic messages!",
-          "code": "System.out.println(\"Total: $\" + (10 + 5));  // Prints \"Total: $15\""
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "double result = Math.pow(2, 3);  // 8.0\nchar ch = 'A';                   // character\nString msg = \"Hello, Java!\";     // string\n\nSystem.out.println(result);\nSystem.out.println(ch);\nSystem.out.println(msg);"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `int`/`double` store numbers (whole/decimal)",
-        "✓ `char` stores ONE character (`'X'`, `'@'`), `String` stores text",
-        "✓ Math follows order of operations (PEMDAS)",
-        "✓ Strings can mix with numbers (but watch your `+` signs!)",
-        "✓ Case matters: `myVar` ≠ `MyVar`"
+        "The Math class provides methods for common mathematical operations",
+        "The char type stores a single Unicode character enclosed in single quotes",
+        "The String class represents sequences of characters and is immutable",
+        "printf allows formatted output using format specifiers like %d, %f, and %s",
+        "This chapter builds on variables and expressions from elementary programming"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `double` for money to avoid rounding errors",
-        "Add spaces in strings for readability: `\"Hello \" + name`",
-        "Use `Math.pow()` for exponents (e.g., `Math.pow(2, 3)` = 8)"
-      ],
-      "donts": [
-        "Don’t start variable names with numbers (`1var` is invalid)",
-        "Don’t confuse `'` (char) with `\"` (string)",
-        "Don’t forget semicolons at the end of statements!"
-      ],
-      "protip": "Use `final` for constants (e.g., `final double PI = 3.14`) to prevent accidental changes"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where you’ll see this in action:",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Apps",
-          "how": "Calculates interest with `double` and formats receipts with strings"
-        },
-        {
-          "app": "Social Media",
-          "how": "Counts characters in posts (`char`) and displays usernames (`String`)"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that:\n1. Stores your age as an `int`\n2. Stores your first initial as a `char`\n3. Prints a message like \"J is 25 years old!\"",
-        "starterCode": "// Starter code\npublic class AboutMe {\n  public static void main(String[] args) {\n    int age = ;\n    char initial = ;\n    // Add your code here!\n  }\n}",
-        "hints": [
-          "Remember: `char` uses single quotes, `String` uses double quotes",
-          "Combine them with `+` (e.g., initial + \" is \" + age)"
-        ],
-        "solution": "public class AboutMe {\n  public static void main(String[] args) {\n    int age = 25;\n    char initial = 'J';\n    System.out.println(initial + \" is \" + age + \" years old!\");\n  }\n}",
-        "explanation": "We used `int` for age (whole number) and `char` for the initial. The `+` operator combines them into one string for printing."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Numbers (`int`, `double`) power calculations in apps",
-        "📌 `char` = single character, `String` = text",
-        "📌 Practice mixing math and strings for dynamic output",
-        "📌 Ready to learn loops next – they’ll make this 10x more powerful!"
-      ]
+      "title": "Summary",
+      "content": "Numbers (`int`, `double`) power calculations in apps. `char` = single character, `String` = text. Practice mixing math and strings for dynamic output. Ready to learn loops next – they’ll make this 10x more powerful.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T04:05:02.300340",
   "_topic_id": "4-1"
 }

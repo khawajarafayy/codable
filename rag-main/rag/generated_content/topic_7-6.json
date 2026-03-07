@@ -13,112 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Hey there! 👋 Ready to learn **Searching Arrays**?\n\nHere's what we'll cover:\n\n• Finding elements in arrays\n• Why this matters for your coding journey\n• Hands-on examples you can try",
+      "title": "What You'll Learn",
+      "content": "Ready to learn **Searching Arrays**?\n\nHere's what we'll cover:\n\n• Finding elements in arrays\n• Why this matters for your coding journey\n• Hands-on examples you can try",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
-      "content": "Think of **Searching Arrays** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
+      "title": "Core Concepts",
+      "content": "Think of **Searching Arrays** like building blocks. \n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Let's see how Searching Arrays works step by step:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Start Here",
-          "description": "Begin with the basic structure",
-          "code": "// Your code starts here"
-        },
-        {
-          "step": 2,
-          "title": "Add Logic",
-          "description": "Build on the foundation",
-          "code": "// Add your logic"
-        },
-        {
-          "step": 3,
-          "title": "See Results",
-          "description": "Run and observe output",
-          "code": "// Check the output!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Linear search: check each element\npublic static int linearSearch(int[] arr, int key) {\n    for (int i = 0; i < arr.length; i++)\n        if (arr[i] == key) return i;\n    return -1;\n}\n\nint[] data = {3, 7, 1, 9, 5};\nint index = linearSearch(data, 9);  // returns 3"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Finding elements in arrays",
-        "✓ Foundation for advanced topics",
-        "✓ Practice by writing code yourself",
-        "✓ Used frequently in real programs",
-        "✓ Understanding this = easier future topics"
+        "Linear search checks each element sequentially until the target is found or the array ends",
+        "Linear search has O(n) time complexity: it checks up to all n elements",
+        "Binary search requires a sorted array and repeatedly halves the search range",
+        "Binary search has O(log n) time complexity, much faster for large sorted arrays",
+        "Both methods return the index if found, or -1 (or a negative value) if not found"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Read code carefully first",
-        "Modify examples to learn",
-        "Focus on understanding"
-      ],
-      "donts": [
-        "Skip the basics",
-        "Copy-paste blindly",
-        "Give up on errors"
-      ],
-      "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where do we use Searching Arrays in real life?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Mobile Apps",
-          "how": "Building user interfaces and handling data"
-        },
-        {
-          "app": "Web Services",
-          "how": "Processing requests and managing information"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a simple program using Searching Arrays. Start with the example and modify it!",
-        "starterCode": "// Practice Searching Arrays here\npublic class Practice {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Start with the basic structure",
-          "Run your code after each change"
-        ],
-        "solution": "// Solution will vary based on your approach",
-        "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Searching Arrays - Finding elements in arrays",
-        "📌 Master basics before advancing",
-        "📌 Practice with the examples",
-        "📌 Builds foundation for what's next!"
-      ]
+      "title": "Summary",
+      "content": "Searching Arrays - Finding elements in arrays. Master basics before advancing. Practice with the examples. Builds foundation for what's next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:38:00.465681",
   "_topic_id": "7-6"
 }

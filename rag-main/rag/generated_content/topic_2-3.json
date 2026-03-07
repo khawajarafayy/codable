@@ -13,122 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered how programs talk to users? Today, you'll learn how to read input from the console - like having a conversation with your code!\n\n• How to use the Scanner class to read user input\n• Different methods to read numbers, text, and more\n• Common mistakes to avoid when reading input",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine the Scanner class like a friendly receptionist at a hotel. When a guest (user) arrives, the receptionist (Scanner) asks for their details and writes them down for you.\n\nThe Scanner class helps your program 'listen' to what the user types. Here's how it works:\n\n• First, you create a Scanner object that listens to the keyboard (System.in)\n• Then you ask the user for input with a clear prompt\n• Finally, you read what they typed using special methods\n\nFor example, to read a number:",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Reading Input from the Console works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Create the Scanner",
-          "description": "First, we create a Scanner object that will listen to the keyboard. This is like hiring our receptionist!",
-          "code": "Scanner input = new Scanner(System.in);"
-        },
-        {
-          "step": 2,
-          "title": "Ask for Input",
-          "description": "We show a message to the user telling them what to enter. This is like the receptionist asking for a name.",
-          "code": "System.out.print(\"Enter your age: \");"
-        },
-        {
-          "step": 3,
-          "title": "Read the Input",
-          "description": "The Scanner reads what the user types and stores it in a variable. The user presses Enter when done.",
-          "code": "int age = input.nextInt();"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "import java.util.Scanner;\n\npublic class ReadInput {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n\n        System.out.print(\"Enter a number: \");\n        int number = input.nextInt();\n\n        System.out.print(\"Enter a decimal: \");\n        double decimal = input.nextDouble();\n\n        System.out.println(\"You entered: \" + number + \" and \" + decimal);\n    }\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Always import java.util.Scanner at the top of your file",
-        "✓ Create only ONE Scanner object per program (don't make multiple!)",
-        "✓ Use clear prompts so users know what to enter",
-        "✓ Match the method to the data type (nextInt() for integers, nextDouble() for decimals)",
-        "✓ Remember to close the Scanner when done (input.close())"
+        "The Scanner class is in java.util and must be imported to read console input",
+        "Create a Scanner with: Scanner input = new Scanner(System.in)",
+        "nextInt() reads an integer, nextDouble() reads a decimal, nextLine() reads a full line",
+        "Always display a prompt message before reading input so users know what to enter",
+        "next() reads one token (word), while nextLine() reads the entire remaining line"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use print() instead of println() for prompts so the user types on the same line",
-        "Check for valid input before using it (we'll learn this soon!)",
-        "Give examples in your prompts (e.g., \"Enter your height in cm: \")"
-      ],
-      "donts": [
-        "Don't create multiple Scanner objects for System.in",
-        "Don't forget to import Scanner",
-        "Don't use nextInt() when you need a decimal number"
-      ],
-      "protip": "Always put a space after your prompt (like \"Enter age: \") so the user's input doesn't stick to your text!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Reading Input from the Console used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Login Systems",
-          "how": "Reading usernames and passwords when users log in"
-        },
-        {
-          "app": "ATM Machines",
-          "how": "Reading the amount of money to withdraw or deposit"
-        },
-        {
-          "app": "Survey Applications",
-          "how": "Collecting user responses to questions"
-        },
-        {
-          "app": "Command Line Tools",
-          "how": "Reading configuration options when starting programs"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a program that asks for a user's name and age, then prints a message like \"Hello [name]! You are [age] years old.\"",
-        "starterCode": "// Import Scanner here\npublic class UserInfo {\n    public static void main(String[] args) {\n        // Create Scanner object\n        // Ask for name\n        // Read name\n        // Ask for age\n        // Read age\n        // Print the message\n    }\n}",
-        "hints": [
-          "Remember to import java.util.Scanner first!",
-          "Use nextLine() for the name and nextInt() for the age",
-          "Put a space after your prompts so the input looks nice"
-        ],
-        "solution": "// Import Scanner\nimport java.util.Scanner;\n\npublic class UserInfo {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        \n        System.out.print(\"Enter your name: \");\n        String name = input.nextLine();\n        \n        System.out.print(\"Enter your age: \");\n        int age = input.nextInt();\n        \n        System.out.println(\"Hello \" + name + \"! You are \" + age + \" years old.\");\n        \n        input.close();\n    }\n}",
-        "explanation": "We first import Scanner, then create a Scanner object. We use nextLine() for the name (which can contain spaces) and nextInt() for the age. Finally, we print the combined message and close the Scanner."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Scanner class is your program's way of listening to user input",
-        "📌 Always use clear prompts so users know what to enter",
-        "📌 Match the method to the data type (nextInt(), nextDouble(), nextLine())",
-        "📌 Practice makes perfect - try reading different types of input!",
-        "📌 Ready for next topic: Handling different types of input errors!"
-      ]
+      "title": "Summary",
+      "content": "Scanner class is your program's way of listening to user input. Always use clear prompts so users know what to enter. Match the method to the data type (nextInt(), nextDouble(), nextLine()) Practice makes perfect - try reading different types of input.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:01:38.738597",
   "_topic_id": "2-3"
 }

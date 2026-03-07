@@ -13,112 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Hey there! 👋 Ready to learn **Using Classes from the Java Library**?\n\nHere's what we'll cover:\n\n• Working with built-in Java classes\n• Why this matters for your coding journey\n• Hands-on examples you can try",
+      "title": "What You'll Learn",
+      "content": "Ready to learn **Using Classes from the Java Library**?\n\nHere's what we'll cover:\n\n• Working with built-in Java classes\n• Why this matters for your coding journey\n• Hands-on examples you can try",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
-      "content": "Think of **Using Classes from the Java Library** like building blocks. 🧱\n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
+      "title": "Core Concepts",
+      "content": "Think of **Using Classes from the Java Library** like building blocks. \n\nEvery great program starts with small, simple pieces. This is one of those essential pieces!\n\n• Start simple, then build up\n• Practice makes it click\n• Don't worry if it takes time - totally normal!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Let's see how Using Classes from the Java Library works step by step:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Start Here",
-          "description": "Begin with the basic structure",
-          "code": "// Your code starts here"
-        },
-        {
-          "step": 2,
-          "title": "Add Logic",
-          "description": "Build on the foundation",
-          "code": "// Add your logic"
-        },
-        {
-          "step": 3,
-          "title": "See Results",
-          "description": "Run and observe output",
-          "code": "// Check the output!"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "import java.util.Date;\nimport java.util.Random;\n\nDate now = new Date();\nSystem.out.println(now);  // current date/time\n\nRandom rand = new Random();\nint n = rand.nextInt(100);  // random 0-99\nSystem.out.println(\"Random: \" + n);"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Working with built-in Java classes",
-        "✓ Foundation for advanced topics",
-        "✓ Practice by writing code yourself",
-        "✓ Used frequently in real programs",
-        "✓ Understanding this = easier future topics"
+        "The Java API provides thousands of pre-built classes for common tasks",
+        "The Date class represents a specific point in time",
+        "The Random class generates pseudo-random numbers of various types",
+        "Use import statements to access classes from specific packages",
+        "Reading API documentation is essential for using library classes effectively"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Read code carefully first",
-        "Modify examples to learn",
-        "Focus on understanding"
-      ],
-      "donts": [
-        "Skip the basics",
-        "Copy-paste blindly",
-        "Give up on errors"
-      ],
-      "protip": "Break big problems into tiny steps. Master each before moving on! 💪"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where do we use Using Classes from the Java Library in real life?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Mobile Apps",
-          "how": "Building user interfaces and handling data"
-        },
-        {
-          "app": "Web Services",
-          "how": "Processing requests and managing information"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a simple program using Using Classes from the Java Library. Start with the example and modify it!",
-        "starterCode": "// Practice Using Classes from the Java Library here\npublic class Practice {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Start with the basic structure",
-          "Run your code after each change"
-        ],
-        "solution": "// Solution will vary based on your approach",
-        "explanation": "The key is understanding the pattern. Try variations to solidify learning!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Using Classes from the Java Library - Working with built-in Java classes",
-        "📌 Master basics before advancing",
-        "📌 Practice with the examples",
-        "📌 Builds foundation for what's next!"
-      ]
+      "title": "Summary",
+      "content": "Using Classes from the Java Library - Working with built-in Java classes. Master basics before advancing. Practice with the examples. Builds foundation for what's next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:45:30.523763",
   "_topic_id": "9-5"
 }

@@ -13,129 +13,52 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
-      "content": "Ready to level up from simple lists? Multidimensional arrays let you organize data in grids, cubes, and beyond!\n\n• What multidimensional arrays are and why they’re useful\n• How to create and use 2D arrays (like spreadsheets!)\n• Real-world examples where they shine",
+      "title": "What You'll Learn",
+      "content": "What multidimensional arrays are and why they’re useful\n• How to create and use 2D arrays (like spreadsheets!)\n• Real-world examples where they shine",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine a **chessboard**. It’s not just a list of squares - it’s a grid with rows and columns. That’s exactly what a 2D array is!\n\nThink of it like:\n- A **spreadsheet** (rows × columns)\n- A **game board** (like tic-tac-toe)\n- A **pixel grid** in an image\n\nIn Java, a 2D array is simply an array of arrays. Here’s the magic:",
       "type": "explanation"
     },
     {
       "content": "**Declaring a 2D array** is easy:\n```java\nint[][] grid = new int[3][3]; // 3 rows, 3 columns\n```\n\n• First `[]` = rows (like floors in a building)\n• Second `[]` = columns (like rooms on each floor)\n• You can have 3D, 4D... but 2D is most common!",
-      "type": "explanation"
+      "type": "explanation",
+      "title": "Core Concepts"
     },
     {
       "content": "**Accessing elements** works like coordinates:\n```java\ngrid[1][2] = 5; // Row 1, Column 2 gets value 5\n```\n\n• Remember: **indexes start at 0** (like most arrays)\n• `grid.length` = number of rows\n• `grid[0].length` = number of columns in first row",
-      "type": "explanation"
+      "type": "explanation",
+      "title": "Core Concepts"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Let’s create a 2×3 grid and fill it with values:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Declare the Array",
-          "description": "We create a 2-row, 3-column grid (like a tiny spreadsheet).",
-          "code": "int[][] grid = new int[2][3];"
-        },
-        {
-          "step": 2,
-          "title": "Assign Values",
-          "description": "Fill each cell with a value (row by row).",
-          "code": "grid[0][0] = 1;  grid[0][1] = 2;  grid[0][2] = 3;\ngrid[1][0] = 4;  grid[1][1] = 5;  grid[1][2] = 6;"
-        },
-        {
-          "step": 3,
-          "title": "Visual Result",
-          "description": "Here’s how it looks in memory (like a table):\n\n|       | Col 0 | Col 1 | Col 2 |\n|-------|-------|-------|-------|\n| Row 0 |   1   |   2   |   3   |\n| Row 1 |   4   |   5   |   6   |",
-          "code": "// grid[1][2] would return 6"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// 2D array declaration\nint[][] matrix = new int[3][4];  // 3 rows, 4 columns\n\n// 2D array with initializer\nint[][] grid = {\n    {1, 2, 3},\n    {4, 5, 6},\n    {7, 8, 9}\n};"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ 2D arrays = arrays of arrays (like a grid)",
-        "✓ Syntax: `type[][] name = new type[rows][cols]`",
-        "✓ Access elements with `array[row][col]`",
-        "✓ `array.length` = rows, `array[0].length` = columns",
-        "✓ Great for tables, game boards, and matrices!"
+        "A multidimensional array is an array of arrays, extending data to two or more dimensions",
+        "A 2D array is declared as: dataType[][] name = new dataType[rows][columns]",
+        "2D arrays are useful for representing matrices, tables, grids, and game boards",
+        "Each row in a 2D array is itself a one-dimensional array",
+        "Multidimensional arrays can have more than two dimensions, though 2D is most common"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use nested loops to process 2D arrays (row by row)",
-        "Initialize with values: `int[][] grid = {{1,2}, {3,4}};`",
-        "Check array bounds to avoid `ArrayIndexOutOfBoundsException`"
-      ],
-      "donts": [
-        "Forget that indexes start at 0 (not 1!)",
-        "Assume all rows have the same length (jagged arrays exist!)",
-        "Confuse `array.length` (rows) with `array[0].length` (columns)"
-      ],
-      "protip": "For game boards, use `final int SIZE = 8;` to easily change dimensions later!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where you’ll see multidimensional arrays in action:",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Image Processing",
-          "how": "Pixels are stored in 2D arrays (RGB values for each pixel)"
-        },
-        {
-          "app": "Board Games",
-          "how": "Chess, Sudoku, and tic-tac-toe use 2D arrays to track moves"
-        },
-        {
-          "app": "Scientific Data",
-          "how": "Matrices (2D arrays) store measurements like temperature grids"
-        },
-        {
-          "app": "Spreadsheets",
-          "how": "Excel-like programs use 2D arrays to store cell values"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a 3×3 tic-tac-toe board. Write a method `printBoard(char[][] board)` that prints it like this:\n\nX | O | X\n---------\nO | X | O\n---------\n  | X |  ",
-        "starterCode": "public class TicTacToe {\n    public static void main(String[] args) {\n        char[][] board = new char[3][3];\n        // Initialize empty board (spaces)\n        // TODO: Fill some positions with 'X' and 'O'\n        printBoard(board);\n    }\n    \n    public static void printBoard(char[][] board) {\n        // TODO: Implement this method\n    }\n}",
-        "hints": [
-          "Use nested loops to iterate through rows and columns",
-          "Print \"---------\" after every row except the last one",
-          "Check if a cell is empty (' ') before printing"
-        ],
-        "solution": "public static void printBoard(char[][] board) {\n    for (int row = 0; row < 3; row++) {\n        for (int col = 0; col < 3; col++) {\n            System.out.print(board[row][col]);\n            if (col < 2) System.out.print(\" | \");\n        }\n        System.out.println();\n        if (row < 2) System.out.println(\"---------\");\n    }\n}",
-        "explanation": "The solution uses nested loops to print each row. The inner loop prints each cell with \" | \" separators, while the outer loop adds the \"---------\" line between rows."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Multidimensional arrays organize data in grids (2D), cubes (3D), etc.",
-        "📌 Most important rule: `array[row][col]` for access",
-        "📌 Practice with nested loops to process them efficiently",
-        "📌 Ready for next topic: Processing 2D arrays like a pro!"
-      ]
+      "title": "Summary",
+      "content": "Multidimensional arrays organize data in grids (2D), cubes (3D), etc. Most important rule: `array[row][col]` for access. Practice with nested loops to process them efficiently.",
+      "type": "summary"
     }
   ],
-  "total_pages": 10,
+  "total_pages": 7,
   "_generated_at": "2026-03-06T06:39:56.794309",
   "_topic_id": "8-1"
 }

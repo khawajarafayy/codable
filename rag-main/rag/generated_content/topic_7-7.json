@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Sorting arrays is like organizing your closet - it makes everything easier to find! Let's learn how to arrange numbers or words in order.\n\n• How to sort arrays in ascending/descending order\n• Built-in Java sorting methods\n• How sorting works behind the scenes",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you have a messy pile of numbered cards. Sorting is like arranging them from smallest to largest number.\n\n• Sorting puts elements in a specific order (numbers: 1,2,3... or words: A,B,C...)\n• Java has built-in tools to sort arrays automatically\n• You can sort numbers, strings, or even custom objects\n\nThink of it like organizing your music playlist by song title or your contacts by name - it makes everything more useful!",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Sorting Arrays works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Unsorted Array",
-          "description": "We start with a messy array of numbers: [5, 2, 9, 1, 5]",
-          "code": "int[] numbers = {5, 2, 9, 1, 5};"
-        },
-        {
-          "step": 2,
-          "title": "Sorting Process",
-          "description": "Java compares and swaps elements until they're in order. Like sorting playing cards in your hand!",
-          "code": "Arrays.sort(numbers); // Magic happens here!"
-        },
-        {
-          "step": 3,
-          "title": "Sorted Result",
-          "description": "Now the array is neatly organized: [1, 2, 5, 5, 9]",
-          "code": "System.out.println(Arrays.toString(numbers)); // [1, 2, 5, 5, 9]"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Selection sort: find minimum, swap to front\npublic static void selectionSort(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n        int minIdx = i;\n        for (int j = i + 1; j < arr.length; j++)\n            if (arr[j] < arr[minIdx]) minIdx = j;\n        int temp = arr[i];\n        arr[i] = arr[minIdx];\n        arr[minIdx] = temp;\n    }\n}\n\nint[] nums = {5, 2, 8, 1, 9};\nselectionSort(nums);  // {1, 2, 5, 8, 9}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Sorting arranges elements in order (ascending/descending)",
-        "✓ Use `Arrays.sort()` for simple sorting in Java",
-        "✓ Works with numbers, strings, and custom objects",
-        "✓ Makes searching and organizing data much easier",
-        "✓ Sorting is a fundamental computer science concept"
+        "Selection sort finds the minimum element and swaps it into the correct position each pass",
+        "Insertion sort builds the sorted portion one element at a time by shifting larger elements",
+        "Both selection sort and insertion sort have O(n^2) time complexity",
+        "Arrays.sort() uses a highly optimized sorting algorithm and should be preferred in practice",
+        "Understanding sorting algorithms builds intuition for algorithm efficiency"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `Arrays.sort()` for quick sorting",
-        "For descending order, sort then reverse",
-        "Remember arrays are sorted in-place (original changes)"
-      ],
-      "donts": [
-        "Don't forget to import `java.util.Arrays`",
-        "Don't try to sort mixed types (numbers + strings)",
-        "Don't assume the original array stays unchanged"
-      ],
-      "protip": "For custom objects, implement the `Comparable` interface to define your own sorting rules!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Sorting Arrays used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "E-commerce Websites",
-          "how": "Sort products by price, rating, or popularity to help customers find what they want"
-        },
-        {
-          "app": "Music Apps",
-          "how": "Sort songs alphabetically or by play count to create playlists"
-        },
-        {
-          "app": "Leaderboards",
-          "how": "Sort player scores to show who's at the top of the game"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that takes 5 names from the user, stores them in an array, and then displays them in alphabetical order.",
-        "starterCode": "import java.util.Arrays;\nimport java.util.Scanner;\n\npublic class NameSorter {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        String[] names = new String[5];\n        \n        // Get 5 names from user\n        \n        // Sort the names\n        \n        // Display sorted names\n    }\n}",
-        "hints": [
-          "Use a loop to get input for each name",
-          "Remember `Arrays.sort()` works with Strings too!",
-          "Use `Arrays.toString()` to display the array"
-        ],
-        "solution": "import java.util.Arrays;\nimport java.util.Scanner;\n\npublic class NameSorter {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        String[] names = new String[5];\n        \n        System.out.println(\"Enter 5 names:\");\n        for (int i = 0; i < 5; i++) {\n            names[i] = input.nextLine();\n        }\n        \n        Arrays.sort(names);\n        \n        System.out.println(\"Sorted names: \" + Arrays.toString(names));\n    }\n}",
-        "explanation": "We collect 5 names, use `Arrays.sort()` to sort them alphabetically, then display the sorted array. Easy peasy!"
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Sorting organizes array elements in order (numbers or words)",
-        "📌 `Arrays.sort()` is your best friend for quick sorting",
-        "📌 Practice sorting different types of data",
-        "📌 Ready to learn about searching sorted arrays next!"
-      ]
+      "title": "Summary",
+      "content": "Sorting organizes array elements in order (numbers or words) `Arrays.sort()` is your best friend for quick sorting. Practice sorting different types of data. Ready to learn about searching sorted arrays next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:38:28.010799",
   "_topic_id": "7-7"
 }

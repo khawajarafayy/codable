@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Ever wondered how Java handles numbers that don't quite fit? Let's explore type casting - your tool to convert between data types!\n\n• What type casting is and why it matters\n• How to widen and narrow data types\n• Common pitfalls and how to avoid them",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're pouring liquids between containers:\n- A small cup (int) can easily fit into a large pitcher (double) - that's widening!\n- But pouring a pitcher into a cup? You might spill some - that's narrowing, and you need to be careful!\n\nType casting works the same way with numbers in Java:\n• **Widening**: Safe, automatic conversion (e.g., int → double)\n  - Java does this for you behind the scenes\n  - No data loss occurs\n\n• **Narrowing**: Risky, manual conversion (e.g., double → int)\n  - You must explicitly tell Java to do this\n  - Can lose data (like decimal places)",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Type Casting works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Widening (Automatic)",
-          "description": "Java automatically converts smaller types to larger ones when needed.",
-          "code": "int small = 5;\ndouble big = small; // No cast needed!\nSystem.out.println(big); // Output: 5.0"
-        },
-        {
-          "step": 2,
-          "title": "Narrowing (Manual)",
-          "description": "You must explicitly cast larger types to smaller ones.",
-          "code": "double big = 3.14;\nint small = (int)big; // Cast required!\nSystem.out.println(small); // Output: 3"
-        },
-        {
-          "step": 3,
-          "title": "Mixed Operations",
-          "description": "Java automatically widens in mixed-type operations.",
-          "code": "int a = 1;\ndouble b = 2.5;\nSystem.out.println(a + b); // Output: 3.5 (a becomes 1.0)"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Widening (implicit) - no data loss\nint i = 100;\ndouble d = i;   // d is 100.0\n\n// Narrowing (explicit) - possible data loss\ndouble pi = 3.14159;\nint truncated = (int) pi;   // truncated is 3\n\n// Casting in expressions\nint a = 7, b = 2;\ndouble result = (double) a / b;  // 3.5 (not 3)"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ Widening = safe (int → double), automatic",
-        "✓ Narrowing = risky (double → int), needs explicit cast",
-        "✓ Casting syntax: `(targetType)value`",
-        "✓ Narrowing truncates decimals (3.99 → 3)",
-        "✓ Mixed operations automatically widen the smaller type"
+        "Widening casting (implicit) converts a smaller type to a larger type without data loss",
+        "Narrowing casting (explicit) requires a cast operator and may lose data: (int) 3.9 yields 3",
+        "Casting in expressions: (double) a / b forces floating-point division",
+        "The promotion order is: byte -> short -> int -> long -> float -> double",
+        "Always cast explicitly when narrowing to make the intent clear and avoid compiler errors"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use widening when possible - it's safer",
-        "Always check for data loss when narrowing",
-        "Remember: casting doesn't change the original variable"
-      ],
-      "donts": [
-        "Forget the cast when narrowing - causes errors!",
-        "Assume all conversions are safe (e.g., long → int)",
-        "Mix types without understanding the conversion"
-      ],
-      "protip": "When in doubt, print the result to check for unexpected truncation!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Type Casting used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Financial Calculations",
-          "how": "Converting precise double values to cents (int) for transactions"
-        },
-        {
-          "app": "Graphics Programming",
-          "how": "Converting floating-point coordinates to pixel positions (int)"
-        },
-        {
-          "app": "Data Processing",
-          "how": "Converting between different numeric formats when reading files"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that calculates the average of three test scores (as doubles) but displays the result as an integer percentage. Watch out for truncation!",
-        "starterCode": "public class TestAverage {\n    public static void main(String[] args) {\n        double score1 = 85.5;\n        double score2 = 92.3;\n        double score3 = 77.8;\n        // Your code here\n    }\n}",
-        "hints": [
-          "First calculate the average as a double",
-          "Then cast to int for the percentage",
-          "Remember: (int) truncates decimals!"
-        ],
-        "solution": "public class TestAverage {\n    public static void main(String[] args) {\n        double score1 = 85.5;\n        double score2 = 92.3;\n        double score3 = 77.8;\n        double average = (score1 + score2 + score3) / 3;\n        int percentage = (int)average;\n        System.out.println(\"Average: \" + percentage + \"%\");\n    }\n}",
-        "explanation": "We calculate the precise average first, then cast to int to get the whole number percentage. The decimal part is truncated (not rounded)."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Type casting converts between data types",
-        "📌 Widening = safe & automatic; Narrowing = risky & manual",
-        "📌 Practice casting with different numeric types",
-        "📌 Ready to handle user input next!"
-      ]
+      "title": "Summary",
+      "content": "Type casting converts between data types. Widening = safe & automatic; Narrowing = risky & manual. Practice casting with different numeric types. Ready to handle user input next.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:09:39.096381",
   "_topic_id": "2-14"
 }

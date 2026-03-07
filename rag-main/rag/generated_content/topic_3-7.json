@@ -13,117 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let's explore how to generate random numbers in Java! It's like rolling a digital dice or picking a lucky number.\n\n• How `Math.random()` works\n• Generating numbers in a specific range\n• Practical uses of randomness in programs",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine you're playing a board game and need to roll a dice. `Math.random()` is like that digital dice - it gives you a random number between 0.0 and 1.0 (but never quite reaching 1.0).\n\nHere's the magic: `Math.random()` returns a double value between 0.0 (inclusive) and 1.0 (exclusive).\n\n• Always starts with 0.0\n• Never reaches 1.0\n• Perfect for creating randomness in games, simulations, and more\n\nTo get a random number in a specific range, you can use this formula:\n`(int)(Math.random() * (max - min + 1)) + min`",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Generating Random Numbers works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Basic Random Number",
-          "description": "`Math.random()` gives you a number between 0.0 and 0.999...",
-          "code": "double randomNum = Math.random();\nSystem.out.println(randomNum); // e.g., 0.5487231"
-        },
-        {
-          "step": 2,
-          "title": "Scaling Up",
-          "description": "Multiply to get a larger range (e.g., 0-9)",
-          "code": "int randomInt = (int)(Math.random() * 10);\nSystem.out.println(randomInt); // e.g., 7"
-        },
-        {
-          "step": 3,
-          "title": "Custom Range",
-          "description": "Get a number between 5 and 15 (inclusive)",
-          "code": "int customRandom = (int)(Math.random() * 11) + 5;\nSystem.out.println(customRandom); // e.g., 12"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "// Generate a random integer between 0 and 9\nint random0to9 = (int)(Math.random() * 10);\n\n// Generate a random integer between 1 and 6 (dice roll)\nint dice = (int)(Math.random() * 6) + 1;\n\n// Generate a random integer in range [min, max]\nint min = 10, max = 50;\nint randomInRange = (int)(Math.random() * (max - min + 1)) + min;"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `Math.random()` gives a number between 0.0 (inclusive) and 1.0 (exclusive)",
-        "✓ Cast to `int` to get whole numbers",
-        "✓ Multiply to expand the range",
-        "✓ Add a minimum value to shift the range",
-        "✓ Perfect for games, simulations, and random selections"
+        "Math.random() returns a double value >= 0.0 and < 1.0",
+        "To get a random int in [0, n): (int)(Math.random() * n)",
+        "To get a random int in [min, max]: (int)(Math.random() * (max - min + 1)) + min",
+        "Each call to Math.random() produces a different pseudo-random value",
+        "Random values are useful for simulations, games, and testing"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `(int)` to convert to whole numbers",
-        "Remember ranges are exclusive of the upper bound",
-        "Test your random ranges thoroughly"
-      ],
-      "donts": [
-        "Forget to cast to `int` when you need whole numbers",
-        "Assume `Math.random()` includes 1.0 (it doesn't!)",
-        "Use randomness for security-sensitive applications (use `SecureRandom` instead)"
-      ],
-      "protip": "For better randomness in games, use `Random` class instead of `Math.random()` - it's more flexible!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Generating Random Numbers used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Mobile Games",
-          "how": "Randomly generating enemies, loot drops, or map layouts to keep gameplay fresh"
-        },
-        {
-          "app": "E-commerce Websites",
-          "how": "Showing random product recommendations or running A/B tests with different layouts"
-        },
-        {
-          "app": "Password Managers",
-          "how": "Generating secure random passwords (using more secure methods than `Math.random()`)"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Write a program that simulates rolling two six-sided dice and prints the result. The output should look like: \"You rolled a 4 and a 2. Total: 6\"",
-        "starterCode": "// Starter code\npublic class DiceRoll {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}",
-        "hints": [
-          "Each die has numbers 1-6",
-          "Use Math.random() to generate each die roll",
-          "Remember to cast to int and adjust the range"
-        ],
-        "solution": "// Solution\npublic class DiceRoll {\n    public static void main(String[] args) {\n        int die1 = (int)(Math.random() * 6) + 1;\n        int die2 = (int)(Math.random() * 6) + 1;\n        int total = die1 + die2;\n        \n        System.out.println(\"You rolled a \" + die1 + \" and a \" + die2 + \". Total: \" + total);\n    }\n}",
-        "explanation": "We generate two random numbers between 1-6 (inclusive) by multiplying Math.random() by 6 and adding 1. The cast to int gives us whole numbers. Then we simply add them together and print the result."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 `Math.random()` gives you a random double between 0.0 and 1.0",
-        "📌 Use `(int)` casting and multiplication to get whole numbers in any range",
-        "📌 Practice creating random ranges for different scenarios",
-        "📌 Ready to use randomness in games, simulations, and more!"
-      ]
+      "title": "Summary",
+      "content": "`Math.random()` gives you a random double between 0.0 and 1.0. Use `(int)` casting and multiplication to get whole numbers in any range. Practice creating random ranges for different scenarios. Ready to use randomness in games, simulations, and more.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T02:14:16.750125",
   "_topic_id": "3-7"
 }

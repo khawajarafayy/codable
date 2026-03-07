@@ -13,120 +13,42 @@
   },
   "sections": [
     {
-      "title": "🎯 What You'll Learn",
+      "title": "What You'll Learn",
       "content": "Let's explore how to control who can access parts of your code! Visibility modifiers are like security guards for your classes.\n\n• What `public`, `private`, and other modifiers do\n• How to protect your data with encapsulation\n• When to use each modifier for clean, safe code",
       "type": "introduction"
     },
     {
-      "title": "💡 Concept Explanation",
+      "title": "Core Concepts",
       "content": "Imagine your class is a house:\n- `public` is like the front door - anyone can come in\n- `private` is like your bedroom - only you can access it\n- `protected` is like a family room - only family (subclasses) can enter\n\nVisibility modifiers control who can see and use your class members (variables and methods).\n\n• **Public**: Accessible from anywhere (even other packages)\n  - Use for: Methods that need to be called externally\n  - Example: `public void startEngine() {}`\n\n• **Private**: Only accessible within the same class\n  - Use for: Internal implementation details\n  - Example: `private int fuelLevel;`\n\n• **Protected**: Accessible within package + subclasses\n  - Use for: Inheritance scenarios\n  - Example: `protected String familySecret;`\n\n• **Default (no modifier)**: Package-private (same package only)\n  - Use for: Internal package organization",
       "type": "explanation"
     },
     {
-      "title": "📊 Visual Simulation",
-      "content": "Step-by-step visualization of how Visibility Modifiers works:",
-      "type": "visual",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Class Definition",
-          "description": "We create a `BankAccount` class with different visibility levels",
-          "code": "public class BankAccount {\n  public String accountName;\n  private double balance;\n  protected String accountNumber;\n  int pinCode; // default access\n}"
-        },
-        {
-          "step": 2,
-          "title": "Access Attempts",
-          "description": "Different classes try to access these members:",
-          "code": "// In another class...\nBankAccount account = new BankAccount();\naccount.accountName = \"Alice\"; // ✅ Works (public)\naccount.balance = 1000; // ❌ Error (private)\naccount.accountNumber = \"123\"; // ✅ if same package (protected)\naccount.pinCode = 1234; // ✅ if same package (default)"
-        },
-        {
-          "step": 3,
-          "title": "Proper Encapsulation",
-          "description": "We add controlled access through methods:",
-          "code": "public class BankAccount {\n  private double balance;\n\n  public void deposit(double amount) {\n    if (amount > 0) balance += amount;\n  }\n\n  public double getBalance() {\n    return balance;\n  }\n}"
-        }
+      "title": "Code Examples",
+      "content": "",
+      "type": "code",
+      "examples": [
+        "public class Person {\n    private String name;   // only accessible within this class\n    public int age;        // accessible from anywhere\n\n    public String getName() {\n        return name;\n    }\n\n    public void setName(String name) {\n        this.name = name;\n    }\n}"
       ]
     },
     {
-      "title": "⚡ Key Points",
+      "title": "Key Points",
       "content": "",
       "type": "keypoints",
       "points": [
-        "✓ `private` = most restrictive (class-only access)",
-        "✓ `public` = least restrictive (anywhere access)",
-        "✓ `protected` = package + subclasses access",
-        "✓ Default (no modifier) = package-private access",
-        "✓ Always make fields `private` and provide controlled access via methods"
+        "private restricts access to within the same class; public allows access from any class",
+        "Use private for data fields to enforce encapsulation",
+        "Use public for methods that other classes need to access",
+        "The default (package-private) access allows access within the same package",
+        "Visibility modifiers control how classes interact and protect internal implementation"
       ]
     },
     {
-      "title": "🔥 Tips & Mistakes",
-      "content": "",
-      "type": "tips",
-      "sidebar": true,
-      "dos": [
-        "Use `private` for all instance variables by default",
-        "Provide public getters/setters only when needed",
-        "Use `protected` when designing for inheritance",
-        "Document your public API clearly"
-      ],
-      "donts": [
-        "Don't make everything public - it breaks encapsulation",
-        "Don't expose internal implementation details",
-        "Don't use default access unless you mean to",
-        "Don't forget to add access modifiers (default is package-private)"
-      ],
-      "protip": "Start with the most restrictive modifier (`private`) and only open up access when necessary - it's easier to relax restrictions later than to tighten them!"
-    },
-    {
-      "title": "🌍 Real World Use",
-      "content": "Where is Visibility Modifiers used in real apps?",
-      "type": "realworld",
-      "examples": [
-        {
-          "app": "Banking Systems",
-          "how": "Private fields protect sensitive data like account balances, with public methods for controlled access (deposit/withdraw)"
-        },
-        {
-          "app": "Game Development",
-          "how": "Protected methods allow game entities to share behavior with subclasses while hiding implementation details"
-        },
-        {
-          "app": "Android Apps",
-          "how": "Public methods define the app's interface with the system, while private methods handle internal logic"
-        }
-      ]
-    },
-    {
-      "title": "🧪 Practice Problem",
-      "content": "Try this challenge:",
-      "type": "practice",
-      "problem": {
-        "description": "Create a `Student` class with proper encapsulation:\n1. Make all fields private\n2. Provide public getters for all fields\n3. Provide a public setter only for the grade (with validation)\n4. Make the constructor public",
-        "starterCode": "public class Student {\n  // Add fields here\n  \n  // Add constructor\n  \n  // Add getters\n  \n  // Add setter for grade only\n}",
-        "hints": [
-          "Fields should include: name, id, grade",
-          "Grade should be between 0-100",
-          "Use if-statement in the grade setter for validation"
-        ],
-        "solution": "public class Student {\n  private String name;\n  private String id;\n  private int grade;\n\n  public Student(String name, String id, int grade) {\n    this.name = name;\n    this.id = id;\n    setGrade(grade); // Use setter for validation\n  }\n\n  public String getName() { return name; }\n  public String getId() { return id; }\n  public int getGrade() { return grade; }\n\n  public void setGrade(int grade) {\n    if (grade >= 0 && grade <= 100) {\n      this.grade = grade;\n    } else {\n      System.out.println(\"Invalid grade!\");\n    }\n  }\n}",
-        "explanation": "This solution properly encapsulates the student data by making fields private and providing controlled access. The grade setter includes validation to ensure data integrity."
-      }
-    },
-    {
-      "title": "📝 Summary",
-      "content": "",
-      "type": "summary",
-      "points": [
-        "📌 Visibility modifiers control who can access your class members",
-        "📌 `private` > default > `protected` > `public` in restrictiveness",
-        "📌 Always start with the most restrictive modifier possible",
-        "📌 Practice encapsulation by hiding data and exposing controlled access",
-        "📌 You're now ready to design safer, more maintainable classes!"
-      ]
+      "title": "Summary",
+      "content": "Visibility modifiers control who can access your class members. `private` > default > `protected` > `public` in restrictiveness. Always start with the most restrictive modifier possible. Practice encapsulation by hiding data and exposing controlled access.",
+      "type": "summary"
     }
   ],
-  "total_pages": 8,
+  "total_pages": 5,
   "_generated_at": "2026-03-06T06:46:39.539367",
   "_topic_id": "9-7"
 }

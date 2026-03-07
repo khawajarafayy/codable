@@ -45,7 +45,7 @@ userProgressSchema.statics.initializeForUser = async function(userId) {
   // First 7 chapters unlocked by default structure (chapter 1 unlocked, rest locked)
   const defaultChapters = [];
   
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 12; i++) {
     defaultChapters.push({
       chapterId: i,
       status: i === 1 ? "not-started" : "locked",

@@ -19,6 +19,11 @@ export const getUserProgress = async (req, res) => {
   }
 };
 
+// Known total topics per chapter (from the RAG content)
+const CHAPTER_TOTAL_TOPICS = {
+  1: 10, 2: 16, 3: 11, 4: 5, 5: 8, 6: 8, 7: 8, 8: 5, 9: 9, 10: 8
+};
+
 // Get chapter progress for dashboard (locked/unlocked status)
 export const getChaptersProgress = async (req, res) => {
   try {
@@ -30,7 +35,7 @@ export const getChaptersProgress = async (req, res) => {
       chapterId: chapter.chapterId,
       status: chapter.status,
       completedTopics: chapter.topicsProgress.filter(t => t.completed).length,
-      totalTopics: chapter.topicsProgress.length,
+      totalTopics: CHAPTER_TOTAL_TOPICS[chapter.chapterId] || chapter.topicsProgress.length,
     }));
     
     res.status(200).json({

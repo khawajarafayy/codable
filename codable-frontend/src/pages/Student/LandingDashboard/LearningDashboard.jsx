@@ -98,6 +98,7 @@ export default function LearningDashboard() {
 	const navigate = useNavigate();
 	const [chatOpen, setChatOpen] = useState(false);
 	const [chaptersProgress, setChaptersProgress] = useState([]);
+	const [progressStats, setProgressStats] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [topics, setTopics] = useState(javaBookTopics);
 	const toggleChat = () => setChatOpen((v) => !v);
@@ -111,6 +112,7 @@ export default function LearningDashboard() {
 				
 				if (response.success && response.chapters) {
 					setChaptersProgress(response.chapters);
+					setProgressStats(response.stats || {});
 					
 					// Merge progress data with static topic data
 					const updatedTopics = javaBookTopics.map(topic => {
@@ -160,7 +162,11 @@ export default function LearningDashboard() {
 
 			<div className="flex max-w-[1600px] mx-auto">
 				<main className="flex-1 p-6 lg:p-8">
-					<ProgressSection />
+					<ProgressSection 
+						chaptersProgress={chaptersProgress} 
+						stats={progressStats} 
+						topics={topics} 
+					/>
 
 					<section className="mt-8">
 						<div className="flex items-center justify-between mb-6">
@@ -183,6 +189,7 @@ export default function LearningDashboard() {
 									<div key={topic.id} className="h-full">
 										<TopicCard
 											topic={topic}
+											chapterProgress={chaptersProgress.find(c => c.chapterId === topic.chapter)}
 											onActionClick={() => {
 												handleTopicAction(topic);
 											}}

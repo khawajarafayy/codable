@@ -24,6 +24,19 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
     return completedTopics.has(index - 1); // Previous topic must be completed
   };
 
+  // Ensure chapter is marked as in-progress when entering the learning page
+  useEffect(() => {
+    const ensureChapterStarted = async () => {
+      if (!chapterId) return;
+      try {
+        await learningApi.startChapter(chapterId);
+      } catch (err) {
+        // Ignore - chapter may already be started, completed, or locked
+      }
+    };
+    ensureChapterStarted();
+  }, [chapterId]);
+
   // Load existing progress when chapter loads
   useEffect(() => {
     const loadProgress = async () => {
@@ -472,9 +485,10 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
 
                   <Button
                     onClick={() => {
-                      setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
+                      const newCompleted = new Set([...completedTopics, currentTopicIndex]);
+                      setCompletedTopics(newCompleted);
                       saveTopicCompletion(currentTopicIndex);
-                      if (currentTopicIndex === topics.length - 1) {
+                      if (newCompleted.size >= topics.length) {
                         saveChapterCompletion();
                       }
                       onStartPractice(currentTopic?.id, currentTopic?.title, currentTopicIndex);

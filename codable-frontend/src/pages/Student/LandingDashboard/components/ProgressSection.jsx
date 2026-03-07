@@ -3,13 +3,28 @@ import { Button } from '../../../../components/ui/button';
 import { Progress } from '../../../../components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 
-export function ProgressSection() {
-  const overallProgress = 65;
+export function ProgressSection({ chaptersProgress = [], stats = {}, topics = [] }) {
   const navigate = useNavigate();
+
+  const totalChapters = topics.length || chaptersProgress.length;
+  const completedChapters = chaptersProgress.filter(c => c.status === 'completed').length;
+  const overallProgress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+
+  const totalTopicsCompleted = stats.totalTopicsCompleted || 0;
+  const totalTimeSpent = stats.totalTimeSpent || 0;
+  const timeHours = Math.floor(totalTimeSpent / 3600);
+  const timeMinutes = Math.floor((totalTimeSpent % 3600) / 60);
+  const timeDisplay = timeHours > 0 ? `${timeHours}h ${timeMinutes}m` : `${timeMinutes}m`;
+
+  // Find the current in-progress topic for "Continue Learning"
+  const currentTopic = topics.find(t => {
+    const cp = chaptersProgress.find(c => c.chapterId === t.chapter);
+    return cp && cp.status === 'in-progress';
+  });
   
   return (
     <section className="mb-8">
-      <h1 className="text-white mb-6">Welcome back, Khawaja! 👋</h1>
+      <h1 className="text-white mb-6">Welcome back! 👋</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Overall Progress Card */}
@@ -65,17 +80,17 @@ export function ProgressSection() {
             
             <div className="flex gap-6 pt-2">
               <div>
-                <div className="text-white">8</div>
-                <div className="text-gray-400">Lessons Completed</div>
+                <div className="text-white">{completedChapters}</div>
+                <div className="text-gray-400">Chapters Completed</div>
               </div>
               <div className="h-12 w-px bg-gray-800"></div>
               <div>
-                <div className="text-white">4</div>
-                <div className="text-gray-400">Topics Mastered</div>
+                <div className="text-white">{totalTopicsCompleted}</div>
+                <div className="text-gray-400">Topics Completed</div>
               </div>
               <div className="h-12 w-px bg-gray-800"></div>
               <div>
-                <div className="text-white">28h</div>
+                <div className="text-white">{timeDisplay}</div>
                 <div className="text-gray-400">Time Invested</div>
               </div>
             </div>
@@ -95,18 +110,37 @@ export function ProgressSection() {
             <h3 className="mb-2">Continue Learning</h3>
             <p className="text-purple-300 mb-6">Pick up where you left off</p>
             
-            <div className="bg-purple-500/10 backdrop-blur-sm rounded-lg p-3 mb-4 border border-purple-500/20">
-              <div className="text-purple-300 mb-1">Current Topic</div>
-              <div>Loops - For & While</div>
-            </div>
-            
-            <Button 
-              className="w-full bg-purple-600 text-white hover:bg-purple-700"
-              onClick={() => navigate("/student/learning?topic=intro-to-java")}
-            >
-              Continue
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            {currentTopic ? (
+              <>
+                <div className="bg-purple-500/10 backdrop-blur-sm rounded-lg p-3 mb-4 border border-purple-500/20">
+                  <div className="text-purple-300 mb-1">Current Chapter</div>
+                  <div>{currentTopic.title}</div>
+                </div>
+                
+                <Button 
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                  onClick={() => navigate(`/student/learning?topic=${currentTopic.id}`)}
+                >
+                  Continue
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="bg-purple-500/10 backdrop-blur-sm rounded-lg p-3 mb-4 border border-purple-500/20">
+                  <div className="text-purple-300 mb-1">Status</div>
+                  <div>{completedChapters === totalChapters ? 'All chapters completed!' : 'Start a new chapter'}</div>
+                </div>
+                
+                <Button 
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                  onClick={() => navigate("/student/learning?chapter=1")}
+                >
+                  {completedChapters === totalChapters ? 'Review' : 'Start Learning'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

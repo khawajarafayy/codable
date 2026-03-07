@@ -2,10 +2,13 @@ import { Lock, Play, Check, Clock } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 
-export function TopicCard({ topic, onActionClick }) {
+export function TopicCard({ topic, chapterProgress, onActionClick }) {
   const isLocked = topic.locked || topic.status === 'locked';
   const isCompleted = topic.status === 'completed';
   const isInProgress = topic.status === 'in-progress';
+  const completedTopics = chapterProgress?.completedTopics || 0;
+  const totalTopics = chapterProgress?.totalTopics || 0;
+  const progressPercent = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
   
   return (
     <div 
@@ -50,9 +53,17 @@ export function TopicCard({ topic, onActionClick }) {
       <p className="text-gray-400 mb-4 line-clamp-2">{topic.description}</p>
       
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-gray-500">
-          <Clock className="w-4 h-4" />
-          <span>{topic.duration}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-gray-500">
+            <Clock className="w-4 h-4" />
+            <span>{topic.duration}</span>
+          </div>
+          {(isInProgress || isCompleted) && completedTopics > 0 && (
+            <div className="flex items-center gap-1.5 text-gray-500">
+              <Check className="w-4 h-4" />
+              <span>{completedTopics} topics done</span>
+            </div>
+          )}
         </div>
         
         <Button 
@@ -81,16 +92,16 @@ export function TopicCard({ topic, onActionClick }) {
       </div>
       
       {/* Progress bar for in-progress topics */}
-      {isInProgress && (
+      {isInProgress && totalTopics > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-800/50">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-400">Progress</span>
-            <span className="text-white">45%</span>
+            <span className="text-white">{progressPercent}%</span>
           </div>
           <div className="w-full bg-gray-800 rounded-full h-1.5">
             <div 
-              className="bg-gradient-to-r from-purple-600 to-blue-600 h-1.5 rounded-full" 
-              style={{ width: '45%' }}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 h-1.5 rounded-full transition-all duration-300" 
+              style={{ width: `${progressPercent}%` }}
             ></div>
           </div>
         </div>

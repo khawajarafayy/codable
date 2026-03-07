@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LogIn, Github } from "lucide-react";
 import CodableLogo from "../../assets/codable-logo.png";
 import { api } from "../../services/apiClient";
+import { useAuth } from "../../context/AuthContext";
 
 
 const TYPING_MESSAGES = [
@@ -16,6 +17,11 @@ const TYPING_MESSAGES = [
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  // Get the page user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || "/student";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,9 +65,9 @@ function Login() {
       const data = await api.login(email, password);
 
       if(data?.token){
-        localStorage.setItem("token", data.token);
+        login(data.token, data.user);
       }
-      navigate("/student");
+      navigate(from, { replace: true });
     } catch(err){
       setError(err.payload?.message || err.message || "Login Failed");
     } finally {

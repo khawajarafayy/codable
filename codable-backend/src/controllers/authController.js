@@ -1,5 +1,6 @@
 import userModel from "../models/User.js";
 import StudentProfile from "../models/StudentProfile.js";
+import UserProgress from "../models/UserProgress.js";
 
 const registerUser = async (req, res) => {
     try {
@@ -49,12 +50,30 @@ const login = async (req, res) => {
 
         const userExists = await userModel.findOne({email: email});
         if(!userExists){
-            res.status(400).json({success: false, message: "Invalid Credentials."});
+            return res.status(400).json({success: false, message: "Invalid Credentials."});
         }
 
         try {
             const validUser = await userExists.comparePassword(password);
             if(validUser){
+                // Initialize or get user progress on login
+                try {
+                    await UserProgress.getOrCreate(userExists._id);
+                } catch (progressError) {
+                    console.error("Error initializing user progress:", progressError);
+                    // Continue even if progress init fails
+                }
+
+                // Initialize or get student profile on login
+                try {
+                    await StudentProfile.getOrCreateForUser(userExists._id, { 
+                        name: userExists.name, 
+                        email: userExists.email 
+                    });
+                } catch (profileError) {
+                    console.error("Error initializing student profile:", profileError);
+                }
+
                 res.status(200).json({
                     success: true, 
                     message: "Login Successful", 

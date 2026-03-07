@@ -10,29 +10,43 @@ import { ProfileInfo } from "./components/ProfileInfo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Navbar } from "../LandingDashboard/components/Navbar";
 import { api } from "../../../services/apiClient";
+import learningApi from "../../../services/learningApi";
 
 export default function ProfileAndAnalytics() {
   const [profileData, setProfileData] = useState(null);
+  const [progressData, setProgressData] = useState({ chapters: [], stats: {} });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchProfileData();
+    fetchAllData();
   }, []);
 
-  const fetchProfileData = async () => {
+  const fetchAllData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.getStudentProfile();
-      if (response.success || response.user_profile) {
-        setProfileData(response.user_profile);
+      // Fetch both profile and progress data in parallel
+      const [profileResponse, progressResponse] = await Promise.all([
+        api.getStudentProfile(),
+        learningApi.getChaptersProgress().catch(() => ({ chapters: [], stats: {} }))
+      ]);
+
+      if (profileResponse.success || profileResponse.user_profile) {
+        setProfileData(profileResponse.user_profile);
       } else {
         setError("Failed to load profile data");
       }
+
+      if (progressResponse.success && progressResponse.chapters) {
+        setProgressData({
+          chapters: progressResponse.chapters,
+          stats: progressResponse.stats || {}
+        });
+      }
     } catch (err) {
-      console.error("Error fetching profile:", err);
-      setError(err.message || "Failed to load profile");
+      console.error("Error fetching data:", err);
+      setError(err.message || "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -131,6 +145,7 @@ export default function ProfileAndAnalytics() {
           <TabsContent value="profile">
             <ProfileInfo 
               profileData={headerData} 
+              progressData={progressData}
               loading={loading}
               onProfileUpdate={handleProfileUpdate}
             />

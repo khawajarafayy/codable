@@ -122,6 +122,17 @@ studentProfileSchema.statics.createForUser = async function(userId, userData) {
   return await profile.save();
 };
 
+// Static method to get or create profile for a user
+studentProfileSchema.statics.getOrCreateForUser = async function(userId, userData = {}) {
+  let profile = await this.findOne({ userId });
+  
+  if (!profile) {
+    profile = await this.createForUser(userId, userData);
+  }
+  
+  return profile;
+};
+
 // Ensure virtuals are included in JSON
 studentProfileSchema.set('toJSON', { virtuals: true });
 studentProfileSchema.set('toObject', { virtuals: true });

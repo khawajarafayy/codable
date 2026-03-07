@@ -201,7 +201,7 @@ export default function LearningDashboard() {
 					</section>
 				</main>
 
-				<Sidebar />
+				<Sidebar stats={progressStats} chaptersProgress={chaptersProgress} />
 			</div>
 
 			<button

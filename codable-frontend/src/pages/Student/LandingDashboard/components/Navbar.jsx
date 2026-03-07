@@ -8,10 +8,15 @@ import {
 } from '../../../../components/ui/dropdown-menu';
 import codableLogo from "../../../../assets/codable-logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
 
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout, user } = useAuth();
+
+  // Get user's display name
+  const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
   const navItems = [
     { key: "dashboard", label: "Dashboard", icon: Home, path: "/student" },
@@ -71,7 +76,7 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-800 transition-colors">
                   <User className="w-5 h-5 text-gray-300" />
-                  <span className="text-gray-300 hidden sm:block">Khawaja</span>
+                  <span className="text-gray-300 hidden sm:block">{userName}</span>
                 </button>
               </DropdownMenuTrigger>
 
@@ -111,7 +116,8 @@ export function Navbar() {
                 <DropdownMenuItem
                   className="text-red-400 focus:bg-gray-800 focus:text-red-400 cursor-pointer"
                   onClick={() => {
-                    navigate("/logout");
+                    logout();
+                    navigate("/");
                   }}
                 >
                   Log out

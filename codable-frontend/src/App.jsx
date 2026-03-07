@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SplashScreen from "./components/splashScreen";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 import RoleSelectionDashboard from "./pages/Dashboard/RoleSelectionDashboard";
 import Workspace from "./pages/Workspace/Workspace";
 import LoginPage from "./pages/Auth/Login";
@@ -32,17 +34,41 @@ export default function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<RoleSelectionDashboard />} />
-        <Route path="/workspace" element={<Workspace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/student" element={<StudentLandingPage />} />
-        <Route path="/student/learning" element={<StudentLearningPage />} />
-        <Route path="/student/profile-and-analytics" element={<ProfileAndAnalytics />} />
-        <Route path="/mentor" element={<MentorDashboard />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<RoleSelectionDashboard />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          
+          {/* Protected Routes */}
+          <Route path="/workspace" element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          } />
+          <Route path="/student" element={
+            <ProtectedRoute>
+              <StudentLandingPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/student/learning" element={
+            <ProtectedRoute>
+              <StudentLearningPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/student/profile-and-analytics" element={
+            <ProtectedRoute>
+              <ProfileAndAnalytics />
+            </ProtectedRoute>
+          } />
+          <Route path="/mentor" element={
+            <ProtectedRoute>
+              <MentorDashboard />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }

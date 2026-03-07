@@ -8,8 +8,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../../context/AuthContext';
 
 export function Navbar() {
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+
+  // Get user's display name and initials
+  const userName = user?.name || user?.email?.split('@')[0] || 'User';
+  const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <nav className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800/50 sticky top-0 z-50">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-8">
@@ -36,10 +50,10 @@ export function Navbar() {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 hover:bg-gray-800 rounded-full pr-3 pl-1 py-1 transition-colors">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" />
-                  <AvatarFallback>AJ</AvatarFallback>
+                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`} />
+                  <AvatarFallback>{userInitials}</AvatarFallback>
                 </Avatar>
-                <span className="text-gray-300 hidden sm:block">Alex Johnson</span>
+                <span className="text-gray-300 hidden sm:block">{userName}</span>
               </button>
             </DropdownMenuTrigger>
 
@@ -59,7 +73,10 @@ export function Navbar() {
 
               <DropdownMenuSeparator className="bg-gray-800" />
 
-              <DropdownMenuItem className="text-red-400 focus:bg-gray-800 focus:text-red-400">
+              <DropdownMenuItem 
+                className="text-red-400 focus:bg-gray-800 focus:text-red-400 cursor-pointer"
+                onClick={handleLogout}
+              >
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>

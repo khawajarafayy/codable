@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:25:14.198168",
-  "_topic_id": "5-3"
+  "_topic_id": "5-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How does a do-while loop differ from a while loop?",
+      "options": [
+        "It runs faster",
+        "It always executes the loop body at least once",
+        "It does not need a condition",
+        "It can only run a fixed number of times"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A do-while loop checks its condition after executing the loop body, guaranteeing that the body executes at least once, unlike a while loop which checks the condition first."
+    },
+    {
+      "id": 2,
+      "question": "Where is the condition checked in a do-while loop?",
+      "options": [
+        "Before the loop body",
+        "After the loop body",
+        "In the middle of the loop body",
+        "Conditions are not needed"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In a do-while loop, the condition is checked after the loop body executes. The syntax is: do { statements; } while (condition);"
+    }
+  ]
 }

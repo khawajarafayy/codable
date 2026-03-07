@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:43:05.418054",
-  "_topic_id": "9-1"
+  "_topic_id": "9-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a class in object-oriented programming?",
+      "options": [
+        "A type of variable",
+        "A blueprint or template for creating objects",
+        "A built-in Java method",
+        "A type of array"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A class is a blueprint or template that defines the properties (data fields) and behaviors (methods) that objects created from it will have."
+    },
+    {
+      "id": 2,
+      "question": "What is an object?",
+      "options": [
+        "A keyword in Java",
+        "An instance of a class with its own data values",
+        "A type of data field",
+        "A static method"
+      ],
+      "correctAnswer": 1,
+      "explanation": "An object is a specific instance of a class. It has its own set of data field values defined by the class blueprint. For example, different Circle objects can have different radii."
+    }
+  ]
 }

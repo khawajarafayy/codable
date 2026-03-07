@@ -4,11 +4,11 @@ import { ChevronLeft, ChevronRight, BookOpen, Code, CheckCircle, Lightbulb, Aler
 import { Button } from '../../../../components/ui/button';
 import learningApi from '../../../../services/learningApi';
 
-export function LearningContent({ onStartPractice, chapterId }) {
+export function LearningContent({ onStartPractice, onStartChapterPractice, chapterId, initialTopicIndex }) {
   const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [chapterTitle, setChapterTitle] = useState('');
-  const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
+  const [currentTopicIndex, setCurrentTopicIndex] = useState(initialTopicIndex || 0);
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -284,7 +284,7 @@ export function LearningContent({ onStartPractice, chapterId }) {
             </div>
             <div className="relative group">
               <Button
-                onClick={() => onStartPractice(currentTopic?.id, currentTopic?.title)}
+                onClick={() => onStartChapterPractice(currentTopic?.id, currentTopic?.title)}
                 disabled={!allTopicsCompleted}
                 className={`${allTopicsCompleted 
                   ? 'bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD]' 
@@ -470,32 +470,20 @@ export function LearningContent({ onStartPractice, chapterId }) {
                     Topic {currentTopicIndex + 1} of {topics.length}
                   </div>
 
-                  {currentTopicIndex === topics.length - 1 ? (
-                    <Button
-                      onClick={() => {
-                        setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
-                        saveTopicCompletion(currentTopicIndex);
+                  <Button
+                    onClick={() => {
+                      setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
+                      saveTopicCompletion(currentTopicIndex);
+                      if (currentTopicIndex === topics.length - 1) {
                         saveChapterCompletion();
-                        onStartPractice(currentTopic?.id, currentTopic?.title);
-                      }}
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
-                    >
-                      Complete & Practice
-                      <CheckCircle className="w-4 h-4 ml-2" />
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        setCompletedTopics(prev => new Set([...prev, currentTopicIndex]));
-                        saveTopicCompletion(currentTopicIndex);
-                        setCurrentTopicIndex(currentTopicIndex + 1);
-                      }}
-                      className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE]"
-                    >
-                      Next Topic
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
+                      }
+                      onStartPractice(currentTopic?.id, currentTopic?.title, currentTopicIndex);
+                    }}
+                    className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE]"
+                  >
+                    Practice
+                    <Target className="w-4 h-4 ml-2" />
+                  </Button>
                 </div>
               </div>
 

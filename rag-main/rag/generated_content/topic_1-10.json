@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:00:21.607067",
-  "_topic_id": "1-10"
+  "_topic_id": "1-10",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which type of error is detected by the compiler before the program runs?",
+      "options": [
+        "Logic error",
+        "Runtime error",
+        "Syntax error",
+        "Semantic error"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Syntax errors (also called compilation errors) are detected by the compiler before the program runs. They occur when code violates Java's grammar rules, such as missing semicolons or mismatched braces."
+    },
+    {
+      "id": 2,
+      "question": "A program compiles without errors but produces incorrect results. What type of error is this?",
+      "options": [
+        "Syntax error",
+        "Runtime error",
+        "Logic error",
+        "Compilation error"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Logic errors occur when a program runs successfully but produces incorrect results. The code is syntactically correct but the algorithm or logic is flawed."
+    }
+  ]
 }

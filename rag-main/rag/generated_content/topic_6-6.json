@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:33:26.741446",
-  "_topic_id": "6-6"
+  "_topic_id": "6-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does 'modularizing code' mean?",
+      "options": [
+        "Writing code in one long main method",
+        "Breaking code into smaller, reusable methods with specific tasks",
+        "Using only global variables",
+        "Removing all comments from code"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Modularizing code means dividing a program into smaller, manageable methods, each responsible for a specific task. This improves readability, reusability, and maintainability."
+    },
+    {
+      "id": 2,
+      "question": "What is 'stepwise refinement' in programming?",
+      "options": [
+        "Debugging code step by step",
+        "Breaking a large problem into smaller sub-problems solved by individual methods",
+        "Running code one line at a time",
+        "Adding comments after each line"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Stepwise refinement is a top-down approach where a large problem is broken down into smaller, manageable sub-problems, each implemented as a separate method."
+    }
+  ]
 }

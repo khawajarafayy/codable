@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:46:01.444885",
-  "_topic_id": "9-6"
+  "_topic_id": "9-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does the 'static' keyword mean for a variable?",
+      "options": [
+        "The variable cannot be changed",
+        "The variable belongs to the class and is shared by all instances",
+        "The variable is only accessible in the main method",
+        "The variable is stored on the heap"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A static variable belongs to the class rather than any specific instance. All objects of the class share the same static variable."
+    },
+    {
+      "id": 2,
+      "question": "Can you call a static method without creating an object?",
+      "options": [
+        "No, an object is always required",
+        "Yes, using the class name (e.g., ClassName.method())",
+        "Only if the method is void",
+        "Only in the main method"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Static methods can be called using the class name directly, without creating an instance. For example, Math.sqrt(25) calls the static sqrt method of the Math class."
+    }
+  ]
 }

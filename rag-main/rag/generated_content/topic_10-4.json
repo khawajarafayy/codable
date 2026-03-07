@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:50:25.744999",
-  "_topic_id": "10-4"
+  "_topic_id": "10-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is an 'association' between classes?",
+      "options": [
+        "One class inherits from another",
+        "A general relationship where one class uses or interacts with another",
+        "Two classes that are identical",
+        "A class that cannot be used with others"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Association is a general relationship where one class uses or interacts with another. For example, a Student class may be associated with a Course class."
+    },
+    {
+      "id": 2,
+      "question": "What is the difference between aggregation and composition?",
+      "options": [
+        "There is no difference",
+        "In composition, the contained object cannot exist without the container; in aggregation, it can",
+        "Aggregation is stronger than composition",
+        "Composition allows sharing objects, aggregation does not"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In composition, the contained object's lifecycle depends on the container (e.g., a Room cannot exist without a House). In aggregation, the contained object can exist independently (e.g., a Student can exist without a University)."
+    }
+  ]
 }

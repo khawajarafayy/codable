@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:46:39.539367",
-  "_topic_id": "9-7"
+  "_topic_id": "9-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does the 'private' visibility modifier do?",
+      "options": [
+        "Makes the member accessible from anywhere",
+        "Makes the member accessible only within the same class",
+        "Makes the member accessible only to subclasses",
+        "Makes the member accessible within the same package"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The 'private' modifier restricts access to the member (field or method) to only within the same class where it is declared. Other classes cannot access it directly."
+    },
+    {
+      "id": 2,
+      "question": "What does the 'public' visibility modifier do?",
+      "options": [
+        "Makes the member accessible only within the same class",
+        "Makes the member accessible from any class",
+        "Makes the member accessible only to subclasses",
+        "Makes the member static"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The 'public' modifier allows the member to be accessed from any class in any package. It provides the widest level of access."
+    }
+  ]
 }

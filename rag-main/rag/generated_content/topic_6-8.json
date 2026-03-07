@@ -55,5 +55,31 @@
   ],
   "total_pages": 6,
   "_generated_at": "2026-03-06T06:34:27.467810",
-  "_topic_id": "6-8"
+  "_topic_id": "6-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the scope of a local variable in Java?",
+      "options": [
+        "The entire class",
+        "The block (method or code block) where it is declared",
+        "The entire program",
+        "All methods in the same file"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A local variable's scope is limited to the block (method, loop, or if statement) where it is declared. It cannot be accessed outside that block."
+    },
+    {
+      "id": 2,
+      "question": "What happens if you try to access a local variable outside its scope?",
+      "options": [
+        "It returns null",
+        "It returns 0",
+        "A compilation error occurs",
+        "A runtime error occurs"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Accessing a local variable outside its scope causes a compilation error because the variable is not recognized outside the block where it was declared."
+    }
+  ]
 }

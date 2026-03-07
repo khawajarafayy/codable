@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:00:45.326276",
-  "_topic_id": "2-1"
+  "_topic_id": "2-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is elementary programming primarily concerned with?",
+      "options": [
+        "Building graphical user interfaces",
+        "Working with variables, data types, and basic operations",
+        "Creating databases",
+        "Designing web pages"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Elementary programming covers the fundamentals: variables, data types, input/output, basic arithmetic operations, and writing simple programs that perform calculations."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following is a fundamental concept in elementary Java programming?",
+      "options": [
+        "Inheritance",
+        "Polymorphism",
+        "Variable declaration and assignment",
+        "Abstract classes"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Variable declaration and assignment is a core elementary programming concept. Inheritance, polymorphism, and abstract classes are advanced OOP concepts covered in later chapters."
+    }
+  ]
 }

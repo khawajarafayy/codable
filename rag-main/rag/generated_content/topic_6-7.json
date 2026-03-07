@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:33:55.721100",
-  "_topic_id": "6-7"
+  "_topic_id": "6-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is method overloading in Java?",
+      "options": [
+        "Calling a method too many times",
+        "Having multiple methods with the same name but different parameter lists",
+        "A method that is too long",
+        "Overriding a method in a subclass"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Method overloading means defining multiple methods with the same name but different parameter lists (different number, types, or order of parameters). Java determines which to call based on the arguments."
+    },
+    {
+      "id": 2,
+      "question": "Can two overloaded methods differ only in return type?",
+      "options": [
+        "Yes, different return types alone is enough",
+        "No, they must differ in their parameter lists",
+        "Yes, if they are in different classes",
+        "Only if one is static"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Overloaded methods must differ in their parameter lists (number, type, or order of parameters). Differing only in return type causes a compilation error."
+    }
+  ]
 }

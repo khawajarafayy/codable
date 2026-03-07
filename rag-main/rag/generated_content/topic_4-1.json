@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T04:05:02.300340",
-  "_topic_id": "4-1"
+  "_topic_id": "4-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which Java class provides mathematical methods like sqrt, pow, and abs?",
+      "options": [
+        "Scanner",
+        "System",
+        "Math",
+        "String"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The Math class in Java provides commonly used mathematical methods like Math.sqrt(), Math.pow(), Math.abs(), Math.max(), and Math.min()."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following data types represents a single character in Java?",
+      "options": [
+        "String",
+        "char",
+        "byte",
+        "boolean"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The char data type represents a single character in Java. It uses single quotes (e.g., 'A'). String represents a sequence of characters and uses double quotes."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:04:33.719742",
-  "_topic_id": "2-9"
+  "_topic_id": "2-9",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the result of the integer division 7 / 2 in Java?",
+      "options": [
+        "3.5",
+        "3",
+        "4",
+        "3.0"
+      ],
+      "correctAnswer": 1,
+      "explanation": "When both operands are integers, Java performs integer division, which truncates the decimal part. 7 / 2 = 3 (not 3.5). To get 3.5, at least one operand must be a double."
+    },
+    {
+      "id": 2,
+      "question": "What does the modulus operator (%) return?",
+      "options": [
+        "The quotient of division",
+        "The remainder after division",
+        "The percentage value",
+        "The absolute value"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The modulus operator (%) returns the remainder after integer division. For example, 7 % 2 returns 1 because 7 divided by 2 is 3 with a remainder of 1."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:35:38.020442",
-  "_topic_id": "7-2"
+  "_topic_id": "7-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which statement correctly creates an array of 5 integers?",
+      "options": [
+        "int[] arr = new int(5);",
+        "int[] arr = new int[5];",
+        "int arr[] = new int{5};",
+        "array int arr = 5;"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The correct syntax is: int[] arr = new int[5]; This creates an array of 5 integers, all initialized to 0 by default."
+    },
+    {
+      "id": 2,
+      "question": "How do you access the third element of an array named 'data'?",
+      "options": [
+        "data[3]",
+        "data[2]",
+        "data(3)",
+        "data.get(2)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Since arrays are zero-indexed, the third element is at index 2. So data[2] accesses the third element."
+    }
+  ]
 }

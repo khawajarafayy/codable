@@ -51,5 +51,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:25:13.131873",
-  "_topic_id": "5-2"
+  "_topic_id": "5-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When does a while loop stop executing?",
+      "options": [
+        "After a fixed number of iterations",
+        "When the loop condition becomes false",
+        "When the program ends",
+        "When a return statement is reached"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A while loop continues to execute as long as its condition is true. It stops when the condition evaluates to false."
+    },
+    {
+      "id": 2,
+      "question": "What happens if the condition of a while loop is initially false?",
+      "options": [
+        "The loop executes once",
+        "The loop body never executes",
+        "An error occurs",
+        "The loop runs indefinitely"
+      ],
+      "correctAnswer": 1,
+      "explanation": "If the while loop condition is false from the start, the loop body is never executed. The program skips the loop entirely."
+    }
+  ]
 }

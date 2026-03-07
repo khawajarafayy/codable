@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:31:46.389074",
-  "_topic_id": "6-3"
+  "_topic_id": "6-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How do you call a method named 'calculateArea' that takes two int parameters?",
+      "options": [
+        "calculateArea;",
+        "call calculateArea(5, 10);",
+        "calculateArea(5, 10);",
+        "int calculateArea(5, 10);"
+      ],
+      "correctAnswer": 2,
+      "explanation": "You call a method by writing its name followed by arguments in parentheses: calculateArea(5, 10). The arguments must match the parameter types defined in the method."
+    },
+    {
+      "id": 2,
+      "question": "What are 'arguments' in a method call?",
+      "options": [
+        "The return type of the method",
+        "The values passed to the method when it is called",
+        "The variable names inside the method",
+        "The method body statements"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Arguments are the actual values you pass to a method when calling it. They correspond to the parameters defined in the method signature."
+    }
+  ]
 }

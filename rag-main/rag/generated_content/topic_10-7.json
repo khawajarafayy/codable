@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:52:33.687324",
-  "_topic_id": "10-7"
+  "_topic_id": "10-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does the substring(2, 5) method return for the string \"HelloWorld\"?",
+      "options": [
+        "\"llo\"",
+        "\"lloW\"",
+        "\"ell\"",
+        "\"lo\""
+      ],
+      "correctAnswer": 0,
+      "explanation": "substring(2, 5) returns characters from index 2 (inclusive) to index 5 (exclusive). For \"HelloWorld\", indices 2, 3, 4 are 'l', 'l', 'o', giving \"llo\"."
+    },
+    {
+      "id": 2,
+      "question": "What does the indexOf(\"Java\") method return if the substring is not found?",
+      "options": [
+        "0",
+        "null",
+        "-1",
+        "An exception is thrown"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The indexOf() method returns -1 if the specified substring is not found in the string. If found, it returns the index of the first occurrence."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:41:06.183123",
-  "_topic_id": "8-3"
+  "_topic_id": "8-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How many nested loops are typically needed to traverse all elements of a 2D array?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "It depends on the array size"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Traversing a 2D array typically requires 2 nested loops: the outer loop iterates through rows and the inner loop iterates through columns within each row."
+    },
+    {
+      "id": 2,
+      "question": "What is the correct way to get the number of columns in row i of a 2D array named 'grid'?",
+      "options": [
+        "grid.columns",
+        "grid[i].length",
+        "grid.length[i]",
+        "grid.width(i)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "grid[i].length returns the number of columns (elements) in row i. Each row in a 2D array is itself an array, so you use .length on that row."
+    }
+  ]
 }

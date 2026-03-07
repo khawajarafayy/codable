@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T03:15:06.214068",
-  "_topic_id": "3-8"
+  "_topic_id": "3-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the result of: true && false?",
+      "options": [
+        "true",
+        "false",
+        "1",
+        "Error"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The logical AND operator (&&) returns true only if both operands are true. Since one operand is false, the result is false."
+    },
+    {
+      "id": 2,
+      "question": "What is the result of: true || false?",
+      "options": [
+        "true",
+        "false",
+        "1",
+        "Error"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The logical OR operator (||) returns true if at least one operand is true. Since the first operand is true, the result is true."
+    }
+  ]
 }

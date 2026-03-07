@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:08:40.157534",
-  "_topic_id": "2-12"
+  "_topic_id": "2-12",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is 'x += 5;' equivalent to?",
+      "options": [
+        "x = 5;",
+        "x = x + 5;",
+        "x = x * 5;",
+        "x + 5;"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The augmented assignment operator += adds the right operand to the variable and assigns the result back. So x += 5 is shorthand for x = x + 5."
+    },
+    {
+      "id": 2,
+      "question": "If x = 10, what is the value of x after 'x %= 3;'?",
+      "options": [
+        "3",
+        "1",
+        "10",
+        "0"
+      ],
+      "correctAnswer": 1,
+      "explanation": "x %= 3 is equivalent to x = x % 3. Since 10 % 3 = 1 (remainder of 10 divided by 3), x becomes 1."
+    }
+  ]
 }

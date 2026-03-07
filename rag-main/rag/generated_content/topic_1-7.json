@@ -51,5 +51,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:58:56.245829",
-  "_topic_id": "1-7"
+  "_topic_id": "1-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the correct signature of the main method in Java?",
+      "options": [
+        "public void main(String args)",
+        "public static void main(String[] args)",
+        "static void main(String args[])",
+        "public main(String[] args)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The correct main method signature is 'public static void main(String[] args)'. It must be public (accessible), static (no object needed), void (returns nothing), and accept a String array parameter."
+    },
+    {
+      "id": 2,
+      "question": "What does System.out.println() do in Java?",
+      "options": [
+        "Reads input from the user",
+        "Prints text to the console and moves to a new line",
+        "Creates a new variable",
+        "Compiles the program"
+      ],
+      "correctAnswer": 1,
+      "explanation": "System.out.println() prints the specified text (or value) to the console output and then moves the cursor to the next line. 'println' stands for 'print line'."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T05:48:06.219463",
-  "_topic_id": "4-4"
+  "_topic_id": "4-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How do you find the length of a String in Java?",
+      "options": [
+        "str.size()",
+        "str.length()",
+        "str.count()",
+        "length(str)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The length() method of the String class returns the number of characters in the string. For example, \"Hello\".length() returns 5."
+    },
+    {
+      "id": 2,
+      "question": "Are String objects mutable or immutable in Java?",
+      "options": [
+        "Mutable - they can be changed after creation",
+        "Immutable - they cannot be changed after creation",
+        "It depends on how they are created",
+        "Only final Strings are immutable"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Strings in Java are immutable. Once a String object is created, its content cannot be changed. Methods like concat() or replace() create new String objects."
+    }
+  ]
 }

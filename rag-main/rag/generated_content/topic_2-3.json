@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:01:38.738597",
-  "_topic_id": "2-3"
+  "_topic_id": "2-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which class is used to read input from the console in Java?",
+      "options": [
+        "System.in",
+        "Console",
+        "Scanner",
+        "Reader"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The Scanner class (java.util.Scanner) is the standard way to read input from the console. You create it with: Scanner input = new Scanner(System.in);"
+    },
+    {
+      "id": 2,
+      "question": "Which Scanner method reads an integer value from the user?",
+      "options": [
+        "readInt()",
+        "getInt()",
+        "nextInt()",
+        "scanInt()"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The nextInt() method of the Scanner class reads the next integer value from the input. Other methods include nextDouble(), nextLine(), and next()."
+    }
+  ]
 }

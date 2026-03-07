@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LearningContent } from './components/LearningContent';
 import { PracticeMode } from './components/PracticeMode';
+import { TopicPractice } from './components/TopicPractice';
+import learningApi from '../../../services/learningApi';
 
 export default function LearningPage() {
   const [searchParams] = useSearchParams();
@@ -9,6 +11,8 @@ export default function LearningPage() {
   const [chapterId, setChapterId] = useState(null);
   const [topicId, setTopicId] = useState(null);
   const [topicTitle, setTopicTitle] = useState('');
+  const [topicQuestions, setTopicQuestions] = useState([]);
+  const [topicIndex, setTopicIndex] = useState(0);
 
   useEffect(() => {
     // Get chapter and topic from URL query params
@@ -29,16 +33,43 @@ export default function LearningPage() {
       setChapterId(1);
     }
 
-    console.log('📚 LearningPage - chapterParam:', chapterParam, 'topicParam:', topicParam);
+    console.log('LearningPage - chapterParam:', chapterParam, 'topicParam:', topicParam);
   }, [searchParams]);
 
-  const handleStartPractice = (selectedTopicId, selectedTopicTitle) => {
-    // If topic info is passed from LearningContent, use it
+  const handleStartPractice = async (selectedTopicId, selectedTopicTitle, selectedTopicIndex) => {
+    if (selectedTopicId) {
+      setTopicId(selectedTopicId);
+      setTopicTitle(selectedTopicTitle || '');
+      setTopicIndex(selectedTopicIndex ?? 0);
+    }
+
+    // Fetch questions from the topic content
+    try {
+      const response = await learningApi.getTopicContent(selectedTopicId || topicId);
+      if (response.success && response.questions && response.questions.length > 0) {
+        setTopicQuestions(response.questions);
+        setMode('topicPractice');
+      } else {
+        // No questions available, skip to next topic
+        handleTopicPracticeComplete();
+      }
+    } catch (err) {
+      console.error('Error fetching topic questions:', err);
+      handleTopicPracticeComplete();
+    }
+  };
+
+  const handleTopicPracticeComplete = () => {
+    // Advance to next topic index, then go back to learning mode
+    setTopicIndex(prev => prev + 1);
+    setMode('learning');
+  };
+
+  const handleStartChapterPractice = (selectedTopicId, selectedTopicTitle) => {
     if (selectedTopicId) {
       setTopicId(selectedTopicId);
       setTopicTitle(selectedTopicTitle || '');
     } else if (!topicId && chapterId) {
-      // Default to first topic of the chapter
       setTopicId(`${chapterId}-1`);
     }
     setMode('practice');
@@ -62,7 +93,17 @@ export default function LearningPage() {
       {mode === 'learning' && (
         <LearningContent
           onStartPractice={handleStartPractice}
+          onStartChapterPractice={handleStartChapterPractice}
           chapterId={chapterId}
+          initialTopicIndex={topicIndex}
+        />
+      )}
+      {mode === 'topicPractice' && (
+        <TopicPractice
+          questions={topicQuestions}
+          topicTitle={topicTitle}
+          onComplete={handleTopicPracticeComplete}
+          onBackToLearning={handleBackToLearning}
         />
       )}
       {mode === 'practice' && (

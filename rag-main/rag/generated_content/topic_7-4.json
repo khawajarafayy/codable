@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:36:42.024616",
-  "_topic_id": "7-4"
+  "_topic_id": "7-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When an array is passed to a method, what is actually passed?",
+      "options": [
+        "A copy of the entire array",
+        "A reference to the array object",
+        "The first element only",
+        "The array length"
+      ],
+      "correctAnswer": 1,
+      "explanation": "When an array is passed to a method, the reference to the array is passed. This means the method can modify the original array's elements."
+    },
+    {
+      "id": 2,
+      "question": "If a method modifies an array element received as a parameter, is the original array affected?",
+      "options": [
+        "No, a copy is modified",
+        "Yes, because the reference to the original array is passed",
+        "Only if the array is declared as final",
+        "Only for String arrays"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Since the method receives a reference to the original array, any modifications to the array elements inside the method affect the original array."
+    }
+  ]
 }

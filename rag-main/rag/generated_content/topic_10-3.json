@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:49:49.756452",
-  "_topic_id": "10-3"
+  "_topic_id": "10-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When modeling a real-world entity as a class, what should the data fields represent?",
+      "options": [
+        "Methods of the entity",
+        "Properties or attributes of the entity",
+        "Other classes",
+        "Only numeric values"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Data fields should represent the properties or attributes of the real-world entity. For a Student class, fields might be name, age, and GPA."
+    },
+    {
+      "id": 2,
+      "question": "What should methods in a class represent when thinking in objects?",
+      "options": [
+        "The properties of the entity",
+        "The behaviors or actions the entity can perform",
+        "The data types used",
+        "The constructors only"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Methods represent the behaviors or actions that the entity can perform. For a BankAccount class, methods might be deposit(), withdraw(), and getBalance()."
+    }
+  ]
 }

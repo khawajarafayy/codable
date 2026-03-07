@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:30:09.011910",
-  "_topic_id": "5-8"
+  "_topic_id": "5-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does the 'break' statement do inside a loop?",
+      "options": [
+        "Skips the current iteration and continues to the next",
+        "Terminates the loop immediately",
+        "Pauses the loop temporarily",
+        "Restarts the loop from the beginning"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The break statement immediately terminates the innermost loop it is in. Execution continues with the first statement after the loop."
+    },
+    {
+      "id": 2,
+      "question": "What does the 'continue' statement do inside a loop?",
+      "options": [
+        "Terminates the loop",
+        "Skips the remaining statements in the current iteration and starts the next iteration",
+        "Pauses the loop",
+        "Continues to the next loop"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The continue statement skips the remaining statements in the current iteration and jumps to the next iteration of the loop (re-evaluating the condition)."
+    }
+  ]
 }

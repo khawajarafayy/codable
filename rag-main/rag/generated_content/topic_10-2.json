@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:49:13.859200",
-  "_topic_id": "10-2"
+  "_topic_id": "10-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is class abstraction?",
+      "options": [
+        "Making a class that cannot be instantiated",
+        "Separating the class interface from its implementation details",
+        "Creating abstract art with code",
+        "Using only abstract methods"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Class abstraction means separating the class's public interface (what the class does) from its implementation details (how it does it). Users interact with the class through its public methods."
+    },
+    {
+      "id": 2,
+      "question": "How does encapsulation support abstraction?",
+      "options": [
+        "By making all methods public",
+        "By hiding implementation details and exposing only a clean interface",
+        "By using only static methods",
+        "By avoiding the use of data fields"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Encapsulation hides the internal implementation details (private fields, helper methods) and exposes only a clean public interface. Users don't need to know how the class works internally."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:47:55.934290",
-  "_topic_id": "9-9"
+  "_topic_id": "9-9",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When an object is passed to a method in Java, what is actually passed?",
+      "options": [
+        "A copy of the entire object",
+        "A copy of the reference to the object",
+        "The object's class definition",
+        "Only the object's data fields"
+      ],
+      "correctAnswer": 1,
+      "explanation": "When an object is passed to a method, a copy of the reference (memory address) is passed. This means the method can modify the object's state through the reference."
+    },
+    {
+      "id": 2,
+      "question": "If a method changes the data fields of a passed object, is the original object affected?",
+      "options": [
+        "No, objects are always copied",
+        "Yes, because the method has a reference to the same object",
+        "Only if the object is declared final",
+        "Only for String objects"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Since the method receives a reference to the same object, any changes to the object's data fields inside the method affect the original object."
+    }
+  ]
 }

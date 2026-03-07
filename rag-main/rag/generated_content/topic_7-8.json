@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:39:02.927730",
-  "_topic_id": "7-8"
+  "_topic_id": "7-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which method from the Arrays class converts an array to a readable string?",
+      "options": [
+        "Arrays.print(arr)",
+        "Arrays.toString(arr)",
+        "arr.toString()",
+        "Arrays.display(arr)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Arrays.toString(arr) returns a string representation of the array in the format [elem1, elem2, elem3]. This is useful for printing array contents."
+    },
+    {
+      "id": 2,
+      "question": "What does Arrays.fill(arr, value) do?",
+      "options": [
+        "Adds elements to the array",
+        "Assigns the specified value to every element in the array",
+        "Finds the value in the array",
+        "Removes the value from the array"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Arrays.fill(arr, value) sets every element in the array to the specified value. For example, Arrays.fill(arr, 0) sets all elements to 0."
+    }
+  ]
 }

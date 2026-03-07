@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:11:50.340904",
-  "_topic_id": "3-2"
+  "_topic_id": "3-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What are the two possible values of a boolean variable in Java?",
+      "options": [
+        "0 and 1",
+        "yes and no",
+        "true and false",
+        "on and off"
+      ],
+      "correctAnswer": 2,
+      "explanation": "In Java, the boolean data type has exactly two possible values: true and false. Unlike some languages, Java does not allow 0 and 1 to represent boolean values."
+    },
+    {
+      "id": 2,
+      "question": "What is the result of the expression: 5 > 3?",
+      "options": [
+        "5",
+        "3",
+        "true",
+        "1"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The comparison operator > returns a boolean value. Since 5 is greater than 3, the expression 5 > 3 evaluates to true."
+    }
+  ]
 }

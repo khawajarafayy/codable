@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:11:23.119799",
-  "_topic_id": "3-1"
+  "_topic_id": "3-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the purpose of selection statements in Java?",
+      "options": [
+        "To repeat a block of code",
+        "To make decisions and execute code conditionally",
+        "To define methods",
+        "To create objects"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Selection statements (if, if-else, switch) allow programs to make decisions and execute different blocks of code based on whether conditions are true or false."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following is a selection statement in Java?",
+      "options": [
+        "for",
+        "while",
+        "if-else",
+        "do-while"
+      ],
+      "correctAnswer": 2,
+      "explanation": "if-else is a selection statement used for making decisions. for, while, and do-while are loop statements used for repetition."
+    }
+  ]
 }

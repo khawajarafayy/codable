@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:05:03.714190",
-  "_topic_id": "2-10"
+  "_topic_id": "2-10",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which of the following is a floating-point literal in Java?",
+      "options": [
+        "100",
+        "100L",
+        "100.0",
+        "100f only if cast"
+      ],
+      "correctAnswer": 2,
+      "explanation": "100.0 is a floating-point (double) literal because it contains a decimal point. 100 is an integer literal, and 100L is a long literal."
+    },
+    {
+      "id": 2,
+      "question": "What type does Java assign to the literal 3.14 by default?",
+      "options": [
+        "float",
+        "double",
+        "int",
+        "long"
+      ],
+      "correctAnswer": 1,
+      "explanation": "By default, Java treats floating-point literals like 3.14 as double type. To make it a float, you must add an 'f' suffix: 3.14f."
+    }
+  ]
 }

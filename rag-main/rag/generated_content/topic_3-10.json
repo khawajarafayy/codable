@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T04:03:53.052024",
-  "_topic_id": "3-10"
+  "_topic_id": "3-10",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the ternary operator in Java?",
+      "options": [
+        "if-else",
+        "?:",
+        "&&",
+        "||"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The ternary operator (?:) is a shorthand for if-else. Its syntax is: condition ? valueIfTrue : valueIfFalse. For example: int max = (a > b) ? a : b;"
+    },
+    {
+      "id": 2,
+      "question": "What is the value of: int x = (5 > 3) ? 10 : 20;?",
+      "options": [
+        "5",
+        "3",
+        "10",
+        "20"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Since 5 > 3 is true, the ternary operator returns the value after '?', which is 10. If the condition were false, it would return 20."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:50:57.285878",
-  "_topic_id": "10-5"
+  "_topic_id": "10-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Why are wrapper classes needed in Java?",
+      "options": [
+        "To make code more complex",
+        "To allow primitive values to be used where objects are required",
+        "To replace primitive types entirely",
+        "To encrypt data"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Wrapper classes (Integer, Double, Character, etc.) allow primitive values to be treated as objects. This is needed for collections like ArrayList that can only store objects."
+    },
+    {
+      "id": 2,
+      "question": "What is autoboxing in Java?",
+      "options": [
+        "Manually creating wrapper objects",
+        "Automatic conversion of a primitive to its wrapper type",
+        "Converting a wrapper to a primitive",
+        "Packaging classes into a JAR file"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Autoboxing is Java's automatic conversion of a primitive type to its corresponding wrapper class. For example, Integer x = 5; automatically converts the int 5 to an Integer object."
+    }
+  ]
 }

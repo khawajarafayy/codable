@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:25:08.108522",
-  "_topic_id": "5-1"
+  "_topic_id": "5-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the primary purpose of a loop in programming?",
+      "options": [
+        "To make decisions",
+        "To repeat a block of code multiple times",
+        "To define methods",
+        "To store data"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Loops are control structures that repeat a block of code multiple times based on a condition. They help avoid writing repetitive code."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following is NOT a loop structure in Java?",
+      "options": [
+        "while",
+        "for",
+        "do-while",
+        "if-else"
+      ],
+      "correctAnswer": 3,
+      "explanation": "if-else is a selection (decision) statement, not a loop. Java's three loop structures are while, for, and do-while."
+    }
+  ]
 }

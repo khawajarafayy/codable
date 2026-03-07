@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:30:38.803749",
-  "_topic_id": "6-1"
+  "_topic_id": "6-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a method in Java?",
+      "options": [
+        "A type of variable",
+        "A reusable block of code that performs a specific task",
+        "A type of loop",
+        "A class definition"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A method is a reusable block of code that performs a specific task. Methods help organize code into manageable, reusable pieces (modular programming)."
+    },
+    {
+      "id": 2,
+      "question": "What is the main benefit of using methods?",
+      "options": [
+        "They make programs run faster",
+        "They allow code reuse and improve organization",
+        "They are required by Java",
+        "They replace the need for variables"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Methods promote code reuse and better organization. Instead of duplicating code, you write it once in a method and call it whenever needed."
+    }
+  ]
 }

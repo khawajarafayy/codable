@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T05:48:04.501010",
-  "_topic_id": "4-3"
+  "_topic_id": "4-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the correct way to declare a char variable in Java?",
+      "options": [
+        "char c = \"A\";",
+        "char c = 'A';",
+        "char c = A;",
+        "String c = 'A';"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Character literals in Java use single quotes: char c = 'A'. Double quotes are for String literals, not characters."
+    },
+    {
+      "id": 2,
+      "question": "What encoding system does Java use for characters?",
+      "options": [
+        "ASCII only",
+        "EBCDIC",
+        "Unicode",
+        "Binary"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Java uses Unicode encoding for characters, which supports characters from all major world languages. ASCII is a subset of Unicode."
+    }
+  ]
 }

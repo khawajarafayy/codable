@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:47:11.080464",
-  "_topic_id": "9-8"
+  "_topic_id": "9-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is data field encapsulation?",
+      "options": [
+        "Making all fields public",
+        "Making fields private and providing getter/setter methods",
+        "Removing all data fields",
+        "Using arrays to store fields"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Data field encapsulation means making data fields private and providing public getter and setter methods to access and modify them. This protects data integrity."
+    },
+    {
+      "id": 2,
+      "question": "What is the standard naming convention for a getter method of a field named 'radius'?",
+      "options": [
+        "radius()",
+        "getRadius()",
+        "readRadius()",
+        "fetchRadius()"
+      ],
+      "correctAnswer": 1,
+      "explanation": "By Java convention, getter methods are named with 'get' prefix followed by the field name with the first letter capitalized: getRadius(). For boolean fields, 'is' prefix is used."
+    }
+  ]
 }

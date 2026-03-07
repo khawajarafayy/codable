@@ -60,5 +60,31 @@
   ],
   "total_pages": 7,
   "_generated_at": "2026-03-06T06:39:56.794309",
-  "_topic_id": "8-1"
+  "_topic_id": "8-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a two-dimensional array?",
+      "options": [
+        "An array with two elements",
+        "An array of arrays, organized in rows and columns",
+        "Two separate arrays linked together",
+        "An array that can only hold two data types"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A two-dimensional array is an array of arrays, organized like a table with rows and columns. It can be used to represent matrices, grids, or tables of data."
+    },
+    {
+      "id": 2,
+      "question": "How do you access an element in a 2D array at row 2, column 3?",
+      "options": [
+        "arr[2, 3]",
+        "arr[2][3]",
+        "arr(2)(3)",
+        "arr.get(2, 3)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, 2D array elements are accessed using two indices: arr[row][column]. So arr[2][3] accesses row 2, column 3 (both zero-indexed)."
+    }
+  ]
 }

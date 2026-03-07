@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:29:00.298276",
-  "_topic_id": "5-6"
+  "_topic_id": "5-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "In nested loops, how many total iterations occur with an outer loop of 3 and inner loop of 4?",
+      "options": [
+        "7",
+        "12",
+        "3",
+        "4"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In nested loops, the inner loop runs completely for each iteration of the outer loop. So 3 (outer) * 4 (inner) = 12 total iterations of the inner loop body."
+    },
+    {
+      "id": 2,
+      "question": "In nested loops, which loop completes all its iterations first?",
+      "options": [
+        "The outer loop",
+        "The inner loop",
+        "Both complete simultaneously",
+        "It depends on the condition"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The inner loop completes all its iterations for each single iteration of the outer loop. The outer loop advances only after the inner loop finishes."
+    }
+  ]
 }

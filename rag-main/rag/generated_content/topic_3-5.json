@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:13:19.233575",
-  "_topic_id": "3-5"
+  "_topic_id": "3-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the purpose of 'else if' in a multi-way if-else statement?",
+      "options": [
+        "To end the if statement",
+        "To check additional conditions when previous conditions are false",
+        "To create a loop",
+        "To define a default action"
+      ],
+      "correctAnswer": 1,
+      "explanation": "'else if' allows testing additional conditions when the preceding if/else-if condition is false. It creates a chain of condition checks, with only the first true condition's block executing."
+    },
+    {
+      "id": 2,
+      "question": "In a nested if-else, which if does an else belong to?",
+      "options": [
+        "The first if in the code",
+        "The nearest preceding unmatched if",
+        "The outermost if",
+        "It can belong to any if"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, an else clause is associated with the nearest preceding unmatched if statement. This is known as the 'dangling else' rule."
+    }
+  ]
 }

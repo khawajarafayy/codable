@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:59:50.034279",
-  "_topic_id": "1-9"
+  "_topic_id": "1-9",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which of the following is a proper single-line comment in Java?",
+      "options": [
+        "# This is a comment",
+        "// This is a comment",
+        "<!-- This is a comment -->",
+        "-- This is a comment"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, single-line comments start with //. Everything after // on that line is ignored by the compiler. Multi-line comments use /* */."
+    },
+    {
+      "id": 2,
+      "question": "What is the recommended naming convention for variables in Java?",
+      "options": [
+        "ALLCAPS",
+        "camelCase (e.g., myVariable)",
+        "snake_case (e.g., my_variable)",
+        "PascalCase (e.g., MyVariable)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java convention uses camelCase for variable and method names (e.g., myVariable, calculateArea). Class names use PascalCase, and constants use ALL_CAPS."
+    }
+  ]
 }

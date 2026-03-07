@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:35:08.735281",
-  "_topic_id": "7-1"
+  "_topic_id": "7-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is an array in Java?",
+      "options": [
+        "A single variable that stores one value",
+        "A data structure that stores a collection of elements of the same type",
+        "A type of loop",
+        "A method that returns multiple values"
+      ],
+      "correctAnswer": 1,
+      "explanation": "An array is a data structure that stores a fixed-size collection of elements of the same type. It provides indexed access to its elements."
+    },
+    {
+      "id": 2,
+      "question": "What is the index of the first element in a Java array?",
+      "options": [
+        "1",
+        "0",
+        "-1",
+        "It depends on the array"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java arrays are zero-indexed, meaning the first element has index 0, the second has index 1, and so on. The last element has index length - 1."
+    }
+  ]
 }

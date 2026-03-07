@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T05:48:08.493091",
-  "_topic_id": "4-5"
+  "_topic_id": "4-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which method is used for formatted output in Java?",
+      "options": [
+        "System.out.println()",
+        "System.out.printf()",
+        "System.out.print()",
+        "System.out.write()"
+      ],
+      "correctAnswer": 1,
+      "explanation": "System.out.printf() is used for formatted output, allowing format specifiers like %d for integers, %f for floating-point numbers, and %s for strings."
+    },
+    {
+      "id": 2,
+      "question": "What does the format specifier %d represent in printf?",
+      "options": [
+        "A double value",
+        "A decimal (floating-point) value",
+        "An integer value",
+        "A string value"
+      ],
+      "correctAnswer": 2,
+      "explanation": "%d is the format specifier for integer values in printf. %f is for floating-point, %s is for strings, and %c is for characters."
+    }
+  ]
 }

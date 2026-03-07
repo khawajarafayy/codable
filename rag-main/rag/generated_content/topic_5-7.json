@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:29:41.660589",
-  "_topic_id": "5-7"
+  "_topic_id": "5-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Why can floating-point numbers cause issues in loop conditions?",
+      "options": [
+        "They are too large for loops",
+        "They cannot be used in conditions",
+        "Precision errors can cause unexpected behavior",
+        "They make loops run slower"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Floating-point numbers have limited precision, so accumulated small errors can cause loop conditions to behave unexpectedly. For example, adding 0.1 repeatedly may not exactly equal 1.0."
+    },
+    {
+      "id": 2,
+      "question": "What is a good strategy to minimize numeric errors in loops?",
+      "options": [
+        "Use float instead of double",
+        "Use integer counters and compute floating-point values from them",
+        "Avoid all arithmetic in loops",
+        "Use String operations instead"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Using integer loop counters and computing floating-point values from them avoids accumulated floating-point errors. For example, use i/10.0 instead of adding 0.1 each iteration."
+    }
+  ]
 }

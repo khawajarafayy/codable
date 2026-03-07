@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:04:05.471074",
-  "_topic_id": "2-8"
+  "_topic_id": "2-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "According to Java naming conventions, how should a class be named?",
+      "options": [
+        "camelCase (e.g., myClass)",
+        "PascalCase (e.g., MyClass)",
+        "snake_case (e.g., my_class)",
+        "ALL_CAPS (e.g., MY_CLASS)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java convention uses PascalCase (also called UpperCamelCase) for class names, where each word starts with a capital letter (e.g., MyClass, StudentRecord)."
+    },
+    {
+      "id": 2,
+      "question": "How should constants be named according to Java conventions?",
+      "options": [
+        "camelCase (e.g., maxValue)",
+        "PascalCase (e.g., MaxValue)",
+        "ALL_CAPS with underscores (e.g., MAX_VALUE)",
+        "lowercase (e.g., maxvalue)"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Java constants are conventionally named using ALL_CAPS with underscores separating words (e.g., MAX_VALUE, PI, INTEREST_RATE)."
+    }
+  ]
 }

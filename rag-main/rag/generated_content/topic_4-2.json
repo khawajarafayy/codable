@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T04:05:46.063855",
-  "_topic_id": "4-2"
+  "_topic_id": "4-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does Math.pow(2, 3) return?",
+      "options": [
+        "6.0",
+        "8.0",
+        "5.0",
+        "23.0"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Math.pow(2, 3) computes 2 raised to the power of 3, which is 2 * 2 * 2 = 8.0. The method returns a double value."
+    },
+    {
+      "id": 2,
+      "question": "What does Math.sqrt(16) return?",
+      "options": [
+        "8.0",
+        "4.0",
+        "256.0",
+        "2.0"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Math.sqrt(16) returns the square root of 16, which is 4.0. The method always returns a double value."
+    }
+  ]
 }

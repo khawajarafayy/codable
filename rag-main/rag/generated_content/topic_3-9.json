@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T04:03:25.646880",
-  "_topic_id": "3-9"
+  "_topic_id": "3-9",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What keyword is used to exit a case block in a switch statement?",
+      "options": [
+        "exit",
+        "stop",
+        "break",
+        "return"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The 'break' keyword exits a case block in a switch statement. Without break, execution 'falls through' into the next case block."
+    },
+    {
+      "id": 2,
+      "question": "What happens if you omit the break statement in a switch case?",
+      "options": [
+        "A compilation error occurs",
+        "Only the matching case executes",
+        "Execution falls through to subsequent cases",
+        "The default case executes"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Without a break statement, execution falls through from the matched case into the subsequent cases until a break is encountered or the switch block ends."
+    }
+  ]
 }

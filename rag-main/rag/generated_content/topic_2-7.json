@@ -55,5 +55,31 @@
   ],
   "total_pages": 6,
   "_generated_at": "2026-03-06T02:03:36.704372",
-  "_topic_id": "2-7"
+  "_topic_id": "2-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "How do you declare a constant in Java?",
+      "options": [
+        "const double PI = 3.14;",
+        "final double PI = 3.14;",
+        "constant double PI = 3.14;",
+        "static PI = 3.14;"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, constants are declared using the 'final' keyword. Once assigned, a final variable's value cannot be changed. Java does not use the 'const' keyword."
+    },
+    {
+      "id": 2,
+      "question": "What happens if you try to change the value of a final variable?",
+      "options": [
+        "The value changes normally",
+        "A runtime error occurs",
+        "A compilation error occurs",
+        "The change is silently ignored"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Attempting to reassign a value to a final variable causes a compilation error. The 'final' keyword ensures the value remains constant throughout the program."
+    }
+  ]
 }

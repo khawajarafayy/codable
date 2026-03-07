@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:38:28.010799",
-  "_topic_id": "7-7"
+  "_topic_id": "7-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the basic idea behind selection sort?",
+      "options": [
+        "Insert each element into its correct position",
+        "Find the minimum element and swap it to the front, then repeat",
+        "Divide the array and sort each half",
+        "Compare adjacent elements and swap them"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Selection sort works by repeatedly finding the minimum element from the unsorted portion and placing it at the beginning of that portion."
+    },
+    {
+      "id": 2,
+      "question": "What method can be used to sort an array using Java's built-in library?",
+      "options": [
+        "Array.sort(arr)",
+        "arr.sort()",
+        "Arrays.sort(arr)",
+        "Collections.sort(arr)"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Arrays.sort(arr) from the java.util.Arrays class sorts the array in ascending order. It uses an optimized sorting algorithm internally."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:44:45.669678",
-  "_topic_id": "9-4"
+  "_topic_id": "9-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a reference variable in Java?",
+      "options": [
+        "A variable that stores a primitive value",
+        "A variable that stores the memory address of an object",
+        "A variable declared with the keyword 'ref'",
+        "A variable that cannot be changed"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A reference variable holds the memory address (reference) of an object, not the object itself. It allows you to access the object's data and methods."
+    },
+    {
+      "id": 2,
+      "question": "What does the dot operator (.) do in Java?",
+      "options": [
+        "Concatenates strings",
+        "Accesses an object's members (fields and methods)",
+        "Compares two values",
+        "Separates package names only"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The dot operator (.) is used to access an object's data fields and methods. For example, circle1.getRadius() calls the getRadius method on the circle1 object."
+    }
+  ]
 }

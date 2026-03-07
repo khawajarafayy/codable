@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:43:34.087514",
-  "_topic_id": "9-2"
+  "_topic_id": "9-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What are the two main components of a class definition?",
+      "options": [
+        "Import statements and main method",
+        "Data fields (properties) and methods (behaviors)",
+        "Constructors and destructors",
+        "Variables and loops"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A class definition contains data fields (instance variables that store the object's state) and methods (that define the object's behaviors and actions)."
+    },
+    {
+      "id": 2,
+      "question": "What keyword is used to create a new object from a class?",
+      "options": [
+        "create",
+        "object",
+        "new",
+        "instance"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The 'new' keyword creates a new object (instance) of a class. For example: Circle c = new Circle(); creates a new Circle object."
+    }
+  ]
 }

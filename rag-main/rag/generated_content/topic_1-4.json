@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:57:27.403578",
-  "_topic_id": "1-4"
+  "_topic_id": "1-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the primary role of an operating system?",
+      "options": [
+        "To write programs",
+        "To manage hardware resources and provide services to applications",
+        "To connect to the internet",
+        "To store files permanently"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The operating system manages hardware resources (CPU, memory, storage, I/O devices) and provides a platform and services for application programs to run."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following is an example of an operating system?",
+      "options": [
+        "Java",
+        "Microsoft Word",
+        "Linux",
+        "Google Chrome"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Linux is an operating system (along with Windows and macOS). Java is a programming language, Microsoft Word is an application, and Google Chrome is a web browser."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:10:52.080271",
-  "_topic_id": "2-16"
+  "_topic_id": "2-16",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a common error when dividing two integers in Java?",
+      "options": [
+        "Using the wrong variable name",
+        "Expecting a decimal result from integer division",
+        "Forgetting to import a library",
+        "Using too many variables"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A common beginner mistake is expecting 5/2 to give 2.5. In Java, integer division truncates the decimal part, giving 2. Use double types or cast to get decimal results."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following will cause a compilation error?",
+      "options": [
+        "int x = 5;",
+        "double y = 3.14;",
+        "int z = 3.14;",
+        "String s = \"hello\";"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Assigning a double literal (3.14) directly to an int variable causes a compilation error because it is a narrowing conversion that could lose data. You need an explicit cast: int z = (int) 3.14;"
+    }
+  ]
 }

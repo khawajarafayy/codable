@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:09:39.096381",
-  "_topic_id": "2-14"
+  "_topic_id": "2-14",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the result of: (int) 5.9 in Java?",
+      "options": [
+        "6",
+        "5",
+        "5.0",
+        "Error"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Casting a double to int truncates (removes) the decimal part. (int) 5.9 results in 5, not 6. It does not round the value."
+    },
+    {
+      "id": 2,
+      "question": "Which type of casting happens automatically in Java?",
+      "options": [
+        "Narrowing casting (double to int)",
+        "Widening casting (int to double)",
+        "String to int casting",
+        "Object to int casting"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Widening casting (smaller type to larger type, like int to double) happens automatically because no data is lost. Narrowing casting requires an explicit cast."
+    }
+  ]
 }

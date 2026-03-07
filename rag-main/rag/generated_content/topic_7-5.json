@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:37:18.989222",
-  "_topic_id": "7-5"
+  "_topic_id": "7-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Can a method return an array in Java?",
+      "options": [
+        "No, methods can only return primitive types",
+        "Yes, by specifying the array type as the return type",
+        "Only void methods can work with arrays",
+        "Only static methods can return arrays"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A method can return an array by declaring the return type as an array type. For example: int[] reverseArray(int[] arr) { ... return result; }"
+    },
+    {
+      "id": 2,
+      "question": "What is the return type of a method that returns an integer array?",
+      "options": [
+        "int",
+        "int[]",
+        "array<int>",
+        "Array"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The return type for a method returning an integer array is int[]. For example: public static int[] getScores() { ... }"
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:59:21.695206",
-  "_topic_id": "1-8"
+  "_topic_id": "1-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which command is used to compile a Java file named Hello.java?",
+      "options": [
+        "java Hello.java",
+        "javac Hello.java",
+        "compile Hello.java",
+        "run Hello.java"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The 'javac' command is the Java compiler. Running 'javac Hello.java' compiles the source file and produces a Hello.class bytecode file."
+    },
+    {
+      "id": 2,
+      "question": "What file is produced when you compile a Java source file?",
+      "options": [
+        "A .exe file",
+        "A .class file containing bytecode",
+        "A .jar file",
+        "A .html file"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The Java compiler (javac) produces a .class file containing bytecode. This bytecode is platform-independent and can be executed by any JVM."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:48:44.028377",
-  "_topic_id": "10-1"
+  "_topic_id": "10-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the key difference between procedural and object-oriented programming?",
+      "options": [
+        "Procedural is faster than OOP",
+        "OOP organizes code around objects with data and behavior, procedural around functions",
+        "OOP doesn't use methods",
+        "Procedural doesn't use variables"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Procedural programming focuses on functions/procedures operating on data, while OOP organizes code around objects that combine data (fields) and behavior (methods) together."
+    },
+    {
+      "id": 2,
+      "question": "What does 'thinking in objects' mean when designing a program?",
+      "options": [
+        "Using only primitive data types",
+        "Identifying real-world entities and modeling them as classes with properties and behaviors",
+        "Writing code without methods",
+        "Avoiding the use of loops"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Thinking in objects means identifying real-world entities relevant to the problem and modeling them as classes with appropriate data fields (properties) and methods (behaviors)."
+    }
+  ]
 }

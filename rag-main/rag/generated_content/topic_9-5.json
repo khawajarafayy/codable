@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:45:30.523763",
-  "_topic_id": "9-5"
+  "_topic_id": "9-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which Java library class is used to generate random numbers?",
+      "options": [
+        "java.util.Random",
+        "java.util.Number",
+        "java.lang.Math only",
+        "java.util.Generate"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The java.util.Random class provides methods to generate various types of random numbers. While Math.random() also works, the Random class offers more methods like nextInt(bound)."
+    },
+    {
+      "id": 2,
+      "question": "What must you do before using a class from the java.util package?",
+      "options": [
+        "Nothing, all classes are available automatically",
+        "Import it using an import statement",
+        "Download it separately",
+        "Declare it as static"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Classes from the java.util package must be imported using an import statement (e.g., import java.util.Scanner;). Only classes in java.lang are automatically available."
+    }
+  ]
 }

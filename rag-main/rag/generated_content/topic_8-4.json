@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:41:43.977332",
-  "_topic_id": "8-4"
+  "_topic_id": "8-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the correct way to pass a 2D array to a method?",
+      "options": [
+        "void process(int arr[][])",
+        "void process(int[][] arr)",
+        "void process(int[] arr[])",
+        "All of the above are valid"
+      ],
+      "correctAnswer": 3,
+      "explanation": "Java allows multiple syntaxes for 2D array parameters: int[][] arr, int arr[][], and int[] arr[] are all valid ways to declare a 2D array parameter."
+    },
+    {
+      "id": 2,
+      "question": "When a 2D array is passed to a method, can the method modify the original array?",
+      "options": [
+        "No, a copy is always made",
+        "Yes, because the reference is passed",
+        "Only the first row can be modified",
+        "Only if the method is static"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Like 1D arrays, 2D arrays are passed by reference. The method receives a reference to the original array, so modifications affect the original."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:02:07.696573",
-  "_topic_id": "2-4"
+  "_topic_id": "2-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which of the following is a valid Java identifier?",
+      "options": [
+        "2ndValue",
+        "my-variable",
+        "myVariable",
+        "class"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Java identifiers must start with a letter, underscore, or dollar sign. '2ndValue' starts with a digit, 'my-variable' contains a hyphen, and 'class' is a reserved keyword."
+    },
+    {
+      "id": 2,
+      "question": "Why can't you use 'int' as a variable name in Java?",
+      "options": [
+        "It starts with a lowercase letter",
+        "It is too short",
+        "It is a reserved keyword",
+        "It contains only letters"
+      ],
+      "correctAnswer": 2,
+      "explanation": "'int' is a reserved keyword in Java used to declare integer variables. Reserved keywords cannot be used as identifiers (variable names, method names, etc.)."
+    }
+  ]
 }

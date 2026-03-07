@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:32:49.982294",
-  "_topic_id": "6-5"
+  "_topic_id": "6-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "In Java, how are primitive type arguments passed to methods?",
+      "options": [
+        "By reference",
+        "By value (a copy is passed)",
+        "By pointer",
+        "By name"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java passes primitive type arguments by value, meaning a copy of the value is passed to the method. Changes to the parameter inside the method do not affect the original variable."
+    },
+    {
+      "id": 2,
+      "question": "If you change a parameter's value inside a method, does the original argument change?",
+      "options": [
+        "Yes, always",
+        "No, for primitive types the original is unchanged",
+        "Only if the parameter is final",
+        "Only for int types"
+      ],
+      "correctAnswer": 1,
+      "explanation": "For primitive types, changes to a parameter inside a method do not affect the original argument because Java passes a copy of the value."
+    }
+  ]
 }

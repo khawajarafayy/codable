@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:14:16.750125",
-  "_topic_id": "3-7"
+  "_topic_id": "3-7",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does Math.random() return?",
+      "options": [
+        "A random integer between 0 and 100",
+        "A random double value >= 0.0 and < 1.0",
+        "A random boolean value",
+        "A random double value between 1.0 and 10.0"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Math.random() returns a random double value that is greater than or equal to 0.0 and less than 1.0. You can scale and shift this to get other ranges."
+    },
+    {
+      "id": 2,
+      "question": "How would you generate a random integer between 0 and 9 (inclusive)?",
+      "options": [
+        "Math.random() * 10",
+        "(int)(Math.random() * 10)",
+        "Math.random(10)",
+        "(int)(Math.random() * 9)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Math.random() * 10 gives a double from 0.0 to 9.999... Casting to int with (int) truncates the decimal, giving integers 0 through 9."
+    }
+  ]
 }

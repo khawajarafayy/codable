@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:56:51.549900",
-  "_topic_id": "1-3"
+  "_topic_id": "1-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which type of programming language uses 0s and 1s that the CPU directly understands?",
+      "options": [
+        "High-level language",
+        "Assembly language",
+        "Machine language",
+        "Scripting language"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Machine language consists of binary instructions (0s and 1s) that the CPU can directly execute without any translation."
+    },
+    {
+      "id": 2,
+      "question": "What is the role of a compiler in programming?",
+      "options": [
+        "It runs the program directly",
+        "It translates the entire source code into machine code before execution",
+        "It translates code one line at a time during execution",
+        "It designs the program structure"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A compiler translates the entire source code into machine code (or bytecode) at once before the program is executed, unlike an interpreter which translates line by line."
+    }
+  ]
 }

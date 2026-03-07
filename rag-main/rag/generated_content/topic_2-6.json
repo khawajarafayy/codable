@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:03:06.399402",
-  "_topic_id": "2-6"
+  "_topic_id": "2-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the value of x after: int x = 5; x = x + 3;?",
+      "options": [
+        "5",
+        "3",
+        "8",
+        "Error"
+      ],
+      "correctAnswer": 2,
+      "explanation": "First x is assigned 5. Then x = x + 3 evaluates the right side (5 + 3 = 8) and assigns the result back to x, so x becomes 8."
+    },
+    {
+      "id": 2,
+      "question": "In the assignment statement 'y = x + 1;', which side is evaluated first?",
+      "options": [
+        "The left side (y)",
+        "The right side (x + 1)",
+        "Both sides simultaneously",
+        "It depends on the compiler"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In an assignment statement, the right-hand side expression is evaluated first, then the result is assigned to the variable on the left-hand side."
+    }
+  ]
 }

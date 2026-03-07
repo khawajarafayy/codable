@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:44:16.690086",
-  "_topic_id": "9-3"
+  "_topic_id": "9-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a constructor in Java?",
+      "options": [
+        "A method that destroys objects",
+        "A special method that initializes objects when they are created",
+        "A method that returns the class name",
+        "A static method in every class"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A constructor is a special method called when an object is created using 'new'. It initializes the object's data fields. It has the same name as the class and no return type."
+    },
+    {
+      "id": 2,
+      "question": "What happens if you don't define any constructor in a class?",
+      "options": [
+        "The class cannot create objects",
+        "Java provides a default no-arg constructor",
+        "A compilation error occurs",
+        "All fields are set to null"
+      ],
+      "correctAnswer": 1,
+      "explanation": "If no constructor is defined, Java automatically provides a default no-arg constructor that initializes fields to their default values (0 for numbers, false for boolean, null for objects)."
+    }
+  ]
 }

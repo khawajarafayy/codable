@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:58:28.822900",
-  "_topic_id": "1-6"
+  "_topic_id": "1-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does JDK stand for and what does it contain?",
+      "options": [
+        "Java Design Kit - contains design templates",
+        "Java Development Kit - contains compiler, JRE, and development tools",
+        "Java Debug Kit - contains debugging tools only",
+        "Java Data Kit - contains database tools"
+      ],
+      "correctAnswer": 1,
+      "explanation": "JDK stands for Java Development Kit. It includes the Java compiler (javac), the Java Runtime Environment (JRE), and various development tools needed to write and compile Java programs."
+    },
+    {
+      "id": 2,
+      "question": "What is the purpose of an IDE in Java development?",
+      "options": [
+        "It replaces the need for a JDK",
+        "It provides a comprehensive environment with editor, compiler, and debugger",
+        "It is used only for running programs",
+        "It is a type of operating system"
+      ],
+      "correctAnswer": 1,
+      "explanation": "An IDE (Integrated Development Environment) like Eclipse or IntelliJ provides a code editor, compiler integration, debugger, and other tools in one application to make development more efficient."
+    }
+  ]
 }

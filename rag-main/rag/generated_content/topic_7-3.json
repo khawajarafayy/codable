@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:36:12.632203",
-  "_topic_id": "7-3"
+  "_topic_id": "7-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What happens when you assign one array variable to another (e.g., arr2 = arr1)?",
+      "options": [
+        "The array contents are copied",
+        "Both variables reference the same array object",
+        "A new array is created automatically",
+        "A compilation error occurs"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Assigning arr2 = arr1 copies the reference, not the array contents. Both variables now point to the same array object in memory."
+    },
+    {
+      "id": 2,
+      "question": "Which method can be used to properly copy array contents?",
+      "options": [
+        "arr1 = arr2",
+        "System.arraycopy()",
+        "arr1.copy(arr2)",
+        "Arrays.move()"
+      ],
+      "correctAnswer": 1,
+      "explanation": "System.arraycopy() properly copies array contents from one array to another. A simple assignment only copies the reference, not the actual elements."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:38:00.465681",
-  "_topic_id": "7-6"
+  "_topic_id": "7-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is linear search?",
+      "options": [
+        "Searching by dividing the array in half repeatedly",
+        "Comparing each element sequentially until the target is found",
+        "Sorting the array first then searching",
+        "Using a formula to find the element's position"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Linear search checks each element one by one from the beginning until it finds the target or reaches the end of the array. It works on unsorted arrays."
+    },
+    {
+      "id": 2,
+      "question": "What is required for binary search to work correctly?",
+      "options": [
+        "The array must have an even number of elements",
+        "The array must be sorted",
+        "The array must contain unique elements",
+        "The array must be of type int"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Binary search requires the array to be sorted. It works by repeatedly dividing the search space in half, which is only possible with ordered data."
+    }
+  ]
 }

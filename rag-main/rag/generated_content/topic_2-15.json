@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:10:14.047894",
-  "_topic_id": "2-15"
+  "_topic_id": "2-15",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the first step in the software development process?",
+      "options": [
+        "Writing code",
+        "Testing",
+        "Requirements specification and analysis",
+        "Deployment"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The software development process begins with requirements specification and analysis - understanding what the program should do before any code is written."
+    },
+    {
+      "id": 2,
+      "question": "Why is testing an important part of software development?",
+      "options": [
+        "It makes the code run faster",
+        "It ensures the program meets requirements and works correctly",
+        "It is only needed for large programs",
+        "It replaces the need for documentation"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Testing verifies that the program produces correct results and meets its requirements. It helps catch bugs and ensures reliability before deployment."
+    }
+  ]
 }

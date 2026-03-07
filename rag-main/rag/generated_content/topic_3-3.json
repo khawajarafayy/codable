@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:12:17.527746",
-  "_topic_id": "3-3"
+  "_topic_id": "3-3",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the correct syntax for an if statement in Java?",
+      "options": [
+        "if x > 0 { ... }",
+        "if (x > 0) { ... }",
+        "if [x > 0] { ... }",
+        "if x > 0 then { ... }"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java requires the condition of an if statement to be enclosed in parentheses: if (condition) { statements; }. This is mandatory syntax."
+    },
+    {
+      "id": 2,
+      "question": "What happens if the condition in an if statement is false?",
+      "options": [
+        "The program crashes",
+        "The code inside the if block is skipped",
+        "The condition is re-evaluated",
+        "An error is thrown"
+      ],
+      "correctAnswer": 1,
+      "explanation": "If the condition in an if statement evaluates to false, the code inside the if block is simply skipped, and execution continues with the next statement after the if block."
+    }
+  ]
 }

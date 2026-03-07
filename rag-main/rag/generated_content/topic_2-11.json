@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:05:29.798729",
-  "_topic_id": "2-11"
+  "_topic_id": "2-11",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the result of: 2 + 3 * 4 - 1?",
+      "options": [
+        "19",
+        "13",
+        "12",
+        "15"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Following operator precedence: multiplication first (3 * 4 = 12), then left to right for addition and subtraction (2 + 12 - 1 = 13)."
+    },
+    {
+      "id": 2,
+      "question": "How can you override the default operator precedence in Java?",
+      "options": [
+        "Using curly braces {}",
+        "Using parentheses ()",
+        "Using square brackets []",
+        "You cannot override precedence"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Parentheses () are used to override default operator precedence. Expressions inside parentheses are evaluated first. For example, (2 + 3) * 4 = 20."
+    }
+  ]
 }

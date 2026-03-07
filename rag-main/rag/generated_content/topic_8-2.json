@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:40:30.892829",
-  "_topic_id": "8-2"
+  "_topic_id": "8-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which statement correctly creates a 3x4 two-dimensional integer array?",
+      "options": [
+        "int[][] arr = new int[3, 4];",
+        "int[][] arr = new int[3][4];",
+        "int arr[][] = new int(3)(4);",
+        "int[3][4] arr = new int[][];"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The correct syntax is: int[][] arr = new int[3][4]; This creates an array with 3 rows and 4 columns."
+    },
+    {
+      "id": 2,
+      "question": "What does matrix.length return for a 2D array?",
+      "options": [
+        "The total number of elements",
+        "The number of rows",
+        "The number of columns",
+        "The number of dimensions"
+      ],
+      "correctAnswer": 1,
+      "explanation": "For a 2D array, matrix.length returns the number of rows. To get the number of columns in row i, use matrix[i].length."
+    }
+  ]
 }

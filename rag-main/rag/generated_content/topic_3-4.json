@@ -55,5 +55,31 @@
   ],
   "total_pages": 6,
   "_generated_at": "2026-03-06T02:12:45.769631",
-  "_topic_id": "3-4"
+  "_topic_id": "3-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When is the else block executed in an if-else statement?",
+      "options": [
+        "Always",
+        "When the if condition is true",
+        "When the if condition is false",
+        "Before the if condition is checked"
+      ],
+      "correctAnswer": 2,
+      "explanation": "In an if-else statement, the else block executes only when the if condition evaluates to false. Either the if block or the else block executes, never both."
+    },
+    {
+      "id": 2,
+      "question": "What is the output of: if (10 > 20) { System.out.println(\"A\"); } else { System.out.println(\"B\"); }?",
+      "options": [
+        "A",
+        "B",
+        "AB",
+        "No output"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Since 10 > 20 is false, the else block executes, printing 'B'. The if block is skipped."
+    }
+  ]
 }

@@ -51,5 +51,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:27:54.501259",
-  "_topic_id": "5-4"
+  "_topic_id": "5-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What are the three parts of a for loop header in Java?",
+      "options": [
+        "condition, body, return",
+        "initialization, condition, update",
+        "start, end, step",
+        "input, process, output"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A for loop has three parts: initialization (runs once), condition (checked before each iteration), and update (runs after each iteration). Syntax: for (init; condition; update) { body; }"
+    },
+    {
+      "id": 2,
+      "question": "How many times does this loop execute: for (int i = 0; i < 5; i++)?",
+      "options": [
+        "4 times",
+        "5 times",
+        "6 times",
+        "Infinite"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The loop starts at i=0 and runs while i < 5, so it executes for i = 0, 1, 2, 3, 4 — a total of 5 times."
+    }
+  ]
 }

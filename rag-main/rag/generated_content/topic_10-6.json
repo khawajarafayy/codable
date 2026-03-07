@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:51:55.345921",
-  "_topic_id": "10-6"
+  "_topic_id": "10-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When should you use BigInteger instead of long?",
+      "options": [
+        "When you need faster calculations",
+        "When you need to represent integers larger than Long.MAX_VALUE",
+        "When you need decimal numbers",
+        "Always, for better precision"
+      ],
+      "correctAnswer": 1,
+      "explanation": "BigInteger should be used when you need to work with integers that exceed the range of long (which is about 9.2 * 10^18). BigInteger can represent arbitrarily large integers."
+    },
+    {
+      "id": 2,
+      "question": "How do you add two BigInteger values?",
+      "options": [
+        "a + b",
+        "a.add(b)",
+        "BigInteger.add(a, b)",
+        "add(a, b)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "BigInteger uses method calls instead of operators. To add two BigInteger values, use: result = a.add(b). You cannot use the + operator with BigInteger."
+    }
+  ]
 }

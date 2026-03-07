@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:55:52.312055",
-  "_topic_id": "1-1"
+  "_topic_id": "1-1",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the primary purpose of the Java Virtual Machine (JVM)?",
+      "options": [
+        "To write Java code",
+        "To execute Java bytecode on any platform",
+        "To compile Java source code",
+        "To design user interfaces"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The JVM executes Java bytecode, enabling Java programs to run on any platform that has a JVM installed. This is what makes Java platform-independent."
+    },
+    {
+      "id": 2,
+      "question": "Which of the following is NOT a key tool required for Java development?",
+      "options": [
+        "JDK (Java Development Kit)",
+        "IDE (Integrated Development Environment)",
+        "JRE (Java Runtime Environment)",
+        "GPU (Graphics Processing Unit)"
+      ],
+      "correctAnswer": 3,
+      "explanation": "The JDK, IDEs, and JRE are essential Java development tools. A GPU is a hardware component for graphics processing and is not a Java development requirement."
+    }
+  ]
 }

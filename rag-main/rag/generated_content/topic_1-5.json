@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:57:59.866484",
-  "_topic_id": "1-5"
+  "_topic_id": "1-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Who created the Java programming language?",
+      "options": [
+        "Bill Gates",
+        "Dennis Ritchie",
+        "James Gosling at Sun Microsystems",
+        "Guido van Rossum"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Java was created by James Gosling and his team at Sun Microsystems in the mid-1990s. It was originally designed for interactive television but became popular for web and enterprise applications."
+    },
+    {
+      "id": 2,
+      "question": "What makes Java 'platform-independent'?",
+      "options": [
+        "Java runs only on Windows",
+        "Java code is compiled to bytecode that runs on any JVM",
+        "Java does not need to be compiled",
+        "Java uses machine language directly"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Java achieves platform independence through its 'Write Once, Run Anywhere' principle. Java source code is compiled to bytecode, which can run on any platform that has a Java Virtual Machine (JVM)."
+    }
+  ]
 }

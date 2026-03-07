@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:53:08.354393",
-  "_topic_id": "10-8"
+  "_topic_id": "10-8",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the key difference between String and StringBuilder?",
+      "options": [
+        "String is faster than StringBuilder",
+        "String is immutable, StringBuilder is mutable",
+        "StringBuilder cannot hold text",
+        "There is no difference"
+      ],
+      "correctAnswer": 1,
+      "explanation": "String objects are immutable (cannot be modified after creation), while StringBuilder objects are mutable (can be modified in place). StringBuilder is more efficient for frequent string modifications."
+    },
+    {
+      "id": 2,
+      "question": "Which method adds text to the end of a StringBuilder?",
+      "options": [
+        "add()",
+        "concat()",
+        "append()",
+        "insert(0, text)"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The append() method adds text to the end of a StringBuilder. For example: sb.append(\" World\") adds \" World\" to the existing content."
+    }
+  ]
 }

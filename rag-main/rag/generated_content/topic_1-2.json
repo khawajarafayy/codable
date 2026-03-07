@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T01:56:21.615007",
-  "_topic_id": "1-2"
+  "_topic_id": "1-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which component of a computer is responsible for executing instructions and performing calculations?",
+      "options": [
+        "Hard Drive",
+        "RAM",
+        "CPU (Central Processing Unit)",
+        "Monitor"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The CPU is the brain of the computer. It fetches instructions from memory and executes them, performing all calculations and logic operations."
+    },
+    {
+      "id": 2,
+      "question": "What is the difference between RAM and storage (hard drive)?",
+      "options": [
+        "RAM is permanent, storage is temporary",
+        "RAM is volatile and fast, storage is non-volatile and slower",
+        "RAM stores programs, storage stores only files",
+        "There is no difference"
+      ],
+      "correctAnswer": 1,
+      "explanation": "RAM is volatile memory that loses data when power is off but provides fast access. Storage (hard drive/SSD) retains data permanently but is slower to access."
+    }
+  ]
 }

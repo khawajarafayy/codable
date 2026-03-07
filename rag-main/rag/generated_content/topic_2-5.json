@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:02:36.441565",
-  "_topic_id": "2-5"
+  "_topic_id": "2-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What happens if you try to use a variable before assigning it a value in Java?",
+      "options": [
+        "It defaults to 0",
+        "It defaults to null",
+        "A compilation error occurs",
+        "A runtime error occurs"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Java requires local variables to be initialized before use. If you try to use an uninitialized local variable, the compiler will report an error."
+    },
+    {
+      "id": 2,
+      "question": "Which statement correctly declares two integer variables in Java?",
+      "options": [
+        "int x, y;",
+        "int x; int y;",
+        "int x and y;",
+        "Both A and B are correct"
+      ],
+      "correctAnswer": 3,
+      "explanation": "Both 'int x, y;' (comma-separated) and separate declarations 'int x; int y;' are valid ways to declare multiple variables of the same type in Java."
+    }
+  ]
 }

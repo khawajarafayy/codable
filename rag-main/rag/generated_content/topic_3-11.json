@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T04:04:22.199822",
-  "_topic_id": "3-11"
+  "_topic_id": "3-11",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which operator has higher precedence: && or ||?",
+      "options": [
+        "||",
+        "&&",
+        "They have the same precedence",
+        "It depends on the context"
+      ],
+      "correctAnswer": 1,
+      "explanation": "&& (logical AND) has higher precedence than || (logical OR). So in 'a || b && c', the && is evaluated first: a || (b && c)."
+    },
+    {
+      "id": 2,
+      "question": "What does associativity determine for operators?",
+      "options": [
+        "Which operator runs faster",
+        "The direction of evaluation when operators have equal precedence",
+        "Whether an operator is binary or unary",
+        "The data type of the result"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Associativity determines the order of evaluation when operators have the same precedence. Most binary operators are left-associative (evaluated left to right), while assignment is right-associative."
+    }
+  ]
 }

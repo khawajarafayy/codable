@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:42:16.791534",
-  "_topic_id": "8-5"
+  "_topic_id": "8-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is a ragged array?",
+      "options": [
+        "An array with errors",
+        "A 2D array where each row can have a different number of columns",
+        "An array that is not initialized",
+        "An array with negative indices"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A ragged (or jagged) array is a 2D array where rows can have different lengths. Each row is an independent array that can be of any size."
+    },
+    {
+      "id": 2,
+      "question": "How do you create a ragged array with 3 rows in Java?",
+      "options": [
+        "int[][] arr = new int[3][];",
+        "int[][] arr = new int[][3];",
+        "int[][] arr = new ragged[3];",
+        "int[][] arr = {3};"
+      ],
+      "correctAnswer": 0,
+      "explanation": "To create a ragged array, specify only the number of rows: int[][] arr = new int[3][]; Then create each row individually: arr[0] = new int[2]; arr[1] = new int[5]; etc."
+    }
+  ]
 }

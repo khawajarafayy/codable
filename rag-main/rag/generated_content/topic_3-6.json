@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T02:13:48.452220",
-  "_topic_id": "3-6"
+  "_topic_id": "3-6",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the 'dangling else' problem?",
+      "options": [
+        "An else without a matching if",
+        "Ambiguity about which if an else belongs to in nested statements",
+        "An else that never executes",
+        "Using too many else statements"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The dangling else problem is the ambiguity that arises in nested if statements about which if an else clause belongs to. Java resolves this by matching else with the nearest unmatched if."
+    },
+    {
+      "id": 2,
+      "question": "What is a common mistake when comparing values in if conditions?",
+      "options": [
+        "Using parentheses around the condition",
+        "Using = (assignment) instead of == (comparison)",
+        "Using too many conditions",
+        "Forgetting the semicolon after the condition"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Using = instead of == is a common error. = is the assignment operator, while == is the comparison operator. For example, if (x = 5) is assignment, not comparison."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:32:19.056280",
-  "_topic_id": "6-4"
+  "_topic_id": "6-4",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does the 'void' return type mean in a method?",
+      "options": [
+        "The method returns null",
+        "The method returns 0",
+        "The method does not return any value",
+        "The method returns an empty string"
+      ],
+      "correctAnswer": 2,
+      "explanation": "A void method does not return any value to the caller. It performs an action (like printing) but doesn't send back a result."
+    },
+    {
+      "id": 2,
+      "question": "Can a void method contain a return statement?",
+      "options": [
+        "No, never",
+        "Yes, but only 'return;' without a value to exit the method early",
+        "Yes, it can return any value",
+        "Only if it's the last statement"
+      ],
+      "correctAnswer": 1,
+      "explanation": "A void method can use 'return;' (without a value) to exit the method early. It cannot return a value since its return type is void."
+    }
+  ]
 }

@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:31:08.932841",
-  "_topic_id": "6-2"
+  "_topic_id": "6-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which of the following is a correct method definition in Java?",
+      "options": [
+        "int add(int a, int b) { return a + b; }",
+        "add(int a, int b) { return a + b; }",
+        "int add(a, b) { return a + b; }",
+        "method add(int a, int b) { return a + b; }"
+      ],
+      "correctAnswer": 0,
+      "explanation": "A method definition requires a return type, method name, and parameter list with types. 'int add(int a, int b) { return a + b; }' is the correct syntax."
+    },
+    {
+      "id": 2,
+      "question": "What does the 'return type' in a method signature specify?",
+      "options": [
+        "The name of the method",
+        "The type of value the method sends back to the caller",
+        "The number of parameters",
+        "The access level of the method"
+      ],
+      "correctAnswer": 1,
+      "explanation": "The return type specifies what type of value the method returns to the caller. If a method returns no value, its return type is 'void'."
+    }
+  ]
 }

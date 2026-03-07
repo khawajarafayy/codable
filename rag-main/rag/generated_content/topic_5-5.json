@@ -50,5 +50,31 @@
   ],
   "total_pages": 5,
   "_generated_at": "2026-03-06T06:28:34.816066",
-  "_topic_id": "5-5"
+  "_topic_id": "5-5",
+  "questions": [
+    {
+      "id": 1,
+      "question": "When is a for loop the best choice?",
+      "options": [
+        "When you don't know how many times to loop",
+        "When you need the loop to run at least once",
+        "When you know the exact number of iterations",
+        "When there is no condition"
+      ],
+      "correctAnswer": 2,
+      "explanation": "A for loop is ideal when you know the number of iterations in advance, as it combines initialization, condition, and update in one line."
+    },
+    {
+      "id": 2,
+      "question": "When would you choose a do-while loop over a while loop?",
+      "options": [
+        "When you need better performance",
+        "When the loop must execute at least once before checking the condition",
+        "When you know the number of iterations",
+        "When the loop has no condition"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Use a do-while loop when the loop body must execute at least once regardless of the condition, such as when displaying a menu and getting user input."
+    }
+  ]
 }

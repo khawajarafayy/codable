@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserPlus, Github } from "lucide-react";
+import { useGoogleLogin } from "@react-oauth/google";
 import CodableLogo from "../../assets/codable-logo.png";
 import { api } from "../../services/apiClient";
+import { useAuth } from "../../context/AuthContext";
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const TYPING_MESSAGES = [
   "Join thousands of developers learning to code.",
@@ -15,6 +19,7 @@ const TYPING_MESSAGES = [
 
 function Signup() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -54,7 +59,44 @@ function Signup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleGoogleSignUp = () => alert("Google sign-up coming soon");
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        setError("");
+        
+        // Get user info from Google using access token
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        const userInfo = await userInfoResponse.json();
+        
+        const response = await fetch(`${API_URL}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userInfo })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.token) {
+          login(data.token, data.user);
+          navigate('/student');
+        } else {
+          setError(data.message || "Google sign-up failed");
+        }
+      } catch (err) {
+        console.error("Google sign-up error:", err);
+        setError("Google sign-up failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError("Google sign-up was cancelled or failed");
+    }
+  });
+
   const handleGithubSignUp = () => alert("GitHub sign-up coming soon");
 
   const handleSubmit = async e => {
@@ -237,25 +279,26 @@ function Signup() {
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={handleGoogleSignUp}
-                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-white text-gray-800 hover:bg-gray-100 border border-gray-300 transition"
+                onClick={() => googleLogin()}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-white text-gray-800 hover:bg-gray-100 border border-gray-300 transition cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 48 48">
+                <svg className="w-5 h-5" viewBox="0 0 48 48">
                   <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.813 32.91 29.28 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.153 7.961 3.039l5.657-5.657C33.787 6.053 29.147 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20c10.493 0 19.128-7.637 19.128-20 0-1.341-.147-2.651-.417-3.917z" />
                   <path fill="#FF3D00" d="M6.306 14.691l6.571 4.817C14.38 16.062 18.831 12 24 12c3.059 0 5.842 1.153 7.961 3.039l5.657-5.657C33.787 6.053 29.147 4 24 4 16.318 4 9.661 8.337 6.306 14.691z" />
                   <path fill="#4CAF50" d="M24 44c5.206 0 9.9-1.988 13.423-5.223l-6.197-5.238C29.219 35.488 26.778 36 24 36c-5.259 0-9.781-3.072-11.592-7.49l-6.54 5.04C8.186 39.63 15.53 44 24 44z" />
                   <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.085 3.172-3.557 5.657-6.88 6.539l6.197 5.238C37.76 37.809 40 31.333 40 24c0-1.341-.147-2.651-.417-3.917z" />
                 </svg>
-                <span className="text-sm font-medium cursor-pointer">Sign up with Google</span>
+                <span className="text-sm font-medium">Sign up with Google</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleGithubSignUp}
-                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-[#24292e] text-white hover:bg-black/80 border border-gray-700 transition"
+                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-[#24292e] text-white hover:bg-black/80 border border-gray-700 transition cursor-pointer"
               >
                 <Github size={18} />
-                <span className="text-sm font-medium cursor-pointer">Sign up with GitHub</span>
+                <span className="text-sm font-medium">Sign up with GitHub</span>
               </button>
             </div>
 

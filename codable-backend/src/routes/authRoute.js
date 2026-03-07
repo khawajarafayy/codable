@@ -9,5 +9,6 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 router.route("/signup").post(authMiddleware.validate(signUpSchema), userController.registerUser);
 router.route("/login").post(authMiddleware.validate(loginSchema), userController.login);
+router.route("/google").post(userController.googleLogin);
 
 export default router;

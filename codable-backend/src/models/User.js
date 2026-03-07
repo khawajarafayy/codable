@@ -7,22 +7,19 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["student", "instructor"], default: "student" },
+  googleId: { type: String, default: null },
+  avatar: { type: String, default: null },
+  authProvider: { type: String, enum: ["local", "google"], default: "local" },
 }, { timestamps: true });
 
-userSchema.pre('save', async function (next) {
-    const user = this;
-
-    if(!user.modifiedPaths){
-        next();
+userSchema.pre('save', async function () {
+    // Skip password hashing for Google auth users or if password not modified
+    if (!this.isModified('password') || this.authProvider === 'google') {
+        return;
     }
 
-    try {
-        const saltRound = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user.password, saltRound);
-        user.password = hashedPassword;
-    } catch (error) {
-        next(error);
-    }
+    const saltRound = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, saltRound);
 });
 
 userSchema.methods.comparePassword = async function (plainPassword) {

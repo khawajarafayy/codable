@@ -1,10 +1,152 @@
-import { useState } from 'react';
 import { ArrowLeft, BookOpen, AlertTriangle, Lightbulb, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 
-export function RemediationContent({ content, topicTitle, weakConcepts, onStartRemediationQuiz, onBackToLearning, loading }) {
-  const [expandedSection, setExpandedSection] = useState(0);
+/**
+ * Converts ANY value (string, object, array, number) to a plain readable string.
+ * The LLM sometimes returns section.content as a nested object instead of a string.
+ */
+function toText(val) {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+  if (Array.isArray(val)) {
+    return val.map(item => toText(item)).filter(Boolean).join('\n\n');
+  }
+  if (typeof val === 'object') {
+    // Prefer known text field names first
+    for (const k of ['content', 'text', 'explanation', 'description', 'body']) {
+      if (typeof val[k] === 'string' && val[k].trim()) return val[k];
+    }
+    return Object.values(val).map(v => toText(v)).filter(Boolean).join('\n\n');
+  }
+  return '';
+}
 
+/**
+ * Normalize the full content prop into { sections, summary }.
+ * Handles: proper object, raw JSON string, plain text, or other edge cases.
+ */
+function normalizeContent(raw) {
+  if (!raw) return { sections: [], summary: '' };
+
+  if (typeof raw === 'string') {
+    try { raw = JSON.parse(raw); }
+    catch { return { sections: [{ title: 'Review Material', content: raw }], summary: '' }; }
+  }
+
+  if (typeof raw !== 'object') {
+    return { sections: [{ title: 'Review Material', content: toText(raw) }], summary: '' };
+  }
+
+  if (Array.isArray(raw.sections)) {
+    return {
+      sections: raw.sections.map(s => ({
+        ...s,
+        content: toText(s?.content),
+        examples: Array.isArray(s?.examples)
+          ? s.examples.map(e => (typeof e === 'string' ? e : toText(e)))
+          : [],
+        commonPitfall: toText(s?.commonPitfall),
+        keyTakeaway: toText(s?.keyTakeaway),
+      })),
+      summary: toText(raw.summary),
+    };
+  }
+
+  // No sections field — treat object values as sections
+  const sections = Object.entries(raw)
+    .filter(([, v]) => v)
+    .map(([k, v]) => ({ title: k, content: toText(v) }));
+  return { sections, summary: '' };
+}
+
+/** Apply inline markdown — identical to LearningContent.jsx */
+function applyInline(str) {
+  return (str || '')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="text-gray-300">$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="bg-gray-800 px-1.5 py-0.5 rounded text-emerald-400 text-xs font-mono">$1</code>');
+}
+
+/**
+ * Render a text string using the exact same paragraph-split approach as LearningContent.jsx.
+ * Split on double-newlines, then detect each paragraph's type.
+ */
+function renderTextContent(text) {
+  if (!text) return null;
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  return (
+    <div className="space-y-3">
+      {paragraphs.map((paragraph, idx) => {
+        const trimmed = paragraph.trim();
+
+        // Fenced code block
+        const fenceMatch = trimmed.match(/^```(?:[a-zA-Z]*)?\n?([\s\S]*?)```$/);
+        if (fenceMatch) {
+          return (
+            <div key={idx}>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-900 rounded-t-xl border border-gray-700 border-b-0">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                </div>
+                <span className="text-xs text-gray-400 font-mono">Example.java</span>
+              </div>
+              <pre className="bg-[#0D1117] p-4 rounded-b-xl overflow-x-auto border border-gray-700 shadow-xl">
+                <code className="text-emerald-400 text-sm font-mono leading-relaxed">{fenceMatch[1].trimEnd()}</code>
+              </pre>
+            </div>
+          );
+        }
+
+        // Bullet list (all non-empty lines start with -, *, or •)
+        const lines = trimmed.split('\n');
+        const bulletItems = lines.filter(l => l.trim().match(/^[-*•]\s+/));
+        if (bulletItems.length > 0 && bulletItems.length === lines.filter(l => l.trim()).length) {
+          return (
+            <ul key={idx} className="space-y-2 pl-1">
+              {bulletItems.map((item, ii) => (
+                <li key={ii} className="flex items-start gap-2 text-sm">
+                  <span className="text-amber-400 mt-0.5 flex-shrink-0">•</span>
+                  <span className="text-gray-300 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: applyInline(item.trim().replace(/^[-*•]\s+/, '')) }} />
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        // Numbered list
+        const numberedItems = lines.filter(l => l.trim().match(/^\d+\.\s+/));
+        if (numberedItems.length > 0 && numberedItems.length === lines.filter(l => l.trim()).length) {
+          return (
+            <ol key={idx} className="space-y-2 pl-1">
+              {numberedItems.map((item, ii) => (
+                <li key={ii} className="flex items-start gap-2 text-sm">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-xs mt-0.5">{ii + 1}</span>
+                  <span className="text-gray-300 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: applyInline(item.trim().replace(/^\d+\.\s+/, '')) }} />
+                </li>
+              ))}
+            </ol>
+          );
+        }
+
+        if (trimmed.startsWith('### ')) return <h4 key={idx} className="text-white font-semibold text-sm mt-2">{trimmed.slice(4)}</h4>;
+        if (trimmed.startsWith('## ')) return <h3 key={idx} className="text-white font-semibold mt-2">{trimmed.slice(3)}</h3>;
+
+        // Default paragraph — exactly like LearningContent.jsx
+        return (
+          <p key={idx} className="text-gray-200 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: applyInline(trimmed) }} />
+        );
+      })}
+    </div>
+  );
+}
+
+export function RemediationContent({ content, topicTitle, weakConcepts, onStartRemediationQuiz, onBackToLearning, loading }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950 flex items-center justify-center">
@@ -17,8 +159,7 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
     );
   }
 
-  const sections = content?.sections || [];
-  const summary = content?.summary || '';
+  const { sections, summary } = normalizeContent(content);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-amber-950/30">
@@ -66,70 +207,72 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
           </div>
         )}
 
-        {/* Content Sections */}
+        {/* Content Sections — same card style + same text rendering as LearningContent.jsx */}
         <div className="space-y-6">
           {sections.map((section, idx) => (
             <div
               key={idx}
-              className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 rounded-xl border border-gray-800/50 overflow-hidden"
+              className="bg-gradient-to-br from-amber-500/10 to-orange-500/5 rounded-2xl border border-amber-500/30 p-6 shadow-lg"
             >
-              <button
-                onClick={() => setExpandedSection(expandedSection === idx ? -1 : idx)}
-                className="w-full text-left p-6 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-                    <Lightbulb className="w-4 h-4 text-amber-400" />
-                  </span>
-                  <div>
-                    <h3 className="text-white font-medium">{section.title}</h3>
-                    {section.targetConcept && (
-                      <span className="text-amber-400/70 text-xs">{section.targetConcept}</span>
-                    )}
-                  </div>
+              {/* Section Header */}
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-700/50">
+                <div className="p-2 rounded-lg bg-amber-500/20">
+                  <Lightbulb className="w-5 h-5 text-amber-400" />
                 </div>
-                <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${expandedSection === idx ? 'rotate-90' : ''}`} />
-              </button>
-
-              {expandedSection === idx && (
-                <div className="px-6 pb-6">
-                  {/* Main Content */}
-                  <div className="prose prose-invert max-w-none mb-4">
-                    <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                      {section.content}
-                    </div>
-                  </div>
-
-                  {/* Code Examples */}
-                  {section.examples && section.examples.length > 0 && (
-                    <div className="space-y-3 mb-4">
-                      <h4 className="text-gray-400 text-xs font-medium uppercase tracking-wider">Examples</h4>
-                      {section.examples.map((example, exIdx) => (
-                        <pre key={exIdx} className="p-4 bg-gray-950 rounded-lg border border-gray-800 overflow-x-auto">
-                          <code className="text-green-400 text-sm">{example}</code>
-                        </pre>
-                      ))}
-                    </div>
+                <div>
+                  {section.targetConcept && (
+                    <span className="text-xs font-medium uppercase tracking-wider text-amber-400 block">
+                      {section.targetConcept}
+                    </span>
                   )}
+                  <h3 className="text-xl font-semibold text-white">{section.title}</h3>
+                </div>
+              </div>
 
-                  {/* Common Pitfall */}
-                  {section.commonPitfall && (
-                    <div className="p-3 bg-red-500/5 rounded-lg border border-red-500/20 mb-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <AlertTriangle className="w-3 h-3 text-red-400" />
-                        <span className="text-red-400 text-xs font-medium">Common Pitfall</span>
+              {/* Main text content — paragraphs rendered like LearningContent.jsx */}
+              <div className="prose prose-invert max-w-none">
+                {renderTextContent(section.content)}
+              </div>
+
+              {/* Code Examples (from examples array) — identical Mac-style blocks */}
+              {section.examples && section.examples.length > 0 && (
+                <div className="mt-6 space-y-4">
+                  {section.examples.map((code, exIdx) => (
+                    <div key={exIdx} className="relative group">
+                      <div className="absolute top-0 left-0 right-0 h-9 bg-gray-900 rounded-t-xl flex items-center px-4 border-b border-gray-700">
+                        <div className="flex gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                        </div>
+                        <span className="ml-3 text-xs text-gray-400 font-mono">
+                          Example{section.examples.length > 1 ? ` ${exIdx + 1}` : ''}.java
+                        </span>
                       </div>
-                      <p className="text-gray-300 text-sm">{section.commonPitfall}</p>
+                      <pre className="bg-[#0D1117] pt-12 pb-4 px-4 rounded-xl overflow-x-auto border border-gray-700 shadow-xl">
+                        <code className="text-emerald-400 text-sm font-mono leading-relaxed whitespace-pre-wrap">{code}</code>
+                      </pre>
                     </div>
-                  )}
+                  ))}
+                </div>
+              )}
 
-                  {/* Key Takeaway */}
-                  {section.keyTakeaway && (
-                    <div className="p-3 bg-green-500/5 rounded-lg border border-green-500/20">
-                      <span className="text-green-400 text-xs font-medium">Key Takeaway: </span>
-                      <span className="text-gray-300 text-sm">{section.keyTakeaway}</span>
-                    </div>
-                  )}
+              {/* Common Pitfall */}
+              {section.commonPitfall && (
+                <div className="mt-4 p-3 bg-red-500/5 rounded-lg border border-red-500/20">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                    <span className="text-red-400 text-xs font-medium uppercase tracking-wider">Common Pitfall</span>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">{section.commonPitfall}</p>
+                </div>
+              )}
+
+              {/* Key Takeaway */}
+              {section.keyTakeaway && (
+                <div className="mt-3 p-3 bg-green-500/5 rounded-lg border border-green-500/20">
+                  <span className="text-green-400 text-xs font-semibold">💡 Key Takeaway: </span>
+                  <span className="text-gray-300 text-sm">{section.keyTakeaway}</span>
                 </div>
               )}
             </div>

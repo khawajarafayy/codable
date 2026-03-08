@@ -1,8 +1,17 @@
 import { useState } from 'react';
-import { ArrowLeft, ChevronRight, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CheckCircle, XCircle, HelpCircle, Loader2, Trophy } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 
-export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearning, isRemediation = false }) {
+export function TopicPractice({
+  questions,
+  topicTitle,
+  onComplete,
+  onBackToLearning,
+  isRemediation = false,
+  evalResult = null,
+  isEvaluating = false,
+  onContinueToNextTopic = null,
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
@@ -37,6 +46,57 @@ export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearn
   };
 
   const score = questions.filter(q => isCorrect(q.id)).length;
+
+  // ── Evaluating spinner (shown while adaptive API call is running) ──────────
+  if (isRemediation && isEvaluating) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-amber-950/30 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-amber-400 animate-spin mx-auto mb-4" />
+          <p className="text-white text-lg font-medium">Evaluating your answers…</p>
+          <p className="text-gray-400 text-sm mt-2">Checking your understanding of the concepts</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Remediation passed — show success screen with explicit "Continue" button ──
+  if (isRemediation && evalResult?.passed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-green-950/20 flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center">
+          {/* Trophy icon */}
+          <div className="w-20 h-20 rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center mx-auto mb-6">
+            <Trophy className="w-10 h-10 text-green-400" />
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mb-2">Well done!</h2>
+          <p className="text-gray-400 mb-1">You've strengthened your understanding.</p>
+          <p className="text-gray-500 text-sm mb-8">
+            Score: <span className="text-green-400 font-semibold">{evalResult.score}</span>
+            {' '}/ {evalResult.total}
+          </p>
+
+          {/* Positive score bar */}
+          <div className="w-full bg-gray-800 rounded-full h-2 mb-8">
+            <div
+              className="bg-gradient-to-r from-green-500 to-emerald-400 h-2 rounded-full transition-all"
+              style={{ width: `${Math.round(((evalResult.score ?? 0) / (evalResult.total || 1)) * 100)}%` }}
+            />
+          </div>
+
+          <Button
+            onClick={onContinueToNextTopic}
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 py-3 text-base font-medium"
+          >
+            Continue to Next Topic
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </Button>
+          <p className="text-gray-600 text-xs mt-3">Your progress has been saved</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950">
@@ -185,7 +245,7 @@ export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearn
               }}
               className={`bg-gradient-to-r ${isRemediation ? 'from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' : 'from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'}`}
             >
-              {isRemediation ? 'Submit & Re-evaluate' : 'Next Topic'}
+              {isRemediation ? 'Submit Answers' : 'Next Topic'}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
@@ -201,12 +261,20 @@ export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearn
 
         {/* Score Summary (shown when all answered) */}
         {allAnswered && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-[#6C63FF]/10 to-[#22D3EE]/10 rounded-xl border border-[#6C63FF]/30 text-center">
+          <div className={`mt-6 p-4 rounded-xl border text-center ${
+            isRemediation
+              ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30'
+              : 'bg-gradient-to-r from-[#6C63FF]/10 to-[#22D3EE]/10 border-[#6C63FF]/30'
+          }`}>
             <p className="text-white font-medium">
               You scored {score} out of {questions.length}
             </p>
             <p className="text-gray-400 text-sm mt-1">
-              {score === questions.length ? 'Perfect score! Great understanding of this topic.' : 'Review the explanations above to strengthen your understanding.'}
+              {score === questions.length
+                ? 'Perfect score! Great understanding of this topic.'
+                : isRemediation
+                  ? 'Hit "Submit Answers" to see if you\'ve mastered the concept — or get new material tailored to your mistakes.'
+                  : 'Review the explanations above to strengthen your understanding.'}
             </p>
           </div>
         )}

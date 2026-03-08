@@ -23,6 +23,10 @@ export default function LearningPage() {
   const [remediationContent, setRemediationContent] = useState(null);
   const [remediationQuestions, setRemediationQuestions] = useState([]);
   const [remediationLoading, setRemediationLoading] = useState(false);
+  // Tracks result after remediation quiz evaluation: null | { passed: true, score, total }
+  const [remediationEvalResult, setRemediationEvalResult] = useState(null);
+  // True while the adaptive evaluation API call is in-flight after remediation quiz submission
+  const [remediationEvaluating, setRemediationEvaluating] = useState(false);
 
   useEffect(() => {
     // Get chapter and topic from URL query params
@@ -227,6 +231,10 @@ export default function LearningPage() {
       return;
     }
 
+    // Show evaluating spinner inside TopicPractice
+    setRemediationEvaluating(true);
+    setRemediationEvalResult(null);
+
     // Re-evaluate with the remediation quiz results
     try {
       const evaluation = await learningApi.evaluateQuiz(
@@ -241,12 +249,13 @@ export default function LearningPage() {
       }
 
       if (evaluation.success && evaluation.action === 'advance') {
-        handleAdvanceToNextTopic();
+        // Passed — show success screen; user clicks "Continue to Next Topic" button
+        setRemediationEvalResult({ passed: true, score: quizResult.score, total: quizResult.total });
       } else if (attemptNumber >= 3) {
         // After 3 attempts, advance anyway to avoid frustration
         handleAdvanceToNextTopic();
       } else {
-        // Need more remediation
+        // Need more remediation — fetch new content based on latest mistakes and loop back
         setWeakConcepts(evaluation.weak_concepts || []);
         setRemediationPlan(evaluation.remediation_plan || null);
         setAttemptNumber(prev => prev + 1);
@@ -287,9 +296,17 @@ export default function LearningPage() {
       }
     } catch (err) {
       console.error('Error in remediation evaluation:', err);
-      // Stay on same topic
+      // Stay on same topic so user can retry
       setMode('learning');
+    } finally {
+      setRemediationEvaluating(false);
     }
+  };
+
+  // Called when user clicks "Continue to Next Topic" on the remediation success screen
+  const handleContinueAfterRemediationPass = () => {
+    setRemediationEvalResult(null);
+    handleAdvanceToNextTopic();
   };
 
   const handleStartChapterPractice = (selectedTopicId, selectedTopicTitle) => {
@@ -350,6 +367,9 @@ export default function LearningPage() {
           onComplete={handleRemediationQuizComplete}
           onBackToLearning={handleBackToLearning}
           isRemediation
+          evalResult={remediationEvalResult}
+          isEvaluating={remediationEvaluating}
+          onContinueToNextTopic={handleContinueAfterRemediationPass}
         />
       )}
       {mode === 'remediationQuiz' && remediationLoading && (

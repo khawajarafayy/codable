@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ChevronRight, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 
-export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearning }) {
+export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearning, isRemediation = false }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
@@ -53,7 +53,7 @@ export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearn
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-white font-semibold">Practice Questions</h1>
+              <h1 className="text-white font-semibold">{isRemediation ? 'Remediation Quiz' : 'Practice Questions'}</h1>
               <p className="text-gray-400 text-sm">{topicTitle}</p>
             </div>
           </div>
@@ -172,10 +172,20 @@ export function TopicPractice({ questions, topicTitle, onComplete, onBackToLearn
             </Button>
           ) : allAnswered ? (
             <Button
-              onClick={onComplete}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+              onClick={() => {
+                // Build detailed response data for adaptive evaluation
+                const detailedResponses = questions.map(q => ({
+                  question_text: q.question,
+                  user_answer: q.options[selectedAnswers[q.id]] || '',
+                  correct_answer: q.options[q.correctAnswer] || '',
+                  is_correct: selectedAnswers[q.id] === q.correctAnswer,
+                  concept_tags: q.concept_tags || [],
+                }));
+                onComplete({ responses: detailedResponses, score, total: questions.length });
+              }}
+              className={`bg-gradient-to-r ${isRemediation ? 'from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' : 'from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'}`}
             >
-              Next Topic
+              {isRemediation ? 'Submit & Re-evaluate' : 'Next Topic'}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (

@@ -13,12 +13,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vector import get_relevant_context, load_existing_vector_store
 from question_generator import QuestionGenerator
 from config import GROQ_API_KEY, MISTRAL_API_KEY
+from error_analyzer import ErrorAnalyzer
+from decision_router import AdaptiveRouter
+from remediation_generator import RemediationGenerator
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173", "http://localhost:3000"])
 
 # Initialize question generator
 question_gen = QuestionGenerator()
+
+# Initialize adaptive learning components
+error_analyzer = ErrorAnalyzer()
+adaptive_router = AdaptiveRouter()
+remediation_gen = RemediationGenerator()
 
 # Initialize vector store at startup
 print("🔄 Loading vector store...")
@@ -59,70 +67,80 @@ CHAPTER_TOPICS = {
                 "title": "Introduction",
                 "description": "Overview of the chapter and what you will learn",
                 "keywords": ["introduction", "overview", "objectives", "learn"],
-                "query": "Introduction to computers programs and Java chapter overview objectives"
+                "query": "Introduction to computers programs and Java chapter overview objectives",
+                "concept_tags": ["chapter-overview", "learning-objectives"]
             },
             {
                 "id": "1-2", 
                 "title": "What is a Computer?",
                 "description": "Understanding computer hardware and components",
                 "keywords": ["computer", "hardware", "CPU", "memory", "storage", "devices", "components"],
-                "query": "What is a computer hardware CPU memory storage input output devices components"
+                "query": "What is a computer hardware CPU memory storage input output devices components",
+                "concept_tags": ["hardware-components", "cpu", "memory-ram", "storage", "io-devices"]
             },
             {
                 "id": "1-3",
                 "title": "Programming Languages",
                 "description": "Machine language, assembly language, and high-level languages",
                 "keywords": ["programming language", "machine language", "assembly", "high-level", "compiler", "interpreter"],
-                "query": "Programming languages machine language assembly language high-level languages compiler interpreter"
+                "query": "Programming languages machine language assembly language high-level languages compiler interpreter",
+                "concept_tags": ["machine-language", "assembly-language", "high-level-language", "compiler", "interpreter"]
             },
             {
                 "id": "1-4",
                 "title": "Operating Systems",
                 "description": "Role of operating systems in managing computer resources",
                 "keywords": ["operating system", "OS", "Windows", "Linux", "Mac", "manage", "resources"],
-                "query": "Operating systems manage hardware software resources Windows Linux Mac"
+                "query": "Operating systems manage hardware software resources Windows Linux Mac",
+                "concept_tags": ["operating-system", "resource-management", "os-types"]
             },
             {
                 "id": "1-5",
                 "title": "Java, the World Wide Web, and Beyond",
                 "description": "History of Java and its role in modern computing",
                 "keywords": ["Java", "history", "Sun Microsystems", "James Gosling", "web", "internet", "applet"],
-                "query": "Java history World Wide Web Sun Microsystems James Gosling internet programming"
+                "query": "Java history World Wide Web Sun Microsystems James Gosling internet programming",
+                "concept_tags": ["java-history", "platform-independence", "jvm-concept"]
             },
             {
                 "id": "1-6",
                 "title": "The Java Language Specification, API, JDK, and IDE",
                 "description": "Java tools and development environment",
                 "keywords": ["JDK", "API", "IDE", "specification", "Java SE", "development", "tools"],
-                "query": "Java JDK API IDE specification development kit environment tools Eclipse NetBeans"
+                "query": "Java JDK API IDE specification development kit environment tools Eclipse NetBeans",
+                "concept_tags": ["jdk", "java-api", "ide-tools", "java-specification"]
             },
             {
                 "id": "1-7",
                 "title": "A Simple Java Program",
                 "description": "Writing and understanding your first Java program",
                 "keywords": ["program", "Hello World", "main", "class", "public", "static", "void", "System.out"],
-                "query": "Simple Java program Hello World main method class public static void println"
+                "query": "Simple Java program Hello World main method class public static void println",
+                "concept_tags": ["main-method", "class-structure", "println", "hello-world"]
             },
             {
                 "id": "1-8",
                 "title": "Creating, Compiling, and Executing a Java Program",
                 "description": "Steps to write, compile, and run Java programs",
                 "keywords": ["compile", "execute", "run", "javac", "java", "bytecode", "JVM"],
-                "query": "Create compile execute Java program javac bytecode JVM virtual machine"
+                "query": "Create compile execute Java program javac bytecode JVM virtual machine",
+                "concept_tags": ["compile-javac", "bytecode", "jvm-execution", "program-lifecycle"]
             },
             {
                 "id": "1-9",
                 "title": "Programming Style and Documentation",
                 "description": "Best practices for writing clean and documented code",
                 "keywords": ["style", "documentation", "comments", "naming", "conventions", "readable"],
-                "query": "Java programming style documentation comments naming conventions readable code"
+                "query": "Java programming style documentation comments naming conventions readable code",
+                "concept_tags": ["code-comments", "naming-conventions", "code-style", "documentation"]
             },
             {
                 "id": "1-10",
                 "title": "Programming Errors",
                 "description": "Types of errors: syntax, runtime, and logic errors",
                 "keywords": ["error", "syntax", "runtime", "logic", "bug", "debug", "exception"],
-                "query": "Programming errors syntax errors runtime errors logic errors debugging"
+                "query": "Programming errors syntax errors runtime errors logic errors debugging",
+                "concept_tags": ["syntax-errors", "runtime-errors", "logic-errors", "debugging-basics"]
             }
         ]
     },
@@ -134,112 +152,128 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Elementary Programming",
                 "description": "Overview of elementary programming concepts",
                 "keywords": ["introduction", "elementary", "programming", "basics"],
-                "query": "Elementary programming introduction basics fundamentals Java"
+                "query": "Elementary programming introduction basics fundamentals Java",
+                "concept_tags": ["elementary-intro", "programming-basics"]
             },
             {
                 "id": "2-2",
                 "title": "Writing a Simple Program",
                 "description": "Creating basic Java programs step by step",
                 "keywords": ["simple", "program", "basic", "write", "create"],
-                "query": "Writing simple Java program step by step basic compute area"
+                "query": "Writing simple Java program step by step basic compute area",
+                "concept_tags": ["simple-program", "basic-computation", "program-structure"]
             },
             {
                 "id": "2-3",
                 "title": "Reading Input from the Console",
                 "description": "Using Scanner class to read user input",
                 "keywords": ["input", "Scanner", "console", "read", "keyboard", "nextInt", "nextDouble"],
-                "query": "Java Scanner class read input console keyboard nextInt nextDouble nextLine"
+                "query": "Java Scanner class read input console keyboard nextInt nextDouble nextLine",
+                "concept_tags": ["scanner-class", "console-input", "nextInt", "nextDouble", "nextLine"]
             },
             {
                 "id": "2-4",
                 "title": "Identifiers",
                 "description": "Rules for naming variables, methods, and classes",
                 "keywords": ["identifier", "name", "variable", "naming", "rules", "convention"],
-                "query": "Java identifiers naming rules variables methods classes conventions"
+                "query": "Java identifiers naming rules variables methods classes conventions",
+                "concept_tags": ["identifier-rules", "valid-identifiers", "naming-rules"]
             },
             {
                 "id": "2-5",
                 "title": "Variables",
                 "description": "Declaring and using variables to store data",
                 "keywords": ["variable", "declare", "assign", "store", "data", "value"],
-                "query": "Java variables declare assign store data values declaration"
+                "query": "Java variables declare assign store data values declaration",
+                "concept_tags": ["variable-declaration", "variable-assignment", "data-storage"]
             },
             {
                 "id": "2-6",
                 "title": "Assignment Statements and Assignment Expressions",
                 "description": "Assigning values to variables",
                 "keywords": ["assignment", "statement", "expression", "equals", "="],
-                "query": "Java assignment statements expressions assign values variables equals"
+                "query": "Java assignment statements expressions assign values variables equals",
+                "concept_tags": ["assignment-statement", "assignment-expression", "equals-operator"]
             },
             {
                 "id": "2-7",
                 "title": "Named Constants",
                 "description": "Using final keyword for constants",
                 "keywords": ["constant", "final", "named", "unchanging", "PI"],
-                "query": "Java named constants final keyword unchanging values PI"
+                "query": "Java named constants final keyword unchanging values PI",
+                "concept_tags": ["final-keyword", "named-constants", "immutable-values"]
             },
             {
                 "id": "2-8",
                 "title": "Naming Conventions",
                 "description": "Standard conventions for naming in Java",
                 "keywords": ["naming", "convention", "camelCase", "standard", "style"],
-                "query": "Java naming conventions camelCase style standards variables classes methods"
+                "query": "Java naming conventions camelCase style standards variables classes methods",
+                "concept_tags": ["camelCase", "naming-convention", "PascalCase", "code-standards"]
             },
             {
                 "id": "2-9",
                 "title": "Numeric Data Types and Operations",
                 "description": "Working with int, double, and other numeric types",
                 "keywords": ["numeric", "int", "double", "float", "long", "byte", "short", "arithmetic"],
-                "query": "Java numeric data types int double float long byte short arithmetic operations"
+                "query": "Java numeric data types int double float long byte short arithmetic operations",
+                "concept_tags": ["int-type", "double-type", "arithmetic-operators", "numeric-types"]
             },
             {
                 "id": "2-10",
                 "title": "Numeric Literals",
                 "description": "How to write numeric values in code",
                 "keywords": ["literal", "number", "integer", "decimal", "scientific"],
-                "query": "Java numeric literals integer decimal floating-point scientific notation"
+                "query": "Java numeric literals integer decimal floating-point scientific notation",
+                "concept_tags": ["integer-literals", "floating-point-literals", "scientific-notation"]
             },
             {
                 "id": "2-11",
                 "title": "Evaluating Expressions and Operator Precedence",
                 "description": "Order of operations in expressions",
                 "keywords": ["expression", "precedence", "order", "operations", "evaluate"],
-                "query": "Java expression evaluation operator precedence order of operations arithmetic"
+                "query": "Java expression evaluation operator precedence order of operations arithmetic",
+                "concept_tags": ["operator-precedence", "expression-evaluation", "order-of-operations"]
             },
             {
                 "id": "2-12",
                 "title": "Augmented Assignment Operators",
                 "description": "Shorthand operators like +=, -=, *=",
                 "keywords": ["augmented", "+=", "-=", "*=", "/=", "shorthand"],
-                "query": "Java augmented assignment operators += -= *= /= shorthand compound"
+                "query": "Java augmented assignment operators += -= *= /= shorthand compound",
+                "concept_tags": ["augmented-assignment", "compound-operators", "shorthand-operators"]
             },
             {
                 "id": "2-13",
                 "title": "Increment and Decrement Operators",
                 "description": "Using ++ and -- operators",
                 "keywords": ["increment", "decrement", "++", "--", "prefix", "postfix"],
-                "query": "Java increment decrement operators ++ -- prefix postfix"
+                "query": "Java increment decrement operators ++ -- prefix postfix",
+                "concept_tags": ["increment-operator", "decrement-operator", "prefix-postfix"]
             },
             {
                 "id": "2-14",
                 "title": "Type Casting",
                 "description": "Converting between data types",
                 "keywords": ["casting", "convert", "type", "implicit", "explicit"],
-                "query": "Java type casting convert data types implicit explicit widening narrowing"
+                "query": "Java type casting convert data types implicit explicit widening narrowing",
+                "concept_tags": ["type-casting", "widening", "narrowing", "implicit-explicit-cast"]
             },
             {
                 "id": "2-15",
                 "title": "Software Development Process",
                 "description": "Steps in developing software programs",
                 "keywords": ["development", "process", "requirements", "design", "implement", "test"],
-                "query": "Software development process requirements analysis design implementation testing"
+                "query": "Software development process requirements analysis design implementation testing",
+                "concept_tags": ["sdlc", "requirements-analysis", "design-implement-test"]
             },
             {
                 "id": "2-16",
                 "title": "Common Errors in Elementary Programming",
                 "description": "Common mistakes in elementary programming",
                 "keywords": ["errors", "mistakes", "common", "avoid", "pitfalls"],
-                "query": "Common Java programming errors mistakes beginners avoid elementary"
+                "query": "Common Java programming errors mistakes beginners avoid elementary",
+                "concept_tags": ["common-mistakes", "beginner-errors", "debugging-elementary"]
             }
         ]
     },
@@ -251,77 +285,88 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Selections",
                 "description": "Overview of selection statements",
                 "keywords": ["selection", "introduction", "decision", "control"],
-                "query": "Java selections introduction decision making control flow statements"
+                "query": "Java selections introduction decision making control flow statements",
+                "concept_tags": ["selection-intro", "decision-making", "control-flow"]
             },
             {
                 "id": "3-2",
                 "title": "boolean Data Type",
                 "description": "Understanding true/false values",
                 "keywords": ["boolean", "true", "false", "logical"],
-                "query": "Java boolean data type true false logical values comparison"
+                "query": "Java boolean data type true false logical values comparison",
+                "concept_tags": ["boolean-type", "true-false", "comparison-operators"]
             },
             {
                 "id": "3-3",
                 "title": "if Statements",
                 "description": "Making decisions with if statements",
                 "keywords": ["if", "condition", "statement", "decision"],
-                "query": "Java if statement condition decision making one-way selection"
+                "query": "Java if statement condition decision making one-way selection",
+                "concept_tags": ["if-statement", "condition-check", "one-way-selection"]
             },
             {
                 "id": "3-4",
                 "title": "Two-Way if-else Statements",
                 "description": "Choosing between two alternatives",
                 "keywords": ["if", "else", "two-way", "alternative"],
-                "query": "Java if else statement two-way selection alternative paths"
+                "query": "Java if else statement two-way selection alternative paths",
+                "concept_tags": ["if-else", "two-way-selection", "alternative-paths"]
             },
             {
                 "id": "3-5",
                 "title": "Nested if and Multi-Way if-else Statements",
                 "description": "Complex decision making with nested conditions",
                 "keywords": ["nested", "if", "else if", "multi-way"],
-                "query": "Java nested if else if multi-way selection statements complex conditions"
+                "query": "Java nested if else if multi-way selection statements complex conditions",
+                "concept_tags": ["nested-if", "else-if-chain", "multi-way-selection", "condition-order"]
             },
             {
                 "id": "3-6",
                 "title": "Common Errors in Selection Statements",
                 "description": "Avoiding mistakes with if statements",
                 "keywords": ["errors", "mistakes", "common", "if", "selection"],
-                "query": "Common errors mistakes Java if else selection statements dangling else"
+                "query": "Common errors mistakes Java if else selection statements dangling else",
+                "concept_tags": ["selection-errors", "dangling-else", "common-if-mistakes"]
             },
             {
                 "id": "3-7",
                 "title": "Generating Random Numbers",
                 "description": "Using Math.random() for random values",
                 "keywords": ["random", "Math.random", "generate", "number"],
-                "query": "Java generate random numbers Math.random Random class"
+                "query": "Java generate random numbers Math.random Random class",
+                "concept_tags": ["math-random", "random-numbers", "Random-class"]
             },
             {
                 "id": "3-8",
                 "title": "Logical Operators",
                 "description": "Using AND, OR, and NOT operators",
                 "keywords": ["logical", "AND", "OR", "NOT", "&&", "||", "!"],
-                "query": "Java logical operators AND OR NOT && || ! boolean expressions"
+                "query": "Java logical operators AND OR NOT && || ! boolean expressions",
+                "concept_tags": ["logical-AND", "logical-OR", "logical-NOT", "boolean-expressions"]
             },
             {
                 "id": "3-9",
                 "title": "switch Statements",
                 "description": "Multi-way branching with switch",
                 "keywords": ["switch", "case", "break", "default", "branch"],
-                "query": "Java switch statement case break default multi-way branching"
+                "query": "Java switch statement case break default multi-way branching",
+                "concept_tags": ["switch-statement", "case-break", "default-branch"]
             },
             {
                 "id": "3-10",
                 "title": "Conditional Expressions",
                 "description": "Ternary operator for compact conditions",
                 "keywords": ["conditional", "ternary", "?:", "expression"],
-                "query": "Java conditional expression ternary operator ?: shorthand if else"
+                "query": "Java conditional expression ternary operator ?: shorthand if else",
+                "concept_tags": ["ternary-operator", "conditional-expression", "shorthand-if"]
             },
             {
                 "id": "3-11",
                 "title": "Operator Precedence and Associativity",
                 "description": "Order of evaluation for operators",
                 "keywords": ["precedence", "associativity", "order", "evaluate"],
-                "query": "Java operator precedence associativity evaluation order rules"
+                "query": "Java operator precedence associativity evaluation order rules",
+                "concept_tags": ["precedence-rules", "associativity", "evaluation-order"]
             }
         ]
     },
@@ -333,35 +378,40 @@ CHAPTER_TOPICS = {
                 "title": "Introduction",
                 "description": "Overview of math, characters, and strings",
                 "keywords": ["introduction", "math", "characters", "strings"],
-                "query": "Java mathematical functions characters strings introduction overview"
+                "query": "Java mathematical functions characters strings introduction overview",
+                "concept_tags": ["math-functions-intro", "char-string-intro"]
             },
             {
                 "id": "4-2",
                 "title": "Common Mathematical Functions",
                 "description": "Using Math class methods",
                 "keywords": ["Math", "abs", "sqrt", "pow", "max", "min", "round"],
-                "query": "Java Math class functions abs sqrt pow max min round ceil floor log exp"
+                "query": "Java Math class functions abs sqrt pow max min round ceil floor log exp",
+                "concept_tags": ["Math-class", "abs-sqrt-pow", "max-min-round", "math-methods"]
             },
             {
                 "id": "4-3",
                 "title": "Character Data Type and Operations",
                 "description": "Working with char type",
                 "keywords": ["char", "character", "ASCII", "Unicode"],
-                "query": "Java char character data type ASCII Unicode encoding operations"
+                "query": "Java char character data type ASCII Unicode encoding operations",
+                "concept_tags": ["char-type", "ascii", "unicode", "character-operations"]
             },
             {
                 "id": "4-4",
                 "title": "The String Type",
                 "description": "Creating and using String objects",
                 "keywords": ["String", "text", "create", "object", "immutable"],
-                "query": "Java String type create text objects immutable methods length charAt"
+                "query": "Java String type create text objects immutable methods length charAt",
+                "concept_tags": ["String-class", "string-immutable", "string-methods", "length-charAt"]
             },
             {
                 "id": "4-5",
                 "title": "Formatting Console Output",
                 "description": "Using printf for formatted output",
                 "keywords": ["printf", "format", "output", "console", "%d", "%f", "%s"],
-                "query": "Java printf format console output %d %f %s formatting specifiers"
+                "query": "Java printf format console output %d %f %s formatting specifiers",
+                "concept_tags": ["printf", "format-specifiers", "formatted-output"]
             }
         ]
     },
@@ -373,56 +423,64 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Loops",
                 "description": "Overview of loop structures",
                 "keywords": ["loops", "introduction", "iteration", "repeat"],
-                "query": "Java loops introduction iteration repeat control structures"
+                "query": "Java loops introduction iteration repeat control structures",
+                "concept_tags": ["loops-intro", "iteration-concept", "repetition"]
             },
             {
                 "id": "5-2",
                 "title": "The while Loop",
                 "description": "Repeating code with while",
                 "keywords": ["while", "loop", "condition", "repeat"],
-                "query": "Java while loop condition repeat iteration loop-continuation-condition"
+                "query": "Java while loop condition repeat iteration loop-continuation-condition",
+                "concept_tags": ["while-loop", "loop-condition", "loop-body", "infinite-loop"]
             },
             {
                 "id": "5-3",
                 "title": "The do-while Loop",
                 "description": "Loop that executes at least once",
                 "keywords": ["do", "while", "loop", "execute", "once"],
-                "query": "Java do while loop execute at least once post-test loop"
+                "query": "Java do while loop execute at least once post-test loop",
+                "concept_tags": ["do-while-loop", "post-test", "execute-once"]
             },
             {
                 "id": "5-4",
                 "title": "The for Loop",
                 "description": "Counter-controlled loops",
                 "keywords": ["for", "loop", "counter", "controlled", "iteration"],
-                "query": "Java for loop counter controlled iteration initial-action loop-continuation increment"
+                "query": "Java for loop counter controlled iteration initial-action loop-continuation increment",
+                "concept_tags": ["for-loop", "counter-variable", "loop-control", "initialization-condition-update"]
             },
             {
                 "id": "5-5",
                 "title": "Which Loop to Use?",
                 "description": "Choosing the right loop type",
                 "keywords": ["loop", "choose", "when", "while", "for", "do-while"],
-                "query": "Java which loop to use when while for do-while comparison guidelines"
+                "query": "Java which loop to use when while for do-while comparison guidelines",
+                "concept_tags": ["loop-selection", "while-vs-for", "loop-comparison"]
             },
             {
                 "id": "5-6",
                 "title": "Nested Loops",
                 "description": "Loops inside loops",
                 "keywords": ["nested", "loop", "inside", "inner", "outer"],
-                "query": "Java nested loops inner outer loop multiplication table pattern"
+                "query": "Java nested loops inner outer loop multiplication table pattern",
+                "concept_tags": ["nested-loops", "inner-outer-loop", "loop-patterns"]
             },
             {
                 "id": "5-7",
                 "title": "Minimizing Numeric Errors",
                 "description": "Avoiding floating-point issues in loops",
                 "keywords": ["numeric", "errors", "floating-point", "precision"],
-                "query": "Java minimizing numeric errors floating-point precision loops accumulated"
+                "query": "Java minimizing numeric errors floating-point precision loops accumulated",
+                "concept_tags": ["floating-point-errors", "numeric-precision", "accumulated-errors"]
             },
             {
                 "id": "5-8",
                 "title": "Keywords break and continue",
                 "description": "Controlling loop execution",
                 "keywords": ["break", "continue", "exit", "skip", "loop"],
-                "query": "Java break continue keywords exit loop skip iteration terminate"
+                "query": "Java break continue keywords exit loop skip iteration terminate",
+                "concept_tags": ["break-keyword", "continue-keyword", "loop-exit", "skip-iteration"]
             }
         ]
     },
@@ -434,56 +492,64 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Methods",
                 "description": "Overview of methods in Java",
                 "keywords": ["methods", "introduction", "functions", "procedures"],
-                "query": "Java methods introduction functions procedures modular programming"
+                "query": "Java methods introduction functions procedures modular programming",
+                "concept_tags": ["methods-intro", "modular-programming", "code-reuse"]
             },
             {
                 "id": "6-2",
                 "title": "Defining a Method",
                 "description": "How to create methods",
                 "keywords": ["define", "method", "create", "signature", "body"],
-                "query": "Java defining methods create method signature header body return type parameters"
+                "query": "Java defining methods create method signature header body return type parameters",
+                "concept_tags": ["method-definition", "method-signature", "return-type", "parameters"]
             },
             {
                 "id": "6-3",
                 "title": "Calling a Method",
                 "description": "How to invoke methods",
                 "keywords": ["call", "invoke", "method", "execute"],
-                "query": "Java calling methods invoke execute method call arguments"
+                "query": "Java calling methods invoke execute method call arguments",
+                "concept_tags": ["method-call", "method-invocation", "passing-arguments"]
             },
             {
                 "id": "6-4",
                 "title": "void vs. Value-Returning Methods",
                 "description": "Methods with and without return values",
                 "keywords": ["void", "return", "value", "method"],
-                "query": "Java void return value methods returning values return statement"
+                "query": "Java void return value methods returning values return statement",
+                "concept_tags": ["void-method", "return-value", "return-statement"]
             },
             {
                 "id": "6-5",
                 "title": "Passing Arguments by Values",
                 "description": "How arguments are passed to methods",
                 "keywords": ["arguments", "parameters", "pass", "value", "copy"],
-                "query": "Java passing arguments by value parameters method pass-by-value copy"
+                "query": "Java passing arguments by value parameters method pass-by-value copy",
+                "concept_tags": ["pass-by-value", "argument-passing", "value-copy"]
             },
             {
                 "id": "6-6",
                 "title": "Modularizing Code",
                 "description": "Breaking code into reusable methods",
                 "keywords": ["modular", "reusable", "organize", "methods"],
-                "query": "Java modularizing code reusable methods organize stepwise refinement"
+                "query": "Java modularizing code reusable methods organize stepwise refinement",
+                "concept_tags": ["code-modularization", "stepwise-refinement", "reusable-methods"]
             },
             {
                 "id": "6-7",
                 "title": "Overloading Methods",
                 "description": "Multiple methods with same name",
                 "keywords": ["overload", "same name", "different parameters"],
-                "query": "Java method overloading same name different parameters signature ambiguous"
+                "query": "Java method overloading same name different parameters signature ambiguous",
+                "concept_tags": ["method-overloading", "overloaded-methods", "parameter-signature"]
             },
             {
                 "id": "6-8",
                 "title": "The Scope of Variables",
                 "description": "Where variables can be accessed",
                 "keywords": ["scope", "local", "variable", "access", "block"],
-                "query": "Java variable scope local variables access block method lifetime"
+                "query": "Java variable scope local variables access block method lifetime",
+                "concept_tags": ["variable-scope", "local-variables", "block-scope", "lifetime"]
             }
         ]
     },
@@ -495,56 +561,64 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Arrays",
                 "description": "Overview of arrays",
                 "keywords": ["array", "introduction", "collection", "elements"],
-                "query": "Java arrays introduction collection elements single-dimensional store"
+                "query": "Java arrays introduction collection elements single-dimensional store",
+                "concept_tags": ["arrays-intro", "collection-concept", "indexed-storage"]
             },
             {
                 "id": "7-2",
                 "title": "Array Basics",
                 "description": "Creating and using arrays",
                 "keywords": ["array", "create", "declare", "index", "element"],
-                "query": "Java array basics create declare index element access new size length"
+                "query": "Java array basics create declare index element access new size length",
+                "concept_tags": ["array-declaration", "array-indexing", "array-length", "new-keyword"]
             },
             {
                 "id": "7-3",
                 "title": "Copying Arrays",
                 "description": "How to copy array contents",
                 "keywords": ["copy", "array", "clone", "arraycopy"],
-                "query": "Java copying arrays clone arraycopy System.arraycopy reference vs copy"
+                "query": "Java copying arrays clone arraycopy System.arraycopy reference vs copy",
+                "concept_tags": ["array-copy", "arraycopy-method", "reference-vs-value"]
             },
             {
                 "id": "7-4",
                 "title": "Passing Arrays to Methods",
                 "description": "Using arrays as method parameters",
                 "keywords": ["array", "method", "pass", "parameter", "reference"],
-                "query": "Java passing arrays to methods parameter reference call by reference"
+                "query": "Java passing arrays to methods parameter reference call by reference",
+                "concept_tags": ["array-parameter", "pass-array-to-method", "reference-passing"]
             },
             {
                 "id": "7-5",
                 "title": "Returning an Array from a Method",
                 "description": "Methods that return arrays",
                 "keywords": ["return", "array", "method"],
-                "query": "Java returning array from method return type array reverse"
+                "query": "Java returning array from method return type array reverse",
+                "concept_tags": ["return-array", "array-return-type", "method-returns-array"]
             },
             {
                 "id": "7-6",
                 "title": "Searching Arrays",
                 "description": "Finding elements in arrays",
                 "keywords": ["search", "find", "linear", "binary", "array"],
-                "query": "Java searching arrays linear search binary search find element index"
+                "query": "Java searching arrays linear search binary search find element index",
+                "concept_tags": ["linear-search", "binary-search", "array-search"]
             },
             {
                 "id": "7-7",
                 "title": "Sorting Arrays",
                 "description": "Arranging array elements in order",
                 "keywords": ["sort", "array", "order", "selection", "insertion"],
-                "query": "Java sorting arrays selection sort insertion sort Arrays.sort ascending"
+                "query": "Java sorting arrays selection sort insertion sort Arrays.sort ascending",
+                "concept_tags": ["selection-sort", "insertion-sort", "Arrays-sort", "sorting-algorithms"]
             },
             {
                 "id": "7-8",
                 "title": "The Arrays Class",
                 "description": "Utility methods for arrays",
                 "keywords": ["Arrays", "class", "utility", "sort", "fill", "toString"],
-                "query": "Java Arrays class utility methods sort fill toString binarySearch equals"
+                "query": "Java Arrays class utility methods sort fill toString binarySearch equals",
+                "concept_tags": ["Arrays-class", "utility-methods", "fill-toString", "binarySearch"]
             }
         ]
     },
@@ -556,35 +630,40 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Multidimensional Arrays",
                 "description": "Overview of multidimensional arrays",
                 "keywords": ["multidimensional", "array", "2D", "matrix"],
-                "query": "Java multidimensional arrays introduction 2D two-dimensional matrix table"
+                "query": "Java multidimensional arrays introduction 2D two-dimensional matrix table",
+                "concept_tags": ["multidimensional-intro", "2D-arrays", "matrix-concept"]
             },
             {
                 "id": "8-2",
                 "title": "Two-Dimensional Array Basics",
                 "description": "Creating and using 2D arrays",
                 "keywords": ["2D", "array", "row", "column", "matrix"],
-                "query": "Java two-dimensional 2D array basics row column matrix declare create"
+                "query": "Java two-dimensional 2D array basics row column matrix declare create",
+                "concept_tags": ["2D-declaration", "row-column", "2D-indexing"]
             },
             {
                 "id": "8-3",
                 "title": "Processing Two-Dimensional Arrays",
                 "description": "Working with 2D array elements",
                 "keywords": ["process", "2D", "array", "nested", "loop"],
-                "query": "Java processing two-dimensional arrays nested loops row column traverse"
+                "query": "Java processing two-dimensional arrays nested loops row column traverse",
+                "concept_tags": ["2D-traversal", "nested-loop-2D", "row-column-processing"]
             },
             {
                 "id": "8-4",
                 "title": "Passing Two-Dimensional Arrays to Methods",
                 "description": "Using 2D arrays as parameters",
                 "keywords": ["pass", "2D", "array", "method", "parameter"],
-                "query": "Java passing two-dimensional arrays to methods parameter 2D"
+                "query": "Java passing two-dimensional arrays to methods parameter 2D",
+                "concept_tags": ["2D-array-parameter", "pass-2D-to-method"]
             },
             {
                 "id": "8-5",
                 "title": "Ragged Arrays",
                 "description": "Arrays with varying row lengths",
                 "keywords": ["ragged", "array", "varying", "length", "rows"],
-                "query": "Java ragged arrays varying row lengths irregular jagged"
+                "query": "Java ragged arrays varying row lengths irregular jagged",
+                "concept_tags": ["ragged-arrays", "jagged-arrays", "varying-row-lengths"]
             }
         ]
     },
@@ -596,63 +675,72 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Objects and Classes",
                 "description": "Overview of object-oriented programming",
                 "keywords": ["objects", "classes", "OOP", "introduction"],
-                "query": "Java objects classes OOP object-oriented programming introduction concepts"
+                "query": "Java objects classes OOP object-oriented programming introduction concepts",
+                "concept_tags": ["oop-intro", "objects-concept", "classes-concept"]
             },
             {
                 "id": "9-2",
                 "title": "Defining Classes for Objects",
                 "description": "How to create class definitions",
                 "keywords": ["class", "define", "object", "blueprint"],
-                "query": "Java defining classes for objects blueprint template data fields methods"
+                "query": "Java defining classes for objects blueprint template data fields methods",
+                "concept_tags": ["class-definition", "data-fields", "class-blueprint"]
             },
             {
                 "id": "9-3",
                 "title": "Constructors",
                 "description": "Initializing objects with constructors",
                 "keywords": ["constructor", "initialize", "new", "create", "object"],
-                "query": "Java constructors initialize objects new keyword no-arg default"
+                "query": "Java constructors initialize objects new keyword no-arg default",
+                "concept_tags": ["constructors", "new-keyword", "no-arg-constructor", "default-constructor"]
             },
             {
                 "id": "9-4",
                 "title": "Accessing Objects via Reference Variables",
                 "description": "How reference variables work",
                 "keywords": ["reference", "variable", "object", "access", "dot"],
-                "query": "Java reference variables access objects dot operator instance member"
+                "query": "Java reference variables access objects dot operator instance member",
+                "concept_tags": ["reference-variables", "dot-operator", "instance-members"]
             },
             {
                 "id": "9-5",
                 "title": "Using Classes from the Java Library",
                 "description": "Working with built-in Java classes",
                 "keywords": ["library", "Java", "class", "Date", "Random", "import"],
-                "query": "Java library classes Date Random Point import API built-in"
+                "query": "Java library classes Date Random Point import API built-in",
+                "concept_tags": ["java-library", "Date-class", "import-statement", "built-in-classes"]
             },
             {
                 "id": "9-6",
                 "title": "Static Variables, Constants, and Methods",
                 "description": "Class-level members with static",
                 "keywords": ["static", "class", "variable", "method", "constant"],
-                "query": "Java static variables constants methods class-level shared instance vs static"
+                "query": "Java static variables constants methods class-level shared instance vs static",
+                "concept_tags": ["static-keyword", "class-variables", "static-methods", "instance-vs-static"]
             },
             {
                 "id": "9-7",
                 "title": "Visibility Modifiers",
                 "description": "public, private, and access control",
                 "keywords": ["visibility", "public", "private", "protected", "access"],
-                "query": "Java visibility modifiers public private protected access control encapsulation"
+                "query": "Java visibility modifiers public private protected access control encapsulation",
+                "concept_tags": ["public-modifier", "private-modifier", "access-control"]
             },
             {
                 "id": "9-8",
                 "title": "Data Field Encapsulation",
                 "description": "Hiding data with getters and setters",
                 "keywords": ["encapsulation", "getter", "setter", "private", "data"],
-                "query": "Java encapsulation getter setter methods private data fields accessor mutator"
+                "query": "Java encapsulation getter setter methods private data fields accessor mutator",
+                "concept_tags": ["encapsulation", "getters-setters", "data-hiding", "accessor-mutator"]
             },
             {
                 "id": "9-9",
                 "title": "Passing Objects to Methods",
                 "description": "How objects are passed to methods",
                 "keywords": ["pass", "object", "method", "reference"],
-                "query": "Java passing objects to methods reference parameter object state"
+                "query": "Java passing objects to methods reference parameter object state",
+                "concept_tags": ["pass-object-to-method", "object-reference", "object-state"]
             }
         ]
     },
@@ -664,56 +752,64 @@ CHAPTER_TOPICS = {
                 "title": "Introduction to Object-Oriented Thinking",
                 "description": "Thinking in objects",
                 "keywords": ["object-oriented", "thinking", "design", "OOP"],
-                "query": "Java object-oriented thinking design OOP introduction procedural vs OO"
+                "query": "Java object-oriented thinking design OOP introduction procedural vs OO",
+                "concept_tags": ["oo-thinking", "procedural-vs-oop", "oo-design"]
             },
             {
                 "id": "10-2",
                 "title": "Class Abstraction and Encapsulation",
                 "description": "Hiding implementation details",
                 "keywords": ["abstraction", "encapsulation", "hide", "implementation"],
-                "query": "Java class abstraction encapsulation hiding implementation class contract"
+                "query": "Java class abstraction encapsulation hiding implementation class contract",
+                "concept_tags": ["class-abstraction", "implementation-hiding", "class-contract"]
             },
             {
                 "id": "10-3",
                 "title": "Thinking in Objects",
                 "description": "Designing with objects in mind",
                 "keywords": ["thinking", "objects", "design", "modeling"],
-                "query": "Java thinking in objects design modeling real-world class design"
+                "query": "Java thinking in objects design modeling real-world class design",
+                "concept_tags": ["object-modeling", "real-world-design", "class-design"]
             },
             {
                 "id": "10-4",
                 "title": "Class Relationships",
                 "description": "Association, aggregation, and composition",
                 "keywords": ["relationship", "association", "aggregation", "composition"],
-                "query": "Java class relationships association aggregation composition has-a owns"
+                "query": "Java class relationships association aggregation composition has-a owns",
+                "concept_tags": ["association", "aggregation", "composition", "has-a-relationship"]
             },
             {
                 "id": "10-5",
                 "title": "Wrapper Classes for Primitive Types",
                 "description": "Wrapper classes for primitives",
                 "keywords": ["wrapper", "Integer", "Double", "primitive", "object"],
-                "query": "Java wrapper classes Integer Double Character primitive values objects boxing"
+                "query": "Java wrapper classes Integer Double Character primitive values objects boxing",
+                "concept_tags": ["wrapper-classes", "autoboxing", "Integer-Double", "primitive-to-object"]
             },
             {
                 "id": "10-6",
                 "title": "The BigInteger and BigDecimal Classes",
                 "description": "Working with large numbers",
                 "keywords": ["BigInteger", "BigDecimal", "large", "numbers", "precision"],
-                "query": "Java BigInteger BigDecimal large numbers arbitrary precision arithmetic"
+                "query": "Java BigInteger BigDecimal large numbers arbitrary precision arithmetic",
+                "concept_tags": ["BigInteger", "BigDecimal", "arbitrary-precision"]
             },
             {
                 "id": "10-7",
                 "title": "The String Class Methods",
                 "description": "String methods and operations",
                 "keywords": ["String", "methods", "substring", "length", "charAt"],
-                "query": "Java String class methods substring length charAt indexOf compareTo replace"
+                "query": "Java String class methods substring length charAt indexOf compareTo replace",
+                "concept_tags": ["String-methods", "substring", "indexOf", "compareTo"]
             },
             {
                 "id": "10-8",
                 "title": "The StringBuilder and StringBuffer Classes",
                 "description": "Mutable string operations",
                 "keywords": ["StringBuilder", "StringBuffer", "mutable", "append"],
-                "query": "Java StringBuilder StringBuffer mutable strings append insert delete reverse"
+                "query": "Java StringBuilder StringBuffer mutable strings append insert delete reverse",
+                "concept_tags": ["StringBuilder", "StringBuffer", "mutable-strings", "append-insert"]
             }
         ]
     }
@@ -1989,6 +2085,12 @@ def get_topic_content(topic_id):
         if pregenerated:
             # Add metadata to pregenerated content
             pregenerated['metadata'] = metadata
+            # Inject concept_tags into questions for adaptive learning
+            concept_tags = topic_info.get('concept_tags', [])
+            if 'questions' in pregenerated and concept_tags:
+                for q in pregenerated['questions']:
+                    if 'concept_tags' not in q:
+                        q['concept_tags'] = concept_tags
             return jsonify({
                 'success': True,
                 **pregenerated
@@ -2543,6 +2645,173 @@ def admin_regenerate_topic():
         })
             
     except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============ ADAPTIVE LEARNING ENDPOINTS ============
+
+def _find_topic_info(topic_id):
+    """Helper to find topic info from CHAPTER_TOPICS by topic_id."""
+    for chapter in CHAPTER_TOPICS.values():
+        for topic in chapter["topics"]:
+            if topic["id"] == topic_id:
+                return topic
+    return None
+
+
+@app.route('/api/quiz/evaluate', methods=['POST'])
+def evaluate_quiz():
+    """
+    Evaluate quiz results, analyze errors, and decide: advance or remediate.
+    
+    Expects JSON body:
+    {
+        "topic_id": "3-5",
+        "responses": [
+            {
+                "question_text": "...",
+                "user_answer": "answer text or option text",
+                "correct_answer": "correct option text",
+                "is_correct": true/false,
+                "concept_tags": ["tag1", "tag2"]
+            }
+        ],
+        "user_concept_mastery": { "concept-tag": 0.5, ... },
+        "attempt_number": 1
+    }
+    """
+    try:
+        data = request.json or {}
+        topic_id = data.get('topic_id')
+        responses = data.get('responses', [])
+        user_concept_mastery = data.get('user_concept_mastery', {})
+        attempt_number = data.get('attempt_number', 1)
+
+        if not topic_id or not responses:
+            return jsonify({'success': False, 'error': 'topic_id and responses are required'}), 400
+
+        topic_info = _find_topic_info(topic_id)
+        topic_title = topic_info.get('title', 'Unknown Topic') if topic_info else 'Unknown Topic'
+
+        # 1. Analyze errors on incorrect answers
+        analyzed_responses = error_analyzer.analyze_batch(responses, topic_title)
+
+        # 2. Run decision router
+        decision = adaptive_router.evaluate_quiz_result(
+            user_concept_mastery=user_concept_mastery,
+            topic_id=topic_id,
+            quiz_responses=analyzed_responses,
+            attempt_number=attempt_number
+        )
+
+        return jsonify({
+            'success': True,
+            'action': decision['action'],
+            'topic_id': decision['topic_id'],
+            'next_topic_id': decision.get('next_topic_id'),
+            'score': decision.get('score', 0),
+            'updated_masteries': decision.get('updated_masteries', {}),
+            'weak_concepts': decision.get('weak_concepts', []),
+            'remediation_plan': decision.get('remediation_plan'),
+            'analyzed_responses': analyzed_responses
+        })
+
+    except Exception as e:
+        print(f"⚠️ Quiz evaluation error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/remediation/content', methods=['POST'])
+def get_remediation_content():
+    """
+    Generate targeted remedial learning content.
+    
+    Expects JSON body:
+    {
+        "topic_id": "3-5",
+        "weak_concepts": [{"concept": "if-else", "mastery": 0.3, ...}],
+        "mistake_details": [{"concept": "...", "user_said": "...", ...}],
+        "attempt_number": 2,
+        "concept_masteries": {"tag": 0.5, ...}
+    }
+    """
+    try:
+        data = request.json or {}
+        topic_id = data.get('topic_id')
+        weak_concepts = data.get('weak_concepts', [])
+        mistake_details = data.get('mistake_details', [])
+        attempt_number = data.get('attempt_number', 2)
+        concept_masteries = data.get('concept_masteries', {})
+
+        if not topic_id:
+            return jsonify({'success': False, 'error': 'topic_id is required'}), 400
+
+        topic_info = _find_topic_info(topic_id) or {"id": topic_id, "title": f"Topic {topic_id}"}
+
+        result = remediation_gen.generate_remedial_content(
+            topic_info=topic_info,
+            weak_concepts=weak_concepts,
+            mistake_details=mistake_details,
+            attempt_number=attempt_number,
+            concept_masteries=concept_masteries
+        )
+
+        return jsonify({
+            'success': result.get('success', False),
+            'topic_id': topic_id,
+            'content': result.get('content', {}),
+            'error': result.get('error')
+        })
+
+    except Exception as e:
+        print(f"⚠️ Remediation content error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/remediation/questions', methods=['POST'])
+def get_remediation_questions():
+    """
+    Generate targeted remedial questions for weak areas.
+    
+    Expects JSON body:
+    {
+        "topic_id": "3-5",
+        "weak_concepts": [{"concept": "if-else", ...}],
+        "mistake_details": [{"concept": "...", ...}],
+        "attempt_number": 2,
+        "num_questions": 2
+    }
+    """
+    try:
+        data = request.json or {}
+        topic_id = data.get('topic_id')
+        weak_concepts = data.get('weak_concepts', [])
+        mistake_details = data.get('mistake_details', [])
+        attempt_number = data.get('attempt_number', 2)
+        num_questions = data.get('num_questions', 2)
+
+        if not topic_id:
+            return jsonify({'success': False, 'error': 'topic_id is required'}), 400
+
+        topic_info = _find_topic_info(topic_id) or {"id": topic_id, "title": f"Topic {topic_id}"}
+
+        result = remediation_gen.generate_remedial_questions(
+            topic_info=topic_info,
+            weak_concepts=weak_concepts,
+            mistake_details=mistake_details,
+            attempt_number=attempt_number,
+            num_questions=num_questions
+        )
+
+        return jsonify({
+            'success': result.get('success', False),
+            'topic_id': topic_id,
+            'questions': result.get('questions', []),
+            'error': result.get('error')
+        })
+
+    except Exception as e:
+        print(f"⚠️ Remediation questions error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

@@ -1,5 +1,36 @@
 import mongoose from "mongoose";
 
+// Track mastery per concept using Bayesian Knowledge Tracing
+const conceptMasterySchema = new mongoose.Schema({
+  topicId: { type: String, required: true },
+  conceptTag: { type: String, required: true },
+  masteryScore: { type: Number, default: 0.3 },  // 0.0 to 1.0 (BKT probability)
+  attempts: { type: Number, default: 0 },
+  correctAttempts: { type: Number, default: 0 },
+  lastAttempted: { type: Date, default: null },
+});
+
+// Track each quiz attempt with per-question detail
+const quizAttemptSchema = new mongoose.Schema({
+  topicId: { type: String, required: true },
+  attemptNumber: { type: Number, default: 1 },
+  questions: [{
+    questionId: { type: String },
+    questionText: { type: String },
+    conceptTags: [{ type: String }],
+    userAnswer: { type: String },
+    correctAnswer: { type: String },
+    isCorrect: { type: Boolean },
+    errorType: { type: String, enum: ['conceptual', 'syntax', 'logic', 'careless', 'unknown'], default: 'unknown' },
+    errorDetail: { type: String, default: '' },
+    timeSpent: { type: Number, default: 0 },
+  }],
+  passed: { type: Boolean, default: false },
+  score: { type: Number, default: 0 },
+  isRemediation: { type: Boolean, default: false },
+  completedAt: { type: Date, default: Date.now },
+});
+
 const studentProfileSchema = new mongoose.Schema({
   // Reference to User
   userId: { 
@@ -91,7 +122,22 @@ const studentProfileSchema = new mongoose.Schema({
     avgSessionDuration: { type: Number, default: 0 },
     consistencyScore: { type: Number, default: 0 },
     lastActiveDate: { type: Date, default: null }
-  }
+  },
+
+  // Adaptive Learning - Concept Mastery (BKT)
+  conceptMastery: [conceptMasterySchema],
+
+  // Adaptive Learning - Quiz Attempts History
+  quizAttempts: [quizAttemptSchema],
+
+  // Adaptive Learning - Current adaptive state per topic
+  adaptiveState: [{
+    topicId: { type: String, required: true },
+    status: { type: String, enum: ['not-started', 'learning', 'quiz', 'remediation', 'mastered'], default: 'not-started' },
+    remediationCount: { type: Number, default: 0 },
+    weakConcepts: [{ type: String }],
+    lastUpdated: { type: Date, default: Date.now },
+  }]
 
 }, { timestamps: true });
 

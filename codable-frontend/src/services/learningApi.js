@@ -169,6 +169,58 @@ const learningApi = {
       console.error('Error fetching user progress:', error);
       throw error;
     }
+  },
+
+  // ============ ADAPTIVE LEARNING ============
+
+  // Evaluate quiz results and get advance/remediate decision
+  evaluateQuiz: async (topicId, responses, userConceptMastery = {}, attemptNumber = 1) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/quiz/evaluate`, {
+        topic_id: topicId,
+        responses,
+        user_concept_mastery: userConceptMastery,
+        attempt_number: attemptNumber
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error evaluating quiz:', error);
+      throw error;
+    }
+  },
+
+  // Get remedial learning content based on weak concepts
+  getRemedialContent: async (topicId, weakConcepts, mistakeDetails, attemptNumber = 2, conceptMasteries = {}) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/remediation/content`, {
+        topic_id: topicId,
+        weak_concepts: weakConcepts,
+        mistake_details: mistakeDetails,
+        attempt_number: attemptNumber,
+        concept_masteries: conceptMasteries
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching remedial content:', error);
+      throw error;
+    }
+  },
+
+  // Get remedial practice questions targeting weak areas
+  getRemedialQuestions: async (topicId, weakConcepts, mistakeDetails, attemptNumber = 2, numQuestions = 2) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/remediation/questions`, {
+        topic_id: topicId,
+        weak_concepts: weakConcepts,
+        mistake_details: mistakeDetails,
+        attempt_number: attemptNumber,
+        num_questions: numQuestions
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching remedial questions:', error);
+      throw error;
+    }
   }
 };
 

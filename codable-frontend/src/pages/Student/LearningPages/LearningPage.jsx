@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { LearningContent } from './components/LearningContent';
 import { PracticeMode } from './components/PracticeMode';
 import { TopicPractice } from './components/TopicPractice';
+import { RemediationContent } from './components/RemediationContent';
 import learningApi from '../../../services/learningApi';
 
 export default function LearningPage() {
@@ -14,6 +15,15 @@ export default function LearningPage() {
   const [topicQuestions, setTopicQuestions] = useState([]);
   const [topicIndex, setTopicIndex] = useState(0);
 
+  // Adaptive learning state
+  const [conceptMastery, setConceptMastery] = useState({});
+  const [attemptNumber, setAttemptNumber] = useState(1);
+  const [weakConcepts, setWeakConcepts] = useState([]);
+  const [remediationPlan, setRemediationPlan] = useState(null);
+  const [remediationContent, setRemediationContent] = useState(null);
+  const [remediationQuestions, setRemediationQuestions] = useState([]);
+  const [remediationLoading, setRemediationLoading] = useState(false);
+
   useEffect(() => {
     // Get chapter and topic from URL query params
     const chapterParam = searchParams.get('chapter');
@@ -22,14 +32,12 @@ export default function LearningPage() {
     if (chapterParam) {
       setChapterId(parseInt(chapterParam, 10));
     } else if (topicParam) {
-      // Extract chapter from topic ID (format: "1-1" or "java-001-intro")
       const match = topicParam.match(/(\d+)/);
       if (match) {
         setChapterId(parseInt(match[1], 10));
       }
       setTopicId(topicParam);
     } else {
-      // Default to chapter 1
       setChapterId(1);
     }
 
@@ -43,6 +51,12 @@ export default function LearningPage() {
       setTopicIndex(selectedTopicIndex ?? 0);
     }
 
+    // Reset adaptive state for new topic
+    setAttemptNumber(1);
+    setWeakConcepts([]);
+    setRemediationPlan(null);
+    setRemediationContent(null);
+
     // Fetch questions from the topic content
     try {
       const response = await learningApi.getTopicContent(selectedTopicId || topicId);
@@ -50,19 +64,232 @@ export default function LearningPage() {
         setTopicQuestions(response.questions);
         setMode('topicPractice');
       } else {
-        // No questions available, skip to next topic
-        handleTopicPracticeComplete();
+        handleAdvanceToNextTopic();
       }
     } catch (err) {
       console.error('Error fetching topic questions:', err);
-      handleTopicPracticeComplete();
+      handleAdvanceToNextTopic();
     }
   };
 
-  const handleTopicPracticeComplete = () => {
-    // Advance to next topic index, then go back to learning mode
+  const handleAdvanceToNextTopic = async () => {
+    // Save topic completion to backend before advancing
+    try {
+      if (topicId && chapterId) {
+        await learningApi.completeTopic(chapterId, topicId, 0);
+      }
+    } catch (err) {
+      console.error('Error saving topic completion:', err);
+    }
+
     setTopicIndex(prev => prev + 1);
+    setAttemptNumber(1);
+    setWeakConcepts([]);
+    setRemediationPlan(null);
+    setRemediationContent(null);
     setMode('learning');
+  };
+
+  const handleTopicPracticeComplete = async (quizResult) => {
+    // If no detailed data (legacy/fallback), stay on same topic
+    if (!quizResult || !quizResult.responses) {
+      setMode('learning');
+      return;
+    }
+
+    const currentTopicId = topicId;
+
+    try {
+      // Call adaptive evaluation endpoint
+      const evaluation = await learningApi.evaluateQuiz(
+        currentTopicId,
+        quizResult.responses,
+        conceptMastery,
+        attemptNumber
+      );
+
+      if (!evaluation.success) {
+        console.error('Quiz evaluation failed:', evaluation.error);
+        // Stay on same topic so user can retry
+        setMode('learning');
+        return;
+      }
+
+      // Update concept mastery from the evaluation
+      if (evaluation.updated_masteries) {
+        setConceptMastery(prev => ({ ...prev, ...evaluation.updated_masteries }));
+      }
+
+      if (evaluation.action === 'advance') {
+        // Student passed — advance to next topic
+        handleAdvanceToNextTopic();
+      } else {
+        // Student needs remediation
+        setWeakConcepts(evaluation.weak_concepts || []);
+        setRemediationPlan(evaluation.remediation_plan || null);
+        setAttemptNumber(prev => prev + 1);
+
+        // Fetch remedial content
+        setRemediationLoading(true);
+        setMode('remediation');
+
+        try {
+          const mistakeDetails = (evaluation.remediation_plan?.error_summary) || 
+            evaluation.weak_concepts?.map(wc => ({
+              concept: wc.concept,
+              user_said: wc.user_answer,
+              correct_was: wc.correct_answer,
+              what_went_wrong: wc.error_type,
+              detail: wc.error_detail,
+              question_text: wc.question_text,
+            })) || [];
+
+          const contentResult = await learningApi.getRemedialContent(
+            currentTopicId,
+            evaluation.weak_concepts || [],
+            mistakeDetails,
+            attemptNumber + 1,
+            evaluation.updated_masteries || {}
+          );
+
+          if (contentResult.success) {
+            setRemediationContent(contentResult.content);
+          } else {
+            setRemediationContent({
+              sections: [{ title: 'Review Material', content: 'Please review the topic material and try again.' }],
+              summary: 'Focus on the areas where you made mistakes.'
+            });
+          }
+        } catch (err) {
+          console.error('Error fetching remedial content:', err);
+          setRemediationContent({
+            sections: [{ title: 'Review Material', content: 'Please review the topic material and try again.' }],
+            summary: 'Focus on the areas where you made mistakes.'
+          });
+        } finally {
+          setRemediationLoading(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error in adaptive evaluation:', err);
+      // Stay on same topic so user can retry
+      setMode('learning');
+    }
+  };
+
+  const handleStartRemediationQuiz = async () => {
+    setRemediationLoading(true);
+    setMode('remediationQuiz');
+
+    try {
+      const mistakeDetails = remediationPlan?.error_summary ||
+        weakConcepts.map(wc => ({
+          concept: wc.concept,
+          user_said: wc.user_answer,
+          correct_was: wc.correct_answer,
+          what_went_wrong: wc.error_type,
+        }));
+
+      const result = await learningApi.getRemedialQuestions(
+        topicId,
+        weakConcepts,
+        mistakeDetails,
+        attemptNumber,
+        2
+      );
+
+      if (result.success && result.questions && result.questions.length > 0) {
+        setRemediationQuestions(result.questions);
+      } else if (topicQuestions && topicQuestions.length > 0) {
+        // Fallback: reuse original topic questions for the remediation quiz
+        console.warn('Remedial questions unavailable, falling back to topic questions');
+        setRemediationQuestions(topicQuestions);
+      } else {
+        // Last resort: go back to learning mode
+        console.error('No questions available for remediation quiz');
+        setMode('learning');
+      }
+    } catch (err) {
+      console.error('Error fetching remedial questions:', err);
+      if (topicQuestions && topicQuestions.length > 0) {
+        setRemediationQuestions(topicQuestions);
+      } else {
+        setMode('learning');
+      }
+    } finally {
+      setRemediationLoading(false);
+    }
+  };
+
+  const handleRemediationQuizComplete = async (quizResult) => {
+    if (!quizResult || !quizResult.responses) {
+      setMode('learning');
+      return;
+    }
+
+    // Re-evaluate with the remediation quiz results
+    try {
+      const evaluation = await learningApi.evaluateQuiz(
+        topicId,
+        quizResult.responses,
+        conceptMastery,
+        attemptNumber
+      );
+
+      if (evaluation.success && evaluation.updated_masteries) {
+        setConceptMastery(prev => ({ ...prev, ...evaluation.updated_masteries }));
+      }
+
+      if (evaluation.success && evaluation.action === 'advance') {
+        handleAdvanceToNextTopic();
+      } else if (attemptNumber >= 3) {
+        // After 3 attempts, advance anyway to avoid frustration
+        handleAdvanceToNextTopic();
+      } else {
+        // Need more remediation
+        setWeakConcepts(evaluation.weak_concepts || []);
+        setRemediationPlan(evaluation.remediation_plan || null);
+        setAttemptNumber(prev => prev + 1);
+
+        setRemediationLoading(true);
+        setMode('remediation');
+
+        try {
+          const mistakeDetails = evaluation.remediation_plan?.error_summary || 
+            evaluation.weak_concepts?.map(wc => ({
+              concept: wc.concept,
+              user_said: wc.user_answer,
+              correct_was: wc.correct_answer,
+              what_went_wrong: wc.error_type,
+              detail: wc.error_detail,
+            })) || [];
+
+          const contentResult = await learningApi.getRemedialContent(
+            topicId,
+            evaluation.weak_concepts || [],
+            mistakeDetails,
+            attemptNumber + 1,
+            evaluation.updated_masteries || {}
+          );
+
+          setRemediationContent(contentResult.success ? contentResult.content : {
+            sections: [{ title: 'Review Material', content: 'Please review your mistakes and try again.' }],
+            summary: 'Keep practicing — you\'re getting closer!'
+          });
+        } catch {
+          setRemediationContent({
+            sections: [{ title: 'Review Material', content: 'Please review your mistakes and try again.' }],
+            summary: 'Keep practicing!'
+          });
+        } finally {
+          setRemediationLoading(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error in remediation evaluation:', err);
+      // Stay on same topic
+      setMode('learning');
+    }
   };
 
   const handleStartChapterPractice = (selectedTopicId, selectedTopicTitle) => {
@@ -105,6 +332,33 @@ export default function LearningPage() {
           onComplete={handleTopicPracticeComplete}
           onBackToLearning={handleBackToLearning}
         />
+      )}
+      {mode === 'remediation' && (
+        <RemediationContent
+          content={remediationContent}
+          topicTitle={topicTitle}
+          weakConcepts={weakConcepts}
+          onStartRemediationQuiz={handleStartRemediationQuiz}
+          onBackToLearning={handleBackToLearning}
+          loading={remediationLoading}
+        />
+      )}
+      {mode === 'remediationQuiz' && !remediationLoading && remediationQuestions.length > 0 && (
+        <TopicPractice
+          questions={remediationQuestions}
+          topicTitle={`${topicTitle} — Remediation`}
+          onComplete={handleRemediationQuizComplete}
+          onBackToLearning={handleBackToLearning}
+          isRemediation
+        />
+      )}
+      {mode === 'remediationQuiz' && remediationLoading && (
+        <div className="min-h-screen bg-[#0B0B1A] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-white text-lg">Generating targeted questions...</p>
+          </div>
+        </div>
       )}
       {mode === 'practice' && (
         <PracticeMode

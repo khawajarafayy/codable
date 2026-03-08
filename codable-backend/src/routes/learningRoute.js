@@ -128,6 +128,50 @@ router.post('/validate-solution', async (req, res) => {
   }
 });
 
+// ============ ADAPTIVE LEARNING ROUTES ============
+
+// Evaluate quiz results and decide advance/remediate
+router.post('/quiz/evaluate', async (req, res) => {
+  try {
+    const response = await axios.post(`${RAG_API_URL}/quiz/evaluate`, req.body);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error evaluating quiz:', error.message);
+    res.json({
+      success: false,
+      error: 'Quiz evaluation service temporarily unavailable'
+    });
+  }
+});
+
+// Get remedial learning content
+router.post('/remediation/content', async (req, res) => {
+  try {
+    const response = await axios.post(`${RAG_API_URL}/remediation/content`, req.body);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching remediation content:', error.message);
+    res.json({
+      success: false,
+      error: 'Remediation content service temporarily unavailable'
+    });
+  }
+});
+
+// Get remedial practice questions
+router.post('/remediation/questions', async (req, res) => {
+  try {
+    const response = await axios.post(`${RAG_API_URL}/remediation/questions`, req.body);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching remediation questions:', error.message);
+    res.json({
+      success: false,
+      error: 'Remediation questions service temporarily unavailable'
+    });
+  }
+});
+
 // Fallback data functions
 function getFallbackChapters() {
   return [

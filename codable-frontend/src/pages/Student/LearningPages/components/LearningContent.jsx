@@ -485,12 +485,6 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
 
                   <Button
                     onClick={() => {
-                      const newCompleted = new Set([...completedTopics, currentTopicIndex]);
-                      setCompletedTopics(newCompleted);
-                      saveTopicCompletion(currentTopicIndex);
-                      if (newCompleted.size >= topics.length) {
-                        saveChapterCompletion();
-                      }
                       onStartPractice(currentTopic?.id, currentTopic?.title, currentTopicIndex);
                     }}
                     className="bg-gradient-to-r from-[#6C63FF] to-[#22D3EE]"

@@ -64,9 +64,13 @@ export function startWebSocketServer(server) {
           userTempDir = path.join(TEMP_DIR, `session_${Date.now()}`);
           fs.mkdirSync(userTempDir, { recursive: true });
 
-          const tempFile = path.join(userTempDir, 'Main.java');
+          // Extract the public class name from the code (default to Main if not found)
+          const classNameMatch = data.code.match(/public\s+class\s+(\w+)/);
+          const className = classNameMatch ? classNameMatch[1] : 'Main';
+          
+          const tempFile = path.join(userTempDir, `${className}.java`);
 
-          // Write code to Main.java
+          // Write code to the Java file with extracted class name
           fs.writeFileSync(tempFile, data.code);
 
           console.log('\n=== CODE ANALYSIS START ===');
@@ -103,9 +107,9 @@ export function startWebSocketServer(server) {
             executionStartTime = process.hrtime.bigint();
             peakMemory = 0;
 
-            // Run Java (Main class in userTempDir)
-            javaProcess = spawn('java', ['-cp', userTempDir, 'Main']);
-            console.log('\n🚀 Java process started with PID:', javaProcess.pid);
+            // Run Java (using the extracted class name)
+            javaProcess = spawn('java', ['-cp', userTempDir, className]);
+            console.log('\n🚀 Java process started with PID:', javaProcess.pid, 'Class:', className);
 
             // Monitor memory usage every 50ms
             memoryMonitorInterval = setInterval(async () => {

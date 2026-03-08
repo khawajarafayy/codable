@@ -1,0 +1,186 @@
+{
+  "chapter_id": 4,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Multiplication Table",
+      "topic": "for Loops",
+      "difficulty": "medium",
+      "description": "Write a Java program that prints the multiplication table of 7 from 1 to 10 using a for loop.",
+      "constraints": [
+        "Use a for loop",
+        "Print each multiplication on a new line",
+        "Format: 7 x 1 = 7"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n..."
+        }
+      ],
+      "hints": [
+        "Loop from i = 1 to i <= 10",
+        "Calculate product as 7 * i",
+        "Print formatted output"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int num = 7;\n        // Print multiplication table\n        \n    }\n}",
+      "expectedOutput": "7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "7 x 10 = 70"
+        }
+      ],
+      "solutionKeywords": ["for", "i++", "*", "System.out.println"],
+      "mustContain": ["for"],
+      "mustNotContain": [],
+      "conceptsTested": ["for-loop", "multiplication", "formatted-output"]
+    },
+    {
+      "id": 2,
+      "title": "Sum of Even Numbers",
+      "topic": "while Loops",
+      "difficulty": "medium",
+      "description": "Write a Java program that calculates the sum of all even numbers from 1 to 20 using a while loop.",
+      "constraints": [
+        "Use a while loop",
+        "Only add even numbers to sum",
+        "Print the final sum"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Sum of even numbers from 1 to 20: 110"
+        }
+      ],
+      "hints": [
+        "Use % 2 == 0 to check for even",
+        "Initialize sum = 0 before loop",
+        "Increment counter in each iteration"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int sum = 0;\n        int i = 1;\n        // Calculate sum of even numbers\n        \n    }\n}",
+      "expectedOutput": "Sum of even numbers from 1 to 20: 110",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "110"
+        }
+      ],
+      "solutionKeywords": ["while", "%", "2", "==", "0", "+="],
+      "mustContain": ["while"],
+      "mustNotContain": [],
+      "conceptsTested": ["while-loop", "modulus-operator", "accumulator-pattern"]
+    },
+    {
+      "id": 3,
+      "title": "Number Pyramid",
+      "topic": "Nested Loops",
+      "difficulty": "hard",
+      "description": "Write a Java program that prints a number pyramid with 5 rows. Each row should print the row number that many times (row 1 prints '1', row 2 prints '2 2', row 3 prints '3 3 3', etc.).",
+      "constraints": [
+        "Use nested for loops",
+        "5 rows total",
+        "Numbers separated by spaces"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "1\n2 2\n3 3 3\n4 4 4 4\n5 5 5 5 5"
+        }
+      ],
+      "hints": [
+        "Outer loop controls rows (1 to 5)",
+        "Inner loop prints the number i times",
+        "Add space between numbers"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Print number pyramid\n        \n    }\n}",
+      "expectedOutput": "1\n2 2\n3 3 3\n4 4 4 4\n5 5 5 5 5",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "5 5 5 5 5"
+        }
+      ],
+      "solutionKeywords": ["for", "for", "i", "j"],
+      "mustContain": ["for"],
+      "mustNotContain": [],
+      "conceptsTested": ["nested-loops", "pattern-printing"]
+    },
+    {
+      "id": 4,
+      "title": "Prime Number Checker",
+      "topic": "break and continue",
+      "difficulty": "hard",
+      "description": "Write a Java program that checks if the number 29 is prime. Use a loop with break statement to optimize the check. A prime number is only divisible by 1 and itself.",
+      "constraints": [
+        "Use a loop to check divisibility",
+        "Use break when divisor found",
+        "Print whether number is prime or not"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "29 is a prime number"
+        }
+      ],
+      "hints": [
+        "Check divisibility from 2 to sqrt(n)",
+        "If any divisor found, break and mark as not prime",
+        "Use boolean flag to track result"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int num = 29;\n        boolean isPrime = true;\n        // Check if prime\n        \n    }\n}",
+      "expectedOutput": "29 is a prime number",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "prime"
+        }
+      ],
+      "solutionKeywords": ["for", "%", "break", "boolean"],
+      "mustContain": ["for", "break"],
+      "mustNotContain": [],
+      "conceptsTested": ["loop", "break-statement", "prime-number-logic"]
+    },
+    {
+      "id": 5,
+      "title": "Factorial Calculator",
+      "topic": "Loop Applications",
+      "difficulty": "hard",
+      "description": "Write a Java program that calculates the factorial of 6 (6!). Use a for loop. Remember: factorial of n = n * (n-1) * (n-2) * ... * 1. Display the calculation process.",
+      "constraints": [
+        "Use a for loop",
+        "Calculate 6! = 720",
+        "Show intermediate results"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "6! = 6 x 5 x 4 x 3 x 2 x 1 = 720"
+        }
+      ],
+      "hints": [
+        "Start with result = 1",
+        "Multiply result by i in each iteration",
+        "Loop from n down to 1 or 1 up to n"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int n = 6;\n        int factorial = 1;\n        // Calculate factorial\n        \n    }\n}",
+      "expectedOutput": "6! = 720",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "720"
+        }
+      ],
+      "solutionKeywords": ["for", "*=", "factorial"],
+      "mustContain": ["for"],
+      "mustNotContain": [],
+      "conceptsTested": ["for-loop", "accumulator-pattern", "factorial"]
+    }
+  ]
+}

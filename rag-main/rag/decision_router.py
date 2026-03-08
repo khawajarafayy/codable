@@ -66,15 +66,18 @@ class AdaptiveRouter:
 
         # 2. Decide: advance or remediate
         all_correct = all(r.get("is_correct", False) for r in quiz_responses)
+        score_pct = sum(1 for r in quiz_responses if r.get("is_correct")) / max(len(quiz_responses), 1) * 100
 
-        if all_correct and self.tracer.should_advance(updated_masteries):
+        # If ALL answers are correct, allow advancement (even if masteries are below threshold)
+        # This prevents infinite remediation loops when user demonstrates understanding
+        if all_correct:
             return {
                 "action": "advance",
                 "topic_id": topic_id,
                 "next_topic_id": self._get_next_topic(topic_id),
                 "updated_masteries": updated_masteries,
                 "weak_concepts": [],
-                "score": sum(1 for r in quiz_responses if r.get("is_correct")) / max(len(quiz_responses), 1) * 100,
+                "score": score_pct,
             }
         else:
             return {
@@ -83,7 +86,7 @@ class AdaptiveRouter:
                 "next_topic_id": None,
                 "weak_concepts": weak_concepts,
                 "updated_masteries": updated_masteries,
-                "score": sum(1 for r in quiz_responses if r.get("is_correct")) / max(len(quiz_responses), 1) * 100,
+                "score": score_pct,
                 "remediation_plan": self._build_remediation_plan(
                     topic_id, weak_concepts, attempt_number
                 ),

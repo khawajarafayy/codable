@@ -1,0 +1,186 @@
+{
+  "chapter_id": 9,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Simple Inheritance",
+      "topic": "Inheritance Basics",
+      "difficulty": "medium",
+      "description": "Write a Java program with an Animal class (with name field and speak() method) and a Dog class that extends Animal. Override speak() to print 'Woof!'. Create a Dog named 'Buddy' and make it speak.",
+      "constraints": [
+        "Animal is parent class",
+        "Dog extends Animal",
+        "Override speak() method"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Name: Buddy\nBuddy says: Woof!"
+        }
+      ],
+      "hints": [
+        "Use 'extends' keyword",
+        "Use @Override annotation",
+        "Call super() in constructor if needed"
+      ],
+      "starterCode": "class Animal {\n    // Define Animal class\n    \n}\n\nclass Dog extends Animal {\n    // Define Dog class\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create Dog and make it speak\n        \n    }\n}",
+      "expectedOutput": "Buddy says: Woof!",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Woof"
+        }
+      ],
+      "solutionKeywords": ["extends", "@Override", "speak", "super"],
+      "mustContain": ["extends"],
+      "mustNotContain": [],
+      "conceptsTested": ["inheritance", "extends-keyword", "method-overriding"]
+    },
+    {
+      "id": 2,
+      "title": "Super Keyword Usage",
+      "topic": "Using super",
+      "difficulty": "medium",
+      "description": "Write a Vehicle class with brand field and a constructor. Write a Car class that extends Vehicle, adds a model field, and uses super() to call the parent constructor. Create a Car with brand 'Toyota' and model 'Camry'.",
+      "constraints": [
+        "Use super() in Car constructor",
+        "Vehicle has brand field",
+        "Car has additional model field"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Brand: Toyota\nModel: Camry"
+        }
+      ],
+      "hints": [
+        "super(brand) calls parent constructor",
+        "super() must be first statement",
+        "Child can access parent fields via super"
+      ],
+      "starterCode": "class Vehicle {\n    // Define Vehicle\n    \n}\n\nclass Car extends Vehicle {\n    // Define Car using super\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create Car\n        \n    }\n}",
+      "expectedOutput": "Brand: Toyota\nModel: Camry",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Toyota"
+        }
+      ],
+      "solutionKeywords": ["extends", "super", "this", "String"],
+      "mustContain": ["extends", "super"],
+      "mustNotContain": [],
+      "conceptsTested": ["super-keyword", "constructor-chaining", "inheritance"]
+    },
+    {
+      "id": 3,
+      "title": "Polymorphism Demo",
+      "topic": "Polymorphism",
+      "difficulty": "hard",
+      "description": "Write a Shape class with an abstract area() method. Create Circle and Rectangle subclasses that implement area(). Create an array of Shape references containing different shapes and calculate total area using polymorphism.",
+      "constraints": [
+        "Shape is abstract with abstract area()",
+        "Circle and Rectangle implement area()",
+        "Use Shape[] array with mixed objects"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Circle area: 78.54\nRectangle area: 20.0\nTotal area: 98.54"
+        }
+      ],
+      "hints": [
+        "abstract class Shape { abstract double area(); }",
+        "Circle: Math.PI * radius * radius",
+        "Loop through Shape[] and call area()"
+      ],
+      "starterCode": "abstract class Shape {\n    // Abstract area method\n    \n}\n\nclass Circle extends Shape {\n    // Implement Circle\n    \n}\n\nclass Rectangle extends Shape {\n    // Implement Rectangle\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create array and calculate total\n        \n    }\n}",
+      "expectedOutput": "Total area calculated using polymorphism",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "area"
+        }
+      ],
+      "solutionKeywords": ["abstract", "extends", "Shape[]", "@Override", "area()"],
+      "mustContain": ["abstract", "extends", "@Override"],
+      "mustNotContain": [],
+      "conceptsTested": ["polymorphism", "abstract-class", "method-overriding"]
+    },
+    {
+      "id": 4,
+      "title": "Interface Implementation",
+      "topic": "Interfaces",
+      "difficulty": "hard",
+      "description": "Write a Drawable interface with a draw() method. Create Circle and Square classes that implement Drawable. Create objects and call draw() on each.",
+      "constraints": [
+        "Define Drawable interface",
+        "Both classes implement Drawable",
+        "Demonstrate interface usage"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Drawing a circle with radius 5\nDrawing a square with side 4"
+        }
+      ],
+      "hints": [
+        "interface Drawable { void draw(); }",
+        "Use 'implements' keyword",
+        "Interface methods are public abstract by default"
+      ],
+      "starterCode": "interface Drawable {\n    // Define draw method\n    \n}\n\nclass Circle implements Drawable {\n    // Implement Circle\n    \n}\n\nclass Square implements Drawable {\n    // Implement Square\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create and draw shapes\n        \n    }\n}",
+      "expectedOutput": "Drawing a circle\nDrawing a square",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Drawing"
+        }
+      ],
+      "solutionKeywords": ["interface", "implements", "draw()", "@Override"],
+      "mustContain": ["interface", "implements"],
+      "mustNotContain": [],
+      "conceptsTested": ["interface", "implements", "abstraction"]
+    },
+    {
+      "id": 5,
+      "title": "Multiple Interfaces",
+      "topic": "Multiple Interfaces",
+      "difficulty": "hard",
+      "description": "Write two interfaces: Flyable (with fly() method) and Swimmable (with swim() method). Create a Duck class that implements both interfaces. Demonstrate a duck that can both fly and swim.",
+      "constraints": [
+        "Two separate interfaces",
+        "Duck implements both",
+        "Call both methods"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Duck is flying!\nDuck is swimming!"
+        }
+      ],
+      "hints": [
+        "class Duck implements Flyable, Swimmable",
+        "Implement all methods from both interfaces",
+        "Java allows multiple interface implementation"
+      ],
+      "starterCode": "interface Flyable {\n    void fly();\n}\n\ninterface Swimmable {\n    void swim();\n}\n\nclass Duck implements Flyable, Swimmable {\n    // Implement both interfaces\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create duck and demonstrate abilities\n        \n    }\n}",
+      "expectedOutput": "Duck is flying!\nDuck is swimming!",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "flying"
+        }
+      ],
+      "solutionKeywords": ["implements", "Flyable", "Swimmable", "fly()", "swim()"],
+      "mustContain": ["implements", ","],
+      "mustNotContain": [],
+      "conceptsTested": ["multiple-interfaces", "interface-implementation"]
+    }
+  ]
+}

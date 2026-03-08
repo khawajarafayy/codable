@@ -199,7 +199,8 @@ export default function LearningPage() {
         weakConcepts,
         mistakeDetails,
         attemptNumber,
-        2
+        2,
+        remediationContent
       );
 
       if (result.success && result.questions && result.questions.length > 0) {
@@ -383,7 +384,7 @@ export default function LearningPage() {
       {mode === 'practice' && (
         <PracticeMode
           onBackToLearning={handleBackToLearning}
-          topicId={topicId || `${chapterId}-1`}
+          chapterId={chapterId}
           topicTitle={topicTitle || `Chapter ${chapterId} Practice`}
         />
       )}

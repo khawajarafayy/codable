@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, AlertTriangle, Lightbulb, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, AlertTriangle, Lightbulb, ChevronRight, Loader2, CheckCircle, Code, List } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 
 /**
@@ -23,21 +23,78 @@ function toText(val) {
 }
 
 /**
- * Normalize the full content prop into { sections, summary }.
- * Handles: proper object, raw JSON string, plain text, or other edge cases.
+ * Normalize the full content prop into { sections, summary, quickCheck }.
+ * Handles the NEW structure: whatWentWrong, conceptExplanation, conceptComparison, example, keyPoints
+ * Also handles legacy field names and sections array format.
  */
 function normalizeContent(raw) {
-  if (!raw) return { sections: [], summary: '' };
+  if (!raw) return { sections: [], summary: '', quickCheck: null };
 
   if (typeof raw === 'string') {
     try { raw = JSON.parse(raw); }
-    catch { return { sections: [{ title: 'Review Material', content: raw }], summary: '' }; }
+    catch { return { sections: [{ title: 'Review Material', content: raw }], summary: '', quickCheck: null }; }
   }
 
   if (typeof raw !== 'object') {
-    return { sections: [{ title: 'Review Material', content: toText(raw) }], summary: '' };
+    return { sections: [{ title: 'Review Material', content: toText(raw) }], summary: '', quickCheck: null };
   }
 
+  // NEW STRUCTURE: whatWentWrong, conceptExplanation, conceptComparison, example, keyPoints
+  // Also supports legacy names: mistakeExplanation, conceptRefresher
+  const whatWentWrong = raw.whatWentWrong || raw.mistakeExplanation;
+  const conceptExplanation = raw.conceptExplanation || raw.conceptRefresher;
+  
+  if (whatWentWrong || conceptExplanation || raw.keyPoints) {
+    const sections = [];
+
+    if (whatWentWrong) {
+      sections.push({
+        title: 'What Went Wrong',
+        type: 'mistake',
+        content: toText(whatWentWrong)
+      });
+    }
+
+    if (conceptExplanation) {
+      sections.push({
+        title: 'Concept Explanation',
+        type: 'explanation',
+        content: toText(conceptExplanation)
+      });
+    }
+
+    if (raw.conceptComparison) {
+      sections.push({
+        title: 'Understanding the Difference',
+        type: 'comparison',
+        content: toText(raw.conceptComparison)
+      });
+    }
+
+    if (raw.example) {
+      sections.push({
+        title: 'Example',
+        type: 'example',
+        content: toText(raw.example)
+      });
+    }
+
+    if (raw.keyPoints && Array.isArray(raw.keyPoints)) {
+      sections.push({
+        title: 'Key Points',
+        type: 'keypoints',
+        content: raw.keyPoints.map(p => `• ${toText(p)}`).join('\n')
+      });
+    }
+
+    return {
+      sections,
+      summary: '',
+      quickCheck: raw.quickCheck || null
+    };
+  }
+
+  // LEGACY STRUCTURE: sections array
   if (Array.isArray(raw.sections)) {
     return {
       sections: raw.sections.map(s => ({
@@ -46,18 +103,20 @@ function normalizeContent(raw) {
         examples: Array.isArray(s?.examples)
           ? s.examples.map(e => (typeof e === 'string' ? e : toText(e)))
           : [],
+        points: Array.isArray(s?.points) ? s.points : [],
         commonPitfall: toText(s?.commonPitfall),
         keyTakeaway: toText(s?.keyTakeaway),
       })),
       summary: toText(raw.summary),
+      quickCheck: raw.quickCheck || null
     };
   }
 
   // No sections field — treat object values as sections
   const sections = Object.entries(raw)
-    .filter(([, v]) => v)
+    .filter(([k, v]) => v && k !== 'quickCheck')
     .map(([k, v]) => ({ title: k, content: toText(v) }));
-  return { sections, summary: '' };
+  return { sections, summary: '', quickCheck: raw.quickCheck || null };
 }
 
 /** Apply inline markdown — identical to LearningContent.jsx */
@@ -146,6 +205,66 @@ function renderTextContent(text) {
   );
 }
 
+/** Get icon and color based on section type */
+function getSectionStyle(type) {
+  switch (type) {
+    case 'mistake':
+      return { 
+        Icon: AlertTriangle, 
+        iconColor: 'text-red-400', 
+        bgColor: 'bg-red-500/20',
+        borderColor: 'border-red-500/30',
+        gradientFrom: 'from-red-500/10',
+        gradientTo: 'to-orange-500/5'
+      };
+    case 'explanation':
+      return { 
+        Icon: BookOpen, 
+        iconColor: 'text-blue-400', 
+        bgColor: 'bg-blue-500/20',
+        borderColor: 'border-blue-500/30',
+        gradientFrom: 'from-blue-500/10',
+        gradientTo: 'to-cyan-500/5'
+      };
+    case 'comparison':
+      return { 
+        Icon: List, 
+        iconColor: 'text-purple-400', 
+        bgColor: 'bg-purple-500/20',
+        borderColor: 'border-purple-500/30',
+        gradientFrom: 'from-purple-500/10',
+        gradientTo: 'to-indigo-500/5'
+      };
+    case 'example':
+      return { 
+        Icon: Code, 
+        iconColor: 'text-emerald-400', 
+        bgColor: 'bg-emerald-500/20',
+        borderColor: 'border-emerald-500/30',
+        gradientFrom: 'from-emerald-500/10',
+        gradientTo: 'to-green-500/5'
+      };
+    case 'keypoints':
+      return { 
+        Icon: CheckCircle, 
+        iconColor: 'text-amber-400', 
+        bgColor: 'bg-amber-500/20',
+        borderColor: 'border-amber-500/30',
+        gradientFrom: 'from-amber-500/10',
+        gradientTo: 'to-yellow-500/5'
+      };
+    default:
+      return { 
+        Icon: Lightbulb, 
+        iconColor: 'text-amber-400', 
+        bgColor: 'bg-amber-500/20',
+        borderColor: 'border-amber-500/30',
+        gradientFrom: 'from-amber-500/10',
+        gradientTo: 'to-orange-500/5'
+      };
+  }
+}
+
 export function RemediationContent({ content, topicTitle, weakConcepts, onStartRemediationQuiz, onBackToLearning, loading }) {
   if (loading) {
     return (
@@ -159,7 +278,7 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
     );
   }
 
-  const { sections, summary } = normalizeContent(content);
+  const { sections, summary, quickCheck } = normalizeContent(content);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-amber-950/30">
@@ -209,19 +328,23 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
 
         {/* Content Sections — same card style + same text rendering as LearningContent.jsx */}
         <div className="space-y-6">
-          {sections.map((section, idx) => (
+          {sections.map((section, idx) => {
+            const style = getSectionStyle(section.type);
+            const { Icon } = style;
+            
+            return (
             <div
               key={idx}
-              className="bg-gradient-to-br from-amber-500/10 to-orange-500/5 rounded-2xl border border-amber-500/30 p-6 shadow-lg"
+              className={`bg-gradient-to-br ${style.gradientFrom} ${style.gradientTo} rounded-2xl border ${style.borderColor} p-6 shadow-lg`}
             >
               {/* Section Header */}
               <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-700/50">
-                <div className="p-2 rounded-lg bg-amber-500/20">
-                  <Lightbulb className="w-5 h-5 text-amber-400" />
+                <div className={`p-2 rounded-lg ${style.bgColor}`}>
+                  <Icon className={`w-5 h-5 ${style.iconColor}`} />
                 </div>
                 <div>
                   {section.targetConcept && (
-                    <span className="text-xs font-medium uppercase tracking-wider text-amber-400 block">
+                    <span className={`text-xs font-medium uppercase tracking-wider ${style.iconColor} block`}>
                       {section.targetConcept}
                     </span>
                   )}
@@ -233,6 +356,19 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
               <div className="prose prose-invert max-w-none">
                 {renderTextContent(section.content)}
               </div>
+
+              {/* Points array (for keypoints type sections) */}
+              {section.points && section.points.length > 0 && (
+                <ul className="space-y-2 mt-4">
+                  {section.points.map((point, pIdx) => (
+                    <li key={pIdx} className="flex items-start gap-2 text-sm">
+                      <span className="text-amber-400 mt-0.5 flex-shrink-0">•</span>
+                      <span className="text-gray-300 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: applyInline(toText(point)) }} />
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               {/* Code Examples (from examples array) — identical Mac-style blocks */}
               {section.examples && section.examples.length > 0 && (
@@ -276,13 +412,46 @@ export function RemediationContent({ content, topicTitle, weakConcepts, onStartR
                 </div>
               )}
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {/* Summary */}
         {summary && (
           <div className="mt-6 p-4 bg-[#6C63FF]/5 rounded-xl border border-[#6C63FF]/20">
             <p className="text-gray-300 text-sm">{summary}</p>
+          </div>
+        )}
+
+        {/* Quick Check Question */}
+        {quickCheck && quickCheck.question && (
+          <div className="mt-6 bg-gradient-to-br from-purple-500/10 to-indigo-500/5 rounded-2xl border border-purple-500/30 p-6 shadow-lg">
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-700/50">
+              <div className="p-2 rounded-lg bg-purple-500/20">
+                <Lightbulb className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white">Quick Check</h3>
+            </div>
+            <p className="text-gray-200 mb-4">{quickCheck.question}</p>
+            {quickCheck.options && (
+              <div className="space-y-2">
+                {quickCheck.options.map((option, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-300 text-sm hover:border-purple-500/50 transition-colors cursor-pointer"
+                  >
+                    <span className="text-purple-400 font-medium mr-2">{String.fromCharCode(65 + idx)}.</span>
+                    {option}
+                  </div>
+                ))}
+              </div>
+            )}
+            {quickCheck.correctAnswer && (
+              <div className="mt-4 p-3 bg-green-500/10 rounded-lg border border-green-500/30">
+                <span className="text-green-400 text-sm font-medium">✓ Correct Answer: </span>
+                <span className="text-gray-300 text-sm">{quickCheck.correctAnswer}</span>
+              </div>
+            )}
           </div>
         )}
 

@@ -2400,6 +2400,185 @@ def get_fallback_practice_questions(topic_info, difficulty, num_questions):
     ]
 
 
+def load_chapter_practice_questions(chapter_id):
+    """Load pre-generated chapter practice questions from file"""
+    import json
+    filepath = os.path.join(GENERATED_CONTENT_DIR, f"chapter_{chapter_id}_practice.json")
+    
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                print(f"⚡ Loaded pre-generated chapter {chapter_id} practice questions instantly!")
+                return data.get('questions', [])
+        except Exception as e:
+            print(f"⚠️ Error loading chapter practice questions: {e}")
+    
+    return None
+
+
+@app.route('/api/chapter/<int:chapter_id>/practice-questions', methods=['GET'])
+def get_chapter_practice_questions(chapter_id):
+    """Get practice questions covering all topics in a chapter (loads from pre-generated files)"""
+    try:
+        if chapter_id not in CHAPTER_TOPICS:
+            return jsonify({'success': False, 'error': 'Chapter not found'}), 404
+        
+        chapter_data = CHAPTER_TOPICS[chapter_id]
+        
+        # First try to load pre-generated questions
+        questions = load_chapter_practice_questions(chapter_id)
+        
+        if questions and len(questions) > 0:
+            return jsonify({
+                'success': True,
+                'chapter_id': chapter_id,
+                'chapter_title': chapter_data['title'],
+                'difficulty': 'mixed',
+                'questions': questions,
+                'source': 'pre-generated'
+            })
+        
+        # Fallback to generating on-the-fly if file doesn't exist
+        print(f"⚠️ No pre-generated questions for chapter {chapter_id}, generating on-the-fly...")
+        topics = chapter_data['topics']
+        difficulty = request.args.get('difficulty', 'medium')
+        num_questions = int(request.args.get('num', 5))
+        
+        questions = generate_chapter_practice_questions(
+            chapter_id=chapter_id,
+            chapter_title=chapter_data['title'],
+            topics=topics,
+            difficulty=difficulty,
+            num_questions=num_questions
+        )
+        
+        return jsonify({
+            'success': True,
+            'chapter_id': chapter_id,
+            'chapter_title': chapter_data['title'],
+            'difficulty': difficulty,
+            'questions': questions,
+            'source': 'generated'
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting chapter practice questions: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def generate_chapter_practice_questions(chapter_id, chapter_title, topics, difficulty, num_questions):
+    """Generate practice questions covering all topics in a chapter"""
+    from langchain_groq import ChatGroq
+    from langchain_core.prompts import ChatPromptTemplate
+    import json
+    
+    model = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        groq_api_key=GROQ_API_KEY,
+        temperature=0.3,
+        max_tokens=8192
+    )
+    
+    topics_summary = '\n'.join([f"- {t['title']}: {t['description']}" for t in topics])
+    all_keywords = []
+    for topic in topics:
+        all_keywords.extend(topic.get('keywords', []))
+    keywords_str = ', '.join(list(set(all_keywords))[:30])
+    
+    relevant_content = get_relevant_context(f"{chapter_title} {keywords_str}", k=5)
+    book_context = '\n\n'.join(relevant_content) if relevant_content else ''
+    
+    prompt_template = """You are an expert Java instructor creating chapter practice questions.
+
+CHAPTER: {chapter_title}
+TOPICS COVERED:
+{topics_summary}
+
+KEY CONCEPTS: {keywords}
+DIFFICULTY: {difficulty}
+
+RELEVANT CONTENT:
+{book_context}
+
+Generate exactly {num_questions} Java coding practice questions as a JSON array. Each question should test different concepts from the chapter.
+
+[
+  {{
+    "id": 1,
+    "title": "Clear descriptive title",
+    "topic": "Topic this tests",
+    "difficulty": "{difficulty}",
+    "description": "Detailed description of what to code",
+    "constraints": ["constraint 1", "constraint 2"],
+    "examples": [{{"input": "example", "output": "expected output"}}],
+    "hints": ["helpful hint 1", "helpful hint 2"],
+    "starterCode": "public class Solution {{\\n    public static void main(String[] args) {{\\n        // Your code here\\n    }}\\n}}",
+    "expectedOutput": "Exact expected output",
+    "testCases": [{{"input": "", "expectedOutput": "output"}}],
+    "solutionKeywords": ["keyword"],
+    "mustContain": ["public class"],
+    "mustNotContain": []
+  }}
+]
+
+DIFFICULTY GUIDELINES:
+- Easy: Basic syntax, simple print statements, variable declarations
+- Medium: Conditionals, simple loops, basic calculations
+- Hard: Nested structures, complex logic, multiple concepts
+
+Return ONLY valid JSON array, no other text."""
+    
+    prompt = ChatPromptTemplate.from_template(prompt_template)
+    chain = prompt | model
+    
+    result = chain.invoke({
+        "chapter_title": chapter_title,
+        "topics_summary": topics_summary,
+        "keywords": keywords_str,
+        "difficulty": difficulty,
+        "num_questions": num_questions,
+        "book_context": book_context[:3000]
+    })
+    
+    response_text = result.content.strip()
+    
+    try:
+        if response_text.startswith('```'):
+            response_text = response_text.split('```')[1]
+            if response_text.startswith('json'):
+                response_text = response_text[4:]
+        return json.loads(response_text.strip())
+    except:
+        import re
+        json_match = re.search(r'\[[\s\S]*\]', response_text)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except:
+                pass
+        
+        # Fallback questions
+        return [{
+            "id": i + 1,
+            "title": f"Practice: {topics[i % len(topics)]['title']}",
+            "topic": topics[i % len(topics)]['title'],
+            "difficulty": difficulty,
+            "description": f"Write a Java program demonstrating {topics[i % len(topics)]['title']}. {topics[i % len(topics)]['description']}",
+            "constraints": ["Your code must compile without errors"],
+            "examples": [{"input": "", "output": "Your output"}],
+            "hints": [f"Review {topics[i % len(topics)]['title']}"],
+            "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}",
+            "expectedOutput": "",
+            "testCases": [],
+            "solutionKeywords": topics[i % len(topics)].get('keywords', [])[:3],
+            "mustContain": ["public class"],
+            "mustNotContain": []
+        } for i in range(num_questions)]
+
+
 def compare_outputs(expected, actual):
     """
     Compare expected and actual outputs with flexible matching.
@@ -2771,14 +2950,14 @@ def get_remediation_content():
 @app.route('/api/remediation/questions', methods=['POST'])
 def get_remediation_questions():
     """
-    Generate targeted remedial questions for weak areas.
+    Generate targeted remedial questions based on remediation content.
     
     Expects JSON body:
     {
         "topic_id": "3-5",
         "weak_concepts": [{"concept": "if-else", ...}],
         "mistake_details": [{"concept": "...", ...}],
-        "attempt_number": 2,
+        "remediation_content": {"whatWentWrong": "...", "conceptExplanation": "...", ...},
         "num_questions": 2
     }
     """
@@ -2787,7 +2966,7 @@ def get_remediation_questions():
         topic_id = data.get('topic_id')
         weak_concepts = data.get('weak_concepts', [])
         mistake_details = data.get('mistake_details', [])
-        attempt_number = data.get('attempt_number', 2)
+        remediation_content = data.get('remediation_content', None)
         num_questions = data.get('num_questions', 2)
 
         if not topic_id:
@@ -2799,7 +2978,7 @@ def get_remediation_questions():
             topic_info=topic_info,
             weak_concepts=weak_concepts,
             mistake_details=mistake_details,
-            attempt_number=attempt_number,
+            remediation_content=remediation_content,
             num_questions=num_questions
         )
 

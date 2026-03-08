@@ -148,14 +148,46 @@ export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, questi
     monacoRef.current.editor.setModelMarkers(model, 'java-syntax', markers);
   };
 
+  // Normalize output for comparison: trim, lowercase, normalize whitespace, remove empty lines
+  const normalizeForComparison = (text) => {
+    if (!text) return '';
+    return text
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .join('\n')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   // Check if output matches expected
   useEffect(() => {
     if (output && question?.expectedOutput) {
-      const normalizedOutput = output.trim().toLowerCase();
-      const normalizedExpected = question.expectedOutput.trim().toLowerCase();
-      const matches = normalizedOutput.includes(normalizedExpected) || 
-                      normalizedExpected.includes(normalizedOutput) ||
-                      normalizedOutput === normalizedExpected;
+      const normalizedOutput = normalizeForComparison(output);
+      const normalizedExpected = normalizeForComparison(question.expectedOutput);
+      
+      // Strict equality check after normalization
+      const exactMatch = normalizedOutput === normalizedExpected;
+      
+      // Check if the expected output appears at the end of actual output
+      // (handles cases where prompts appear before the result)
+      const endsWithExpected = normalizedOutput.endsWith(normalizedExpected);
+      
+      // For multi-line expected output, check if all lines appear in order
+      const expectedLines = normalizedExpected.split(' ');
+      const outputLines = normalizedOutput.split(' ');
+      const allLinesPresent = expectedLines.every(line => 
+        outputLines.some(outLine => outLine.includes(line) || line.includes(outLine))
+      );
+      
+      // Match if exact, ends with expected, or all expected content is found
+      const matches = exactMatch || (endsWithExpected && normalizedExpected.length > 0) || 
+                      (allLinesPresent && normalizedExpected.length > 0 && 
+                       Math.abs(normalizedOutput.length - normalizedExpected.length) < normalizedExpected.length * 0.3);
+      
       setOutputMatch(matches);
     }
   }, [output, question?.expectedOutput]);

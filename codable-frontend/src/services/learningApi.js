@@ -56,7 +56,21 @@ const learningApi = {
     }
   },
 
-  // Validate student's solution
+  // Get chapter-level practice questions (after completing all topics)
+  getChapterPracticeQuestions: async (chapterId, difficulty = 'easy', num = 5) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/learning/chapters/${chapterId}/practice-questions`,
+        { params: { difficulty, num } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching chapter practice questions:', error);
+      throw error;
+    }
+  },
+
+  // Validate student's solution (basic validation)
   validateSolution: async (code, question, actualOutput) => {
     try {
       const response = await axios.post(`${API_URL}/api/learning/validate-solution`, {
@@ -67,6 +81,57 @@ const learningApi = {
       return response.data;
     } catch (error) {
       console.error('Error validating solution:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Validate chapter practice solution using embedding-based comparison
+   * 
+   * Uses semantic similarity via embeddings to compare expected output
+   * with user's code output. Minor differences in spacing, punctuation,
+   * or slight wording don't cause answers to be marked incorrect.
+   * 
+   * @param {string} code - The user's submitted code
+   * @param {object} question - The question object with expectedOutput & validation rules
+   * @param {string} actualOutput - Output from executing the user's code
+   * @param {number} threshold - Optional similarity threshold (default: 0.92)
+   * @returns {Promise<{success: boolean, validation: object}>}
+   */
+  validateChapterPractice: async (code, question, actualOutput, threshold = 0.92) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/validate-chapter-practice`, {
+        code,
+        question,
+        actualOutput,
+        threshold
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error validating chapter practice:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Compare two outputs using embedding-based similarity
+   * Quick check without full validation - useful for testing
+   * 
+   * @param {string} expectedOutput - The expected output
+   * @param {string} userOutput - The user's actual output
+   * @param {number} threshold - Optional similarity threshold (default: 0.92)
+   * @returns {Promise<{similarityScore: number, isCorrect: boolean}>}
+   */
+  compareOutputs: async (expectedOutput, userOutput, threshold = 0.92) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/compare-outputs`, {
+        expectedOutput,
+        userOutput,
+        threshold
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error comparing outputs:', error);
       throw error;
     }
   },
@@ -207,14 +272,15 @@ const learningApi = {
   },
 
   // Get remedial practice questions targeting weak areas
-  getRemedialQuestions: async (topicId, weakConcepts, mistakeDetails, attemptNumber = 2, numQuestions = 2) => {
+  getRemedialQuestions: async (topicId, weakConcepts, mistakeDetails, attemptNumber = 2, numQuestions = 2, remediationContent = null) => {
     try {
       const response = await axios.post(`${API_URL}/api/learning/remediation/questions`, {
         topic_id: topicId,
         weak_concepts: weakConcepts,
         mistake_details: mistakeDetails,
         attempt_number: attemptNumber,
-        num_questions: numQuestions
+        num_questions: numQuestions,
+        remediation_content: remediationContent
       });
       return response.data;
     } catch (error) {

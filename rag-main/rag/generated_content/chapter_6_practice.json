@@ -1,0 +1,186 @@
+{
+  "chapter_id": 6,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Array Sum Calculator",
+      "topic": "Array Basics",
+      "difficulty": "medium",
+      "description": "Write a Java program that creates an array of 5 integers {10, 20, 30, 40, 50} and calculates their sum using a for loop.",
+      "constraints": [
+        "Create array with specified values",
+        "Use a for loop to calculate sum",
+        "Print the total sum"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Array: [10, 20, 30, 40, 50]\nSum: 150"
+        }
+      ],
+      "hints": [
+        "Initialize array: int[] arr = {10, 20, 30, 40, 50}",
+        "Loop through array using arr.length",
+        "Accumulate sum in each iteration"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Create array and calculate sum\n        \n    }\n}",
+      "expectedOutput": "Sum: 150",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "150"
+        }
+      ],
+      "solutionKeywords": ["int[]", "for", ".length", "+="],
+      "mustContain": ["int[]", "for"],
+      "mustNotContain": [],
+      "conceptsTested": ["array-declaration", "array-traversal", "accumulator"]
+    },
+    {
+      "id": 2,
+      "title": "Find Maximum",
+      "topic": "Array Processing",
+      "difficulty": "medium",
+      "description": "Write a Java program that finds the maximum value in an array {45, 12, 78, 34, 56, 89, 23}. Use a loop to compare elements.",
+      "constraints": [
+        "Do not use built-in max functions",
+        "Use a loop to find maximum",
+        "Print the maximum value and its index"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Maximum value: 89\nAt index: 5"
+        }
+      ],
+      "hints": [
+        "Start with max = arr[0]",
+        "Compare each element with current max",
+        "Track the index of maximum"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {45, 12, 78, 34, 56, 89, 23};\n        // Find maximum\n        \n    }\n}",
+      "expectedOutput": "Maximum value: 89",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "89"
+        }
+      ],
+      "solutionKeywords": ["for", ">", "max", "if"],
+      "mustContain": ["for", "if"],
+      "mustNotContain": [],
+      "conceptsTested": ["array-traversal", "finding-maximum", "comparison"]
+    },
+    {
+      "id": 3,
+      "title": "Array Reversal",
+      "topic": "Array Manipulation",
+      "difficulty": "hard",
+      "description": "Write a Java program that reverses an array {1, 2, 3, 4, 5} in-place (without creating a new array). Print the array before and after reversal.",
+      "constraints": [
+        "Reverse in-place (modify original array)",
+        "Do not create a new array",
+        "Use swap technique"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Before: [1, 2, 3, 4, 5]\nAfter: [5, 4, 3, 2, 1]"
+        }
+      ],
+      "hints": [
+        "Use two pointers: start and end",
+        "Swap elements at start and end",
+        "Move pointers toward center"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {1, 2, 3, 4, 5};\n        // Print before, reverse, print after\n        \n    }\n}",
+      "expectedOutput": "After: [5, 4, 3, 2, 1]",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "5, 4, 3, 2, 1"
+        }
+      ],
+      "solutionKeywords": ["for", "temp", "swap", "arr.length"],
+      "mustContain": ["for"],
+      "mustNotContain": [],
+      "conceptsTested": ["array-reversal", "swap-technique", "two-pointers"]
+    },
+    {
+      "id": 4,
+      "title": "2D Array Sum",
+      "topic": "Multidimensional Arrays",
+      "difficulty": "hard",
+      "description": "Write a Java program that creates a 3x3 matrix and calculates the sum of all elements and the sum of the diagonal elements. Use: {{1,2,3}, {4,5,6}, {7,8,9}}.",
+      "constraints": [
+        "Create 3x3 2D array",
+        "Calculate total sum using nested loops",
+        "Calculate diagonal sum separately"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Matrix 3x3\nTotal sum: 45\nDiagonal sum: 15"
+        }
+      ],
+      "hints": [
+        "2D array: int[][] matrix = {{1,2,3}, {4,5,6}, {7,8,9}}",
+        "Nested loops for total sum",
+        "Diagonal: matrix[i][i]"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Create matrix and calculate sums\n        \n    }\n}",
+      "expectedOutput": "Total sum: 45\nDiagonal sum: 15",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "45"
+        }
+      ],
+      "solutionKeywords": ["int[][]", "for", "for", "[i][j]", "[i][i]"],
+      "mustContain": ["int[][]", "for"],
+      "mustNotContain": [],
+      "conceptsTested": ["2d-array", "nested-loops", "diagonal-access"]
+    },
+    {
+      "id": 5,
+      "title": "Bubble Sort Implementation",
+      "topic": "Sorting Arrays",
+      "difficulty": "hard",
+      "description": "Write a Java program that sorts the array {64, 34, 25, 12, 22, 11, 90} using the bubble sort algorithm. Print the array after each pass to show the sorting progress.",
+      "constraints": [
+        "Implement bubble sort algorithm",
+        "Show array after each complete pass",
+        "Final sorted array ascending order"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Original: [64, 34, 25, 12, 22, 11, 90]\nPass 1: [...]\n...\nSorted: [11, 12, 22, 25, 34, 64, 90]"
+        }
+      ],
+      "hints": [
+        "Compare adjacent elements",
+        "Swap if left > right",
+        "Outer loop: n-1 passes, Inner loop: comparisons"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {64, 34, 25, 12, 22, 11, 90};\n        // Implement bubble sort\n        \n    }\n}",
+      "expectedOutput": "Sorted: [11, 12, 22, 25, 34, 64, 90]",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "11, 12, 22, 25, 34, 64, 90"
+        }
+      ],
+      "solutionKeywords": ["for", "for", "if", ">", "temp", "swap"],
+      "mustContain": ["for", "if"],
+      "mustNotContain": ["Arrays.sort"],
+      "conceptsTested": ["bubble-sort", "nested-loops", "swapping"]
+    }
+  ]
+}

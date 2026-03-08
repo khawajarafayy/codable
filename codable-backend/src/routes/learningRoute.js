@@ -1,5 +1,6 @@
 import express from 'express';
 import axios from 'axios';
+import { compareOutputs, validateSolution } from '../utils/outputComparator.js';
 
 const router = express.Router();
 const RAG_API_URL = process.env.RAG_API_URL || 'http://localhost:5001/api';
@@ -100,6 +101,25 @@ router.get('/topics/:topicId/practice-questions', async (req, res) => {
   }
 });
 
+// Get chapter-level practice questions (after completing all topics in chapter)
+router.get('/chapters/:chapterId/practice-questions', async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    const { difficulty = 'easy', num = 5 } = req.query;
+    const response = await axios.get(
+      `${RAG_API_URL}/chapter/${chapterId}/practice-questions`,
+      { params: { difficulty, num } }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching chapter practice questions:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Chapter practice questions service temporarily unavailable'
+    });
+  }
+});
+
 // Search content
 router.post('/search', async (req, res) => {
   try {
@@ -114,7 +134,7 @@ router.post('/search', async (req, res) => {
   }
 });
 
-// Validate student solution
+// Validate student solution (proxies to RAG API)
 router.post('/validate-solution', async (req, res) => {
   try {
     const response = await axios.post(`${RAG_API_URL}/validate-solution`, req.body);
@@ -124,6 +144,106 @@ router.post('/validate-solution', async (req, res) => {
     res.json({
       success: false,
       error: 'Validation service temporarily unavailable'
+    });
+  }
+});
+
+/**
+ * Validate chapter practice solution using embedding-based comparison
+ * 
+ * This endpoint uses semantic similarity via embeddings to compare
+ * expected output with user's code output. Minor differences in spacing,
+ * punctuation, or slight wording don't cause answers to be marked incorrect.
+ * 
+ * @body {string} code - The user's submitted code
+ * @body {string} actualOutput - Output from executing the user's code
+ * @body {object} question - The question object containing expectedOutput and validation rules
+ * @body {number} [threshold=0.92] - Optional custom similarity threshold
+ */
+router.post('/validate-chapter-practice', async (req, res) => {
+  try {
+    const { code, actualOutput, question, threshold } = req.body;
+
+    // Validate required fields
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        error: 'Code is required'
+      });
+    }
+
+    if (!question) {
+      return res.status(400).json({
+        success: false,
+        error: 'Question object is required'
+      });
+    }
+
+    // Compare outputs using embedding-based similarity
+    const outputComparison = await compareOutputs(
+      question.expectedOutput || '',
+      actualOutput || '',
+      { threshold: threshold || 0.92 }
+    );
+
+    // Full solution validation with code pattern checks
+    const validation = await validateSolution({
+      code,
+      actualOutput: actualOutput || '',
+      question
+    });
+
+    res.json({
+      success: true,
+      validation: {
+        isCorrect: validation.isCorrect,
+        score: validation.score,
+        similarityScore: outputComparison.similarityScore,
+        feedback: validation.feedback,
+        suggestions: validation.suggestions,
+        details: {
+          outputMatch: outputComparison.isCorrect,
+          normalizedExpected: outputComparison.normalizedExpected,
+          normalizedUser: outputComparison.normalizedUser
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error validating chapter practice:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Validation failed: ' + error.message
+    });
+  }
+});
+
+/**
+ * Simple output comparison endpoint (without full validation)
+ * Useful for quick similarity checks during development or testing
+ * 
+ * @body {string} expectedOutput - The expected output
+ * @body {string} userOutput - The user's actual output
+ * @body {number} [threshold=0.92] - Optional custom similarity threshold
+ */
+router.post('/compare-outputs', async (req, res) => {
+  try {
+    const { expectedOutput, userOutput, threshold } = req.body;
+
+    const result = await compareOutputs(
+      expectedOutput || '',
+      userOutput || '',
+      { threshold: threshold || 0.92 }
+    );
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    console.error('Error comparing outputs:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Comparison failed: ' + error.message
     });
   }
 });

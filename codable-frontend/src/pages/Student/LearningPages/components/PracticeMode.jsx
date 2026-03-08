@@ -6,7 +6,7 @@ import { PracticeEditor } from './PracticeEditor';
 import { FeedbackPanel } from './FeedbackPanel';
 import learningApi from '../../../../services/learningApi';
 
-export function PracticeMode({ onBackToLearning, topicId, topicTitle }) {
+export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [viewMode, setViewMode] = useState('editor');
   const [metrics, setMetrics] = useState(null);
@@ -21,7 +21,7 @@ export function PracticeMode({ onBackToLearning, topicId, topicTitle }) {
   // Fetch questions when component mounts or difficulty changes
   useEffect(() => {
     fetchQuestions();
-  }, [topicId, difficulty]);
+  }, [chapterId, difficulty]);
 
   // Reset code when question changes - start with empty editor
   useEffect(() => {
@@ -33,16 +33,17 @@ export function PracticeMode({ onBackToLearning, topicId, topicTitle }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await learningApi.getPracticeQuestions(topicId, difficulty, 5);
+      // Fetch chapter-level practice questions (5 questions covering the chapter)
+      const response = await learningApi.getChapterPracticeQuestions(chapterId, difficulty, 5);
       if (response.success && response.questions?.length > 0) {
         setQuestions(response.questions);
         setCode(''); // Start with empty editor
       } else {
-        setError('No questions available for this topic');
+        setError('No questions available for this chapter');
         setQuestions(getDefaultQuestions());
       }
     } catch (err) {
-      console.error('Error fetching questions:', err);
+      console.error('Error fetching chapter practice questions:', err);
       setError('Failed to load questions');
       setQuestions(getDefaultQuestions());
     } finally {
@@ -92,16 +93,23 @@ export function PracticeMode({ onBackToLearning, topicId, topicTitle }) {
   const handleSubmit = async (submittedMetrics) => {
     setMetrics(submittedMetrics);
     
-    // Validate the solution
+    // Validate the solution using embedding-based comparison for chapter practice
+    // This uses semantic similarity to handle minor differences in output
     try {
-      const validation = await learningApi.validateSolution(
+      const validation = await learningApi.validateChapterPractice(
         code,
         currentQuestion,
-        submittedMetrics.output || lastOutput
+        submittedMetrics.output || lastOutput,
+        0.92 // similarity threshold
       );
       
       if (validation.success) {
-        setValidationResult(validation.validation);
+        // Include similarity score in the result for user feedback
+        const result = {
+          ...validation.validation,
+          similarityScore: validation.validation.similarityScore
+        };
+        setValidationResult(result);
       } else {
         setValidationResult({
           isCorrect: false,

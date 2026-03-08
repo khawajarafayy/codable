@@ -1,0 +1,187 @@
+{
+  "chapter_id": 3,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Number Sign Checker",
+      "topic": "if Statements",
+      "difficulty": "medium",
+      "description": "Write a Java program that checks if a number is positive, negative, or zero. Use the number -5 in your code. Print an appropriate message based on the number's sign.",
+      "constraints": [
+        "Use if-else if-else structure",
+        "Check for all three cases: positive, negative, zero",
+        "Use the number -5 for testing"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Number: -5\nThe number is negative"
+        }
+      ],
+      "hints": [
+        "Check if number > 0 for positive",
+        "Check if number < 0 for negative",
+        "Otherwise it must be zero"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int number = -5;\n        // Check if positive, negative, or zero\n        \n    }\n}",
+      "expectedOutput": "The number is negative",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "negative"
+        }
+      ],
+      "solutionKeywords": ["if", "else", ">", "<", "0"],
+      "mustContain": ["if", "else"],
+      "mustNotContain": [],
+      "conceptsTested": ["if-statement", "else-statement", "comparison-operators"]
+    },
+    {
+      "id": 2,
+      "title": "Grade Calculator",
+      "topic": "if-else Statements",
+      "difficulty": "medium",
+      "description": "Write a Java program that converts a numeric score (use 85) to a letter grade. Use the standard grading scale: A (90-100), B (80-89), C (70-79), D (60-69), F (below 60).",
+      "constraints": [
+        "Use nested if-else or else-if chain",
+        "Handle all grade ranges",
+        "Display both score and letter grade"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Score: 85\nGrade: B"
+        }
+      ],
+      "hints": [
+        "Start by checking if score >= 90",
+        "Work your way down through each grade range",
+        "Use else for the failing grade"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 85;\n        // Convert to letter grade\n        \n    }\n}",
+      "expectedOutput": "Score: 85\nGrade: B",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "B"
+        }
+      ],
+      "solutionKeywords": ["if", "else", ">=", "90", "80", "70", "60"],
+      "mustContain": ["if", "else"],
+      "mustNotContain": [],
+      "conceptsTested": ["if-else-chain", "comparison-operators", "grading-logic"]
+    },
+    {
+      "id": 3,
+      "title": "Leap Year Checker",
+      "topic": "Logical Operators",
+      "difficulty": "hard",
+      "description": "Write a Java program that determines if a year is a leap year. Use the year 2024. A year is a leap year if: (1) it's divisible by 4 AND not divisible by 100, OR (2) it's divisible by 400. Use logical operators (&&, ||).",
+      "constraints": [
+        "Use logical operators (&&, ||)",
+        "Implement the complete leap year rule",
+        "Display whether the year is a leap year or not"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Year: 2024\n2024 is a leap year"
+        }
+      ],
+      "hints": [
+        "Use % operator to check divisibility",
+        "Condition: (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)",
+        "2024 % 4 == 0 and 2024 % 100 != 0, so it's a leap year"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int year = 2024;\n        // Check if leap year\n        \n    }\n}",
+      "expectedOutput": "2024 is a leap year",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "leap year"
+        }
+      ],
+      "solutionKeywords": ["if", "&&", "||", "%", "4", "100", "400"],
+      "mustContain": ["if", "&&"],
+      "mustNotContain": [],
+      "conceptsTested": ["logical-operators", "modulus-operator", "complex-conditions"]
+    },
+    {
+      "id": 4,
+      "title": "Day of Week Switch",
+      "topic": "switch Statements",
+      "difficulty": "hard",
+      "description": "Write a Java program that uses a switch statement to print the name of a day based on a number (1-7). Use day = 3. Also handle invalid day numbers with a default case.",
+      "constraints": [
+        "Use switch statement",
+        "1 = Monday through 7 = Sunday",
+        "Include a default case for invalid input"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Day number: 3\nDay: Wednesday"
+        }
+      ],
+      "hints": [
+        "switch (day) { case 1: ... }",
+        "Don't forget break statements",
+        "Use default for invalid numbers"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int day = 3;\n        // Use switch to print day name\n        \n    }\n}",
+      "expectedOutput": "Day: Wednesday",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Wednesday"
+        }
+      ],
+      "solutionKeywords": ["switch", "case", "break", "default"],
+      "mustContain": ["switch", "case", "break"],
+      "mustNotContain": [],
+      "conceptsTested": ["switch-statement", "case-labels", "break-statement"]
+    },
+    {
+      "id": 5,
+      "title": "Triangle Validator",
+      "topic": "Logical Operators",
+      "difficulty": "hard",
+      "description": "Write a Java program that checks if three given side lengths can form a valid triangle. Use sides: a=3, b=4, c=5. A valid triangle requires that the sum of any two sides must be greater than the third side. Also determine if it's equilateral, isosceles, or scalene.",
+      "constraints": [
+        "Check triangle validity first",
+        "Use logical operators for validity check",
+        "Classify the triangle type if valid"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Sides: 3, 4, 5\nValid triangle: Yes\nType: Scalene"
+        }
+      ],
+      "hints": [
+        "Valid if: a+b>c && b+c>a && a+c>b",
+        "Equilateral: all sides equal",
+        "Isosceles: exactly two sides equal",
+        "Scalene: all sides different"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int a = 3, b = 4, c = 5;\n        // Check triangle validity and type\n        \n    }\n}",
+      "expectedOutput": "Valid triangle: Yes\nType: Scalene",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Scalene"
+        }
+      ],
+      "solutionKeywords": ["if", "&&", "==", "equilateral", "isosceles", "scalene"],
+      "mustContain": ["if", "&&"],
+      "mustNotContain": [],
+      "conceptsTested": ["logical-operators", "nested-if", "complex-conditions"]
+    }
+  ]
+}

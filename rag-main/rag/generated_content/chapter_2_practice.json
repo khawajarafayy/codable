@@ -1,0 +1,188 @@
+{
+  "chapter_id": 2,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Temperature Converter",
+      "topic": "Variables and Data Types",
+      "difficulty": "medium",
+      "description": "Write a Java program that converts a temperature from Celsius to Fahrenheit. Declare a double variable for the Celsius temperature (use 25.0), calculate the Fahrenheit equivalent using the formula F = (9/5) * C + 32, and display both temperatures.",
+      "constraints": [
+        "Use double data type for temperatures",
+        "Use the correct conversion formula",
+        "Display output with descriptive labels"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Celsius: 25.0\nFahrenheit: 77.0"
+        }
+      ],
+      "hints": [
+        "Declare: double celsius = 25.0;",
+        "Formula: fahrenheit = (9.0/5.0) * celsius + 32",
+        "Be careful with integer division - use 9.0/5.0 not 9/5"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Declare celsius variable and calculate fahrenheit\n        \n    }\n}",
+      "expectedOutput": "Celsius: 25.0\nFahrenheit: 77.0",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "77.0"
+        }
+      ],
+      "solutionKeywords": ["double", "celsius", "fahrenheit", "9.0", "5.0", "32"],
+      "mustContain": ["double"],
+      "mustNotContain": [],
+      "conceptsTested": ["variables", "double-type", "arithmetic-operations"]
+    },
+    {
+      "id": 2,
+      "title": "Circle Calculator",
+      "topic": "Numeric Data Types and Operations",
+      "difficulty": "medium",
+      "description": "Write a Java program that calculates the area and circumference of a circle. Use a radius of 5.0 and the constant Math.PI. Display both results with appropriate labels.",
+      "constraints": [
+        "Use Math.PI for the value of pi",
+        "Use double data type",
+        "Area formula: π × r²",
+        "Circumference formula: 2 × π × r"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Radius: 5.0\nArea: 78.53981633974483\nCircumference: 31.41592653589793"
+        }
+      ],
+      "hints": [
+        "Use Math.PI for pi",
+        "For r², you can use radius * radius or Math.pow(radius, 2)",
+        "Declare double radius = 5.0;"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Calculate circle area and circumference\n        \n    }\n}",
+      "expectedOutput": "Area: 78.53981633974483",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "78.5"
+        }
+      ],
+      "solutionKeywords": ["Math.PI", "double", "radius", "area", "circumference"],
+      "mustContain": ["Math.PI", "double"],
+      "mustNotContain": [],
+      "conceptsTested": ["math-operations", "constants", "double-type"]
+    },
+    {
+      "id": 3,
+      "title": "Time Calculator",
+      "topic": "Numeric Data Types and Operations",
+      "difficulty": "hard",
+      "description": "Write a Java program that converts a given number of seconds (use 9876) into hours, minutes, and remaining seconds. Use integer division and the modulus operator to extract each component.",
+      "constraints": [
+        "Use int data type",
+        "Use integer division (/) and modulus (%)",
+        "Display hours, minutes, and seconds separately"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Total seconds: 9876\nHours: 2\nMinutes: 44\nSeconds: 36"
+        }
+      ],
+      "hints": [
+        "Hours = totalSeconds / 3600",
+        "Remaining after hours = totalSeconds % 3600",
+        "Minutes = remaining / 60",
+        "Seconds = remaining % 60"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int totalSeconds = 9876;\n        // Convert to hours, minutes, seconds\n        \n    }\n}",
+      "expectedOutput": "Hours: 2\nMinutes: 44\nSeconds: 36",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "2"
+        }
+      ],
+      "solutionKeywords": ["int", "/", "%", "3600", "60"],
+      "mustContain": ["/", "%"],
+      "mustNotContain": [],
+      "conceptsTested": ["integer-division", "modulus-operator", "arithmetic"]
+    },
+    {
+      "id": 4,
+      "title": "Simple Interest Calculator",
+      "topic": "Augmented Assignment Operators",
+      "difficulty": "hard",
+      "description": "Write a Java program that calculates simple interest and the total amount. Use principal = 1000.0, rate = 5.0 (percent), and time = 3 years. Use the formula: Interest = (Principal × Rate × Time) / 100. Display the principal, interest, and total amount.",
+      "constraints": [
+        "Use double for all monetary values",
+        "Use augmented assignment where possible",
+        "Display all values with labels"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Principal: 1000.0\nRate: 5.0%\nTime: 3 years\nInterest: 150.0\nTotal Amount: 1150.0"
+        }
+      ],
+      "hints": [
+        "Simple Interest = (P × R × T) / 100",
+        "Total = Principal + Interest",
+        "You can use += to add interest to principal"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        double principal = 1000.0;\n        double rate = 5.0;\n        int time = 3;\n        // Calculate interest and total\n        \n    }\n}",
+      "expectedOutput": "Interest: 150.0\nTotal Amount: 1150.0",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "150.0"
+        }
+      ],
+      "solutionKeywords": ["double", "interest", "principal", "rate"],
+      "mustContain": ["double"],
+      "mustNotContain": [],
+      "conceptsTested": ["arithmetic-operations", "variables", "formulas"]
+    },
+    {
+      "id": 5,
+      "title": "Character and Type Casting",
+      "topic": "Character Data Type and Operations",
+      "difficulty": "hard",
+      "description": "Write a Java program that demonstrates character operations. Start with the character 'A', print its numeric ASCII value, then print the next 4 letters of the alphabet by adding to the character. Also demonstrate converting an int (66) to its character equivalent.",
+      "constraints": [
+        "Use char data type",
+        "Show type casting between char and int",
+        "Print at least 5 characters"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Character: A\nASCII value: 65\nNext letters: B C D E\nInt 66 as char: B"
+        }
+      ],
+      "hints": [
+        "Cast char to int: (int) 'A' gives 65",
+        "Cast int to char: (char) 66 gives 'B'",
+        "Add to a char: 'A' + 1 gives 'B'"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        char letter = 'A';\n        // Demonstrate character operations\n        \n    }\n}",
+      "expectedOutput": "Character: A\nASCII value: 65",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "65"
+        }
+      ],
+      "solutionKeywords": ["char", "(int)", "(char)", "65", "66"],
+      "mustContain": ["char"],
+      "mustNotContain": [],
+      "conceptsTested": ["char-type", "type-casting", "ascii-values"]
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "chapter_id": 8,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "String Length and Characters",
+      "topic": "String Basics",
+      "difficulty": "medium",
+      "description": "Write a Java program that takes the string 'Hello, Java!' and prints: its length, the first character, the last character, and the character at index 7.",
+      "constraints": [
+        "Use length(), charAt() methods",
+        "Print all four pieces of information",
+        "Handle string correctly"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "String: Hello, Java!\nLength: 12\nFirst char: H\nLast char: !\nChar at 7: J"
+        }
+      ],
+      "hints": [
+        "length() returns string length",
+        "charAt(0) for first character",
+        "charAt(length-1) for last character"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String str = \"Hello, Java!\";\n        // Print string information\n        \n    }\n}",
+      "expectedOutput": "Length: 12\nFirst char: H\nLast char: !\nChar at 7: J",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "12"
+        }
+      ],
+      "solutionKeywords": ["length()", "charAt", "System.out.println"],
+      "mustContain": ["length()", "charAt"],
+      "mustNotContain": [],
+      "conceptsTested": ["string-length", "charAt", "indexing"]
+    },
+    {
+      "id": 2,
+      "title": "String Comparison",
+      "topic": "Comparing Strings",
+      "difficulty": "medium",
+      "description": "Write a Java program that compares two strings 'Java' and 'java'. Demonstrate the difference between == and equals(), and also use equalsIgnoreCase().",
+      "constraints": [
+        "Show == comparison result",
+        "Show equals() comparison result",
+        "Show equalsIgnoreCase() result"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "str1 == str2: false\nstr1.equals(str2): false\nstr1.equalsIgnoreCase(str2): true"
+        }
+      ],
+      "hints": [
+        "== compares references, not content",
+        "equals() compares content (case-sensitive)",
+        "equalsIgnoreCase() ignores case"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String str1 = \"Java\";\n        String str2 = \"java\";\n        // Compare strings\n        \n    }\n}",
+      "expectedOutput": "equals(): false\nequalsIgnoreCase(): true",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "false"
+        }
+      ],
+      "solutionKeywords": ["equals", "equalsIgnoreCase", "=="],
+      "mustContain": ["equals", "equalsIgnoreCase"],
+      "mustNotContain": [],
+      "conceptsTested": ["string-comparison", "equals", "equalsIgnoreCase"]
+    },
+    {
+      "id": 3,
+      "title": "String Manipulation",
+      "topic": "String Methods",
+      "difficulty": "hard",
+      "description": "Write a Java program that takes '  Hello World  ' and performs: trim whitespace, convert to uppercase, convert to lowercase, replace 'World' with 'Java', and get substring from index 0 to 5.",
+      "constraints": [
+        "Use trim(), toUpperCase(), toLowerCase()",
+        "Use replace() and substring()",
+        "Show result of each operation"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Original: '  Hello World  '\nTrimmed: 'Hello World'\nUppercase: 'HELLO WORLD'\nLowercase: 'hello world'\nReplaced: 'Hello Java'\nSubstring: 'Hello'"
+        }
+      ],
+      "hints": [
+        "String methods don't modify original",
+        "Chain methods or store in new variables",
+        "substring(start, end) - end is exclusive"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String str = \"  Hello World  \";\n        // Perform string operations\n        \n    }\n}",
+      "expectedOutput": "Trimmed: Hello World\nUppercase: HELLO WORLD\nLowercase: hello world",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "HELLO WORLD"
+        }
+      ],
+      "solutionKeywords": ["trim()", "toUpperCase()", "toLowerCase()", "replace()", "substring()"],
+      "mustContain": ["trim()", "toUpperCase()"],
+      "mustNotContain": [],
+      "conceptsTested": ["string-methods", "trim", "case-conversion", "substring"]
+    },
+    {
+      "id": 4,
+      "title": "Word Counter",
+      "topic": "String Processing",
+      "difficulty": "hard",
+      "description": "Write a Java program that counts the number of words in the sentence 'Java is a powerful programming language'. Use split() method with space as delimiter.",
+      "constraints": [
+        "Use split() method",
+        "Count words correctly",
+        "Display each word and total count"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Sentence: Java is a powerful programming language\nWords:\n1. Java\n2. is\n...\nTotal words: 6"
+        }
+      ],
+      "hints": [
+        "split(\" \") splits by space",
+        "Returns String[] array",
+        "Array length = word count"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String sentence = \"Java is a powerful programming language\";\n        // Count and display words\n        \n    }\n}",
+      "expectedOutput": "Total words: 6",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "6"
+        }
+      ],
+      "solutionKeywords": ["split", "\" \"", ".length", "for"],
+      "mustContain": ["split"],
+      "mustNotContain": [],
+      "conceptsTested": ["split-method", "string-array", "word-counting"]
+    },
+    {
+      "id": 5,
+      "title": "Palindrome Checker",
+      "topic": "String Algorithms",
+      "difficulty": "hard",
+      "description": "Write a Java program that checks if 'radar' is a palindrome (reads the same forwards and backwards). Use StringBuilder to reverse the string and compare.",
+      "constraints": [
+        "Use StringBuilder's reverse() method",
+        "Check for palindrome correctly",
+        "Test with 'radar' (palindrome) and 'hello' (not palindrome)"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "radar is a palindrome: true\nhello is a palindrome: false"
+        }
+      ],
+      "hints": [
+        "new StringBuilder(str).reverse().toString()",
+        "Compare original with reversed",
+        "Use equals() for comparison"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String str1 = \"radar\";\n        String str2 = \"hello\";\n        // Check if palindrome\n        \n    }\n}",
+      "expectedOutput": "radar is a palindrome: true\nhello is a palindrome: false",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "true"
+        }
+      ],
+      "solutionKeywords": ["StringBuilder", "reverse()", "toString()", "equals"],
+      "mustContain": ["StringBuilder", "reverse"],
+      "mustNotContain": [],
+      "conceptsTested": ["StringBuilder", "reverse", "palindrome-logic"]
+    }
+  ]
+}

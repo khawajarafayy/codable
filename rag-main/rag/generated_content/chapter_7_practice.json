@@ -1,0 +1,186 @@
+{
+  "chapter_id": 7,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Create a Student Class",
+      "topic": "Defining Classes",
+      "difficulty": "medium",
+      "description": "Write a Java program that defines a Student class with name and age fields, and a display() method. Create a Student object with name 'John' and age 20, then display their info.",
+      "constraints": [
+        "Define Student class with fields",
+        "Include a display() method",
+        "Create object and call method"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Student Name: John\nStudent Age: 20"
+        }
+      ],
+      "hints": [
+        "Class fields: String name, int age",
+        "Display method prints both fields",
+        "Create object: new Student()"
+      ],
+      "starterCode": "class Student {\n    // Define fields and method\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create Student and display\n        \n    }\n}",
+      "expectedOutput": "Student Name: John\nStudent Age: 20",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "John"
+        }
+      ],
+      "solutionKeywords": ["class", "String", "int", "void", "new"],
+      "mustContain": ["class", "new"],
+      "mustNotContain": [],
+      "conceptsTested": ["class-definition", "fields", "methods", "object-creation"]
+    },
+    {
+      "id": 2,
+      "title": "Constructor Overloading",
+      "topic": "Constructors",
+      "difficulty": "medium",
+      "description": "Write a Rectangle class with width and height fields. Create two constructors: a default constructor that sets both to 1, and a parameterized constructor. Create two rectangles and calculate their areas.",
+      "constraints": [
+        "Two constructors (default and parameterized)",
+        "Include getArea() method",
+        "Create objects using both constructors"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Rectangle 1 area: 1\nRectangle 2 area: 50"
+        }
+      ],
+      "hints": [
+        "Default: Rectangle() sets width=1, height=1",
+        "Parameterized: Rectangle(int w, int h)",
+        "getArea() returns width * height"
+      ],
+      "starterCode": "class Rectangle {\n    // Define fields and constructors\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create rectangles and calculate areas\n        \n    }\n}",
+      "expectedOutput": "Rectangle 1 area: 1\nRectangle 2 area: 50",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "50"
+        }
+      ],
+      "solutionKeywords": ["Rectangle()", "this", "width", "height", "new"],
+      "mustContain": ["Rectangle()", "new"],
+      "mustNotContain": [],
+      "conceptsTested": ["constructor", "constructor-overloading", "this-keyword"]
+    },
+    {
+      "id": 3,
+      "title": "Encapsulation Practice",
+      "topic": "Encapsulation",
+      "difficulty": "hard",
+      "description": "Write a BankAccount class with a private balance field. Implement public getter, deposit(), and withdraw() methods. The withdraw should prevent negative balance. Start with balance 1000, deposit 500, withdraw 200, then display balance.",
+      "constraints": [
+        "Balance must be private",
+        "Use getter/setter methods",
+        "Withdraw should validate amount"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Initial: 1000\nAfter deposit 500: 1500\nAfter withdraw 200: 1300"
+        }
+      ],
+      "hints": [
+        "Private: private double balance",
+        "Withdraw: check if balance >= amount",
+        "Return boolean from withdraw to indicate success"
+      ],
+      "starterCode": "class BankAccount {\n    // Implement encapsulation\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Test BankAccount\n        \n    }\n}",
+      "expectedOutput": "Final balance: 1300",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "1300"
+        }
+      ],
+      "solutionKeywords": ["private", "public", "get", "deposit", "withdraw"],
+      "mustContain": ["private", "public"],
+      "mustNotContain": [],
+      "conceptsTested": ["encapsulation", "private-fields", "public-methods", "validation"]
+    },
+    {
+      "id": 4,
+      "title": "Static Counter",
+      "topic": "Static Members",
+      "difficulty": "hard",
+      "description": "Write a Counter class that tracks how many instances have been created using a static variable. Each object should have its own ID (1, 2, 3...). Create 3 counters and display each ID and total count.",
+      "constraints": [
+        "Use static variable for total count",
+        "Each object has unique instance ID",
+        "Static method to get total count"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Counter 1 ID: 1\nCounter 2 ID: 2\nCounter 3 ID: 3\nTotal instances: 3"
+        }
+      ],
+      "hints": [
+        "static int totalCount = 0",
+        "Instance field: int id",
+        "In constructor: totalCount++; id = totalCount"
+      ],
+      "starterCode": "class Counter {\n    // Implement static counter\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create 3 counters\n        \n    }\n}",
+      "expectedOutput": "Total instances: 3",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "3"
+        }
+      ],
+      "solutionKeywords": ["static", "int", "Counter()", "++"],
+      "mustContain": ["static"],
+      "mustNotContain": [],
+      "conceptsTested": ["static-variables", "instance-variables", "constructor"]
+    },
+    {
+      "id": 5,
+      "title": "Object Array",
+      "topic": "Objects and Arrays",
+      "difficulty": "hard",
+      "description": "Write a Book class with title and price fields. Create an array of 3 books, then write code to find and display the most expensive book.",
+      "constraints": [
+        "Book class with title and price",
+        "Array of Book objects",
+        "Find maximum price book"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Books: Java($45), Python($35), C++($50)\nMost expensive: C++ - $50"
+        }
+      ],
+      "hints": [
+        "Create: Book[] books = new Book[3]",
+        "Loop through to find max price",
+        "Track both max price and book reference"
+      ],
+      "starterCode": "class Book {\n    // Define Book class\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Create array and find most expensive\n        \n    }\n}",
+      "expectedOutput": "Most expensive: C++ - $50",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "C++"
+        }
+      ],
+      "solutionKeywords": ["Book[]", "new Book", "for", ">", "price"],
+      "mustContain": ["Book[]", "for"],
+      "mustNotContain": [],
+      "conceptsTested": ["object-array", "finding-maximum", "object-comparison"]
+    }
+  ]
+}

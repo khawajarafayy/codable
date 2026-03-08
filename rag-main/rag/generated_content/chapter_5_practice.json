@@ -1,0 +1,186 @@
+{
+  "chapter_id": 5,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Method with Parameters",
+      "topic": "Defining Methods",
+      "difficulty": "medium",
+      "description": "Write a Java program with a method called 'greet' that takes a name as a parameter and prints a greeting message. Call the method from main with the name 'Alice'.",
+      "constraints": [
+        "Create a method named 'greet'",
+        "Method takes String parameter",
+        "Call method from main"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Hello, Alice! Welcome!"
+        }
+      ],
+      "hints": [
+        "Define: public static void greet(String name)",
+        "Use parameter inside method",
+        "Call: greet(\"Alice\") from main"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Call greet method\n        \n    }\n    \n    // Define greet method here\n    \n}",
+      "expectedOutput": "Hello, Alice! Welcome!",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Hello, Alice"
+        }
+      ],
+      "solutionKeywords": ["public static void", "greet", "String", "System.out.println"],
+      "mustContain": ["static", "void", "greet"],
+      "mustNotContain": [],
+      "conceptsTested": ["method-definition", "parameters", "method-call"]
+    },
+    {
+      "id": 2,
+      "title": "Return Value Method",
+      "topic": "Returning Values",
+      "difficulty": "medium",
+      "description": "Write a Java program with a method called 'square' that takes an integer and returns its square. Use the method to calculate and print the square of 8.",
+      "constraints": [
+        "Method must return an int",
+        "Use the returned value",
+        "Calculate square of 8"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "The square of 8 is 64"
+        }
+      ],
+      "hints": [
+        "Return type should be int, not void",
+        "Use: return num * num;",
+        "Store returned value in a variable"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Call square method and print result\n        \n    }\n    \n    // Define square method here\n    \n}",
+      "expectedOutput": "The square of 8 is 64",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "64"
+        }
+      ],
+      "solutionKeywords": ["public static int", "square", "return", "*"],
+      "mustContain": ["return", "int"],
+      "mustNotContain": [],
+      "conceptsTested": ["return-statement", "return-type", "method-call"]
+    },
+    {
+      "id": 3,
+      "title": "Method Overloading",
+      "topic": "Method Overloading",
+      "difficulty": "hard",
+      "description": "Write a Java program that demonstrates method overloading. Create three methods named 'add': one that adds two integers, one that adds three integers, and one that adds two doubles. Test all three versions.",
+      "constraints": [
+        "All methods named 'add'",
+        "Different parameter lists",
+        "Test all three methods"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Sum of 5 and 3: 8\nSum of 2, 4, 6: 12\nSum of 2.5 and 3.5: 6.0"
+        }
+      ],
+      "hints": [
+        "Same method name, different parameters",
+        "add(int a, int b), add(int a, int b, int c)",
+        "add(double a, double b)"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Test all add methods\n        \n    }\n    \n    // Define overloaded add methods here\n    \n}",
+      "expectedOutput": "Sum of 5 and 3: 8\nSum of 2, 4, 6: 12\nSum of 2.5 and 3.5: 6.0",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "12"
+        }
+      ],
+      "solutionKeywords": ["add", "int", "double", "return"],
+      "mustContain": ["add", "return"],
+      "mustNotContain": [],
+      "conceptsTested": ["method-overloading", "different-parameters"]
+    },
+    {
+      "id": 4,
+      "title": "Recursive Fibonacci",
+      "topic": "Recursion",
+      "difficulty": "hard",
+      "description": "Write a Java program with a recursive method to calculate the nth Fibonacci number. Calculate and print the 10th Fibonacci number. Fibonacci: F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2).",
+      "constraints": [
+        "Use recursion (method calls itself)",
+        "Handle base cases F(0) and F(1)",
+        "Calculate 10th Fibonacci number"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "The 10th Fibonacci number is 55"
+        }
+      ],
+      "hints": [
+        "Base case: if n <= 1, return n",
+        "Recursive case: fib(n-1) + fib(n-2)",
+        "10th Fibonacci (0-indexed) = 55"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int n = 10;\n        // Calculate and print Fibonacci\n        \n    }\n    \n    // Define recursive fibonacci method\n    \n}",
+      "expectedOutput": "The 10th Fibonacci number is 55",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "55"
+        }
+      ],
+      "solutionKeywords": ["fibonacci", "fib", "return", "n-1", "n-2"],
+      "mustContain": ["return", "if"],
+      "mustNotContain": [],
+      "conceptsTested": ["recursion", "base-case", "fibonacci-sequence"]
+    },
+    {
+      "id": 5,
+      "title": "Power Calculator",
+      "topic": "Recursion",
+      "difficulty": "hard",
+      "description": "Write a Java program with a recursive method called 'power' that calculates base^exponent. Calculate 2^8 using this method. Do not use Math.pow().",
+      "constraints": [
+        "Use recursion",
+        "Do not use Math.pow()",
+        "Calculate 2^8 = 256"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "2^8 = 256"
+        }
+      ],
+      "hints": [
+        "Base case: if exp == 0, return 1",
+        "Recursive: base * power(base, exp-1)",
+        "2^8 = 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int base = 2;\n        int exp = 8;\n        // Calculate power recursively\n        \n    }\n    \n    // Define recursive power method\n    \n}",
+      "expectedOutput": "2^8 = 256",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "256"
+        }
+      ],
+      "solutionKeywords": ["power", "return", "*", "exp-1"],
+      "mustContain": ["return", "if", "power"],
+      "mustNotContain": ["Math.pow"],
+      "conceptsTested": ["recursion", "base-case", "power-calculation"]
+    }
+  ]
+}

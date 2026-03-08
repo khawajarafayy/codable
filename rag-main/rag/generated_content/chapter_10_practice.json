@@ -1,0 +1,186 @@
+{
+  "chapter_id": 10,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Try-Catch Basics",
+      "topic": "Exception Handling Basics",
+      "difficulty": "medium",
+      "description": "Write a Java program that attempts to parse the string 'abc' as an integer. Use try-catch to handle the NumberFormatException and print an appropriate error message.",
+      "constraints": [
+        "Use try-catch block",
+        "Handle NumberFormatException",
+        "Print meaningful error message"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Attempting to parse: abc\nError: Invalid number format\nProgram continues..."
+        }
+      ],
+      "hints": [
+        "Integer.parseInt() throws NumberFormatException",
+        "catch(NumberFormatException e)",
+        "Program should continue after catch"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String input = \"abc\";\n        // Try to parse and handle exception\n        \n    }\n}",
+      "expectedOutput": "Error: Invalid number format\nProgram continues...",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Error"
+        }
+      ],
+      "solutionKeywords": ["try", "catch", "NumberFormatException", "parseInt"],
+      "mustContain": ["try", "catch"],
+      "mustNotContain": [],
+      "conceptsTested": ["try-catch", "NumberFormatException", "exception-handling"]
+    },
+    {
+      "id": 2,
+      "title": "Array Index Exception",
+      "topic": "Common Exceptions",
+      "difficulty": "medium",
+      "description": "Write a Java program with an array of 3 elements. Attempt to access index 5. Handle the ArrayIndexOutOfBoundsException and print the exception message.",
+      "constraints": [
+        "Create array with 3 elements",
+        "Try to access invalid index",
+        "Print exception message using e.getMessage()"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Array: [1, 2, 3]\nTrying to access index 5...\nException: Index 5 out of bounds for length 3"
+        }
+      ],
+      "hints": [
+        "ArrayIndexOutOfBoundsException for invalid index",
+        "e.getMessage() returns exception details",
+        "Valid indices are 0 to length-1"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {1, 2, 3};\n        // Try to access invalid index\n        \n    }\n}",
+      "expectedOutput": "Exception caught: Index 5 out of bounds for length 3",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Index 5"
+        }
+      ],
+      "solutionKeywords": ["try", "catch", "ArrayIndexOutOfBoundsException", "getMessage"],
+      "mustContain": ["try", "catch", "ArrayIndexOutOfBoundsException"],
+      "mustNotContain": [],
+      "conceptsTested": ["try-catch", "ArrayIndexOutOfBoundsException", "exception-message"]
+    },
+    {
+      "id": 3,
+      "title": "Multiple Catch Blocks",
+      "topic": "Multiple Exceptions",
+      "difficulty": "hard",
+      "description": "Write a Java program that can throw different exceptions: parse a string to int, then use it as array index. Handle both NumberFormatException and ArrayIndexOutOfBoundsException with separate catch blocks. Use finally to print 'Operation complete'.",
+      "constraints": [
+        "Multiple catch blocks",
+        "Include finally block",
+        "Handle each exception differently"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Input: 10\nNumberFormatException or ArrayIndexOutOfBoundsException caught\nOperation complete"
+        }
+      ],
+      "hints": [
+        "Order catch blocks from specific to general",
+        "finally always executes",
+        "Test with different inputs"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String input = \"10\";\n        int[] arr = {1, 2, 3};\n        // Handle multiple exceptions\n        \n    }\n}",
+      "expectedOutput": "Operation complete",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "complete"
+        }
+      ],
+      "solutionKeywords": ["try", "catch", "catch", "finally"],
+      "mustContain": ["try", "catch", "finally"],
+      "mustNotContain": [],
+      "conceptsTested": ["multiple-catch", "finally-block", "exception-handling"]
+    },
+    {
+      "id": 4,
+      "title": "Throw Custom Exception",
+      "topic": "Throwing Exceptions",
+      "difficulty": "hard",
+      "description": "Write a method validateAge(int age) that throws IllegalArgumentException if age is negative. Call this method from main with age = -5 and handle the exception.",
+      "constraints": [
+        "Use 'throw' keyword",
+        "Create meaningful exception message",
+        "Handle in calling code"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Validating age: -5\nException: Age cannot be negative: -5"
+        }
+      ],
+      "hints": [
+        "throw new IllegalArgumentException(\"message\")",
+        "Validate before using the value",
+        "Include the invalid value in message"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Call validateAge with -5\n        \n    }\n    \n    public static void validateAge(int age) {\n        // Throw exception if age is negative\n        \n    }\n}",
+      "expectedOutput": "Exception: Age cannot be negative",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "negative"
+        }
+      ],
+      "solutionKeywords": ["throw", "new", "IllegalArgumentException", "try", "catch"],
+      "mustContain": ["throw", "IllegalArgumentException"],
+      "mustNotContain": [],
+      "conceptsTested": ["throw-keyword", "custom-exception-message", "validation"]
+    },
+    {
+      "id": 5,
+      "title": "Custom Exception Class",
+      "topic": "Custom Exceptions",
+      "difficulty": "hard",
+      "description": "Create a custom exception class InsufficientFundsException that extends Exception. Write a BankAccount class with withdraw() method that throws this exception when withdrawal amount exceeds balance. Test with balance=100 and withdraw=150.",
+      "constraints": [
+        "Create custom exception class",
+        "Include useful error message",
+        "Method declares throws clause"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Balance: $100\nAttempting to withdraw: $150\nException: Insufficient funds. Required: $150, Available: $100"
+        }
+      ],
+      "hints": [
+        "class InsufficientFundsException extends Exception",
+        "throw new InsufficientFundsException(message)",
+        "Method signature: void withdraw(double) throws InsufficientFundsException"
+      ],
+      "starterCode": "class InsufficientFundsException extends Exception {\n    // Custom exception\n    \n}\n\nclass BankAccount {\n    // Account with withdraw that throws exception\n    \n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Test withdrawal that exceeds balance\n        \n    }\n}",
+      "expectedOutput": "InsufficientFundsException caught: Insufficient funds",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Insufficient"
+        }
+      ],
+      "solutionKeywords": ["class", "extends Exception", "throws", "throw new"],
+      "mustContain": ["extends Exception", "throws"],
+      "mustNotContain": [],
+      "conceptsTested": ["custom-exception", "extends-Exception", "throws-clause"]
+    }
+  ]
+}

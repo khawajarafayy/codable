@@ -1,0 +1,186 @@
+{
+  "chapter_id": 1,
+  "generated_at": "2026-03-08 12:00:00",
+  "num_questions": 5,
+  "difficulty_distribution": {
+    "medium": 2,
+    "hard": 3
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Display Your Personal Information",
+      "topic": "A Simple Java Program",
+      "difficulty": "medium",
+      "description": "Write a Java program that displays your personal information in a formatted way. The program should print your name, your favorite programming language, and your goal for learning Java. Each piece of information should be on a separate line.",
+      "constraints": [
+        "Use System.out.println() for each line of output",
+        "Include at least 3 lines of output",
+        "Use proper Java class and main method structure"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Name: John Doe\nFavorite Language: Java\nGoal: Become a software developer"
+        }
+      ],
+      "hints": [
+        "Start with the class declaration: public class Solution",
+        "The main method signature is: public static void main(String[] args)",
+        "Use System.out.println() to print each line"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Print your personal information here\n        \n    }\n}",
+      "expectedOutput": "Name: Student\nFavorite Language: Java\nGoal: Learn programming",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "Name:"
+        }
+      ],
+      "solutionKeywords": ["System.out.println", "public class", "main"],
+      "mustContain": ["System.out.println", "public class", "main"],
+      "mustNotContain": [],
+      "conceptsTested": ["println", "class-structure", "main-method"]
+    },
+    {
+      "id": 2,
+      "title": "ASCII Art Box",
+      "topic": "Creating, Compiling, and Executing a Java Program",
+      "difficulty": "medium",
+      "description": "Write a Java program that prints a simple ASCII art box using asterisks (*). The box should be 5 characters wide and 3 lines tall. Use multiple println statements to create this pattern.",
+      "constraints": [
+        "The box must be exactly 5 asterisks wide",
+        "The box must be exactly 3 lines tall",
+        "Use only asterisks (*) and spaces"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "*****\n*   *\n*****"
+        }
+      ],
+      "hints": [
+        "First line: 5 asterisks in a row",
+        "Middle line: asterisk, spaces, asterisk",
+        "Last line: 5 asterisks again"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Print the ASCII art box\n        \n    }\n}",
+      "expectedOutput": "*****\n*   *\n*****",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "*****\n*   *\n*****"
+        }
+      ],
+      "solutionKeywords": ["System.out.println", "*****"],
+      "mustContain": ["System.out.println"],
+      "mustNotContain": [],
+      "conceptsTested": ["println", "output-formatting"]
+    },
+    {
+      "id": 3,
+      "title": "Program Documentation",
+      "topic": "Programming Style and Documentation",
+      "difficulty": "hard",
+      "description": "Write a well-documented Java program that calculates and displays the number of seconds in a day. Your program must include: a class-level comment explaining the program's purpose, comments for each step of the calculation, and meaningful output that shows the calculation.",
+      "constraints": [
+        "Include a multi-line comment at the top explaining the program",
+        "Use single-line comments to explain each part of the calculation",
+        "Display the result with a descriptive message"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "Calculating seconds in a day:\nHours in a day: 24\nMinutes in an hour: 60\nSeconds in a minute: 60\nTotal seconds in a day: 86400"
+        }
+      ],
+      "hints": [
+        "Use /* */ for multi-line comments",
+        "Use // for single-line comments",
+        "24 hours × 60 minutes × 60 seconds = 86400 seconds"
+      ],
+      "starterCode": "/**\n * Program: Calculate Seconds in a Day\n * Purpose: [Add your description here]\n */\npublic class Solution {\n    public static void main(String[] args) {\n        // Your documented code here\n        \n    }\n}",
+      "expectedOutput": "Total seconds in a day: 86400",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "86400"
+        }
+      ],
+      "solutionKeywords": ["//", "/*", "86400", "System.out.println"],
+      "mustContain": ["//", "System.out.println"],
+      "mustNotContain": [],
+      "conceptsTested": ["code-comments", "documentation", "println"]
+    },
+    {
+      "id": 4,
+      "title": "Java Program Structure Analysis",
+      "topic": "A Simple Java Program",
+      "difficulty": "hard",
+      "description": "Write a Java program that demonstrates your understanding of Java program structure by printing a detailed explanation of each component. Your program should print: what a class is, what the main method does, and what System.out.println does. Format the output as a teaching guide.",
+      "constraints": [
+        "Print at least 6 lines of educational content",
+        "Include section headers for each Java component",
+        "Use proper formatting with blank lines between sections"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "=== Java Program Structure Guide ===\n\nCLASS:\nA class is a container for Java code.\n\nMAIN METHOD:\nThe main method is the entry point of the program.\n\nSYSTEM.OUT.PRINTLN:\nThis statement prints text to the console."
+        }
+      ],
+      "hints": [
+        "Use System.out.println(\"\") to print blank lines",
+        "Think about what you learned about each component",
+        "Structure your output like a mini-tutorial"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Create your Java structure guide\n        \n    }\n}",
+      "expectedOutput": "=== Java Program Structure Guide ===",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "class"
+        }
+      ],
+      "solutionKeywords": ["System.out.println", "class", "main", "method"],
+      "mustContain": ["System.out.println"],
+      "mustNotContain": [],
+      "conceptsTested": ["class-structure", "main-method", "println", "program-understanding"]
+    },
+    {
+      "id": 5,
+      "title": "Error Types Demonstration",
+      "topic": "Programming Errors",
+      "difficulty": "hard",
+      "description": "Write a Java program that prints an educational guide about the three types of programming errors: syntax errors, runtime errors, and logic errors. For each error type, print: the name, a brief description, and an example scenario. Make sure your program compiles and runs correctly!",
+      "constraints": [
+        "Cover all three error types: syntax, runtime, and logic",
+        "Include a description and example for each type",
+        "Program must compile and run without errors"
+      ],
+      "examples": [
+        {
+          "input": "",
+          "output": "=== Programming Errors Guide ===\n\n1. SYNTAX ERRORS\nDescription: Errors detected by the compiler\nExample: Missing semicolon at end of statement\n\n2. RUNTIME ERRORS\nDescription: Errors that occur during execution\nExample: Dividing by zero\n\n3. LOGIC ERRORS\nDescription: Program runs but produces wrong results\nExample: Using wrong formula for calculation"
+        }
+      ],
+      "hints": [
+        "Syntax errors are caught at compile time",
+        "Runtime errors crash the program during execution",
+        "Logic errors are the hardest to find - the program runs but gives wrong answers"
+      ],
+      "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Print your error types guide\n        \n    }\n}",
+      "expectedOutput": "=== Programming Errors Guide ===",
+      "testCases": [
+        {
+          "input": "",
+          "expectedOutput": "SYNTAX"
+        }
+      ],
+      "solutionKeywords": ["syntax", "runtime", "logic", "error", "System.out.println"],
+      "mustContain": ["System.out.println"],
+      "mustNotContain": [],
+      "conceptsTested": ["syntax-errors", "runtime-errors", "logic-errors", "debugging-basics"]
+    }
+  ]
+}

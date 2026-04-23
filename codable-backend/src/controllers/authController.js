@@ -8,9 +8,9 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const registerUser = async (req, res) => {
     try {
-        const {name, email, password} = req.body;
+        const {name, email, password, role} = req.body;
 
-        if(!name || !email || !password){
+        if(!name || !email || !password || !role){
             return res.status(400).json({success: false, message: "Missing Details"});
         }
 
@@ -20,24 +20,26 @@ const registerUser = async (req, res) => {
         }
 
         try {
-            const userData = { name, email, password };
+            const userData = { name, email, password, role };
             const newUser = new userModel(userData);
             await newUser.save();
 
-            // Automatically create a student profile for the new user
-            try {
-                await StudentProfile.createForUser(newUser._id, { name, email });
-                console.log("Student profile created for user:", newUser._id);
-            } catch (profileError) {
-                console.error("Error creating student profile:", profileError);
-                // Continue even if profile creation fails - user can still login
+            // Create appropriate profile based on role
+            if (role === "student") {
+                try {
+                    await StudentProfile.createForUser(newUser._id, { name, email });
+                    console.log("Student profile created for user:", newUser._id);
+                } catch (profileError) {
+                    console.error("Error creating student profile:", profileError);
+                    // Continue even if profile creation fails - user can still login
+                }
             }
 
             res.status(200).json({
                 success: true, 
                 message: "User added successfully.",
                 token: await newUser.generateToken(),
-                user: { _id: newUser._id, name: newUser.name, email: newUser.email } 
+                user: { _id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role } 
             });
         } catch (error){
             console.error("Error creating user ",error);
@@ -60,6 +62,13 @@ const login = async (req, res) => {
         try {
             const validUser = await userExists.comparePassword(password);
             if(validUser){
+                // Ensure user has a role (for backward compatibility with existing users)
+                if (!userExists.role) {
+                    userExists.role = "student";
+                    await userExists.save();
+                    console.log("Assigned default role 'student' to user:", userExists._id);
+                }
+
                 // Initialize or get user progress on login
                 try {
                     await UserProgress.getOrCreate(userExists._id);
@@ -68,21 +77,23 @@ const login = async (req, res) => {
                     // Continue even if progress init fails
                 }
 
-                // Initialize or get student profile on login
-                try {
-                    await StudentProfile.getOrCreateForUser(userExists._id, { 
-                        name: userExists.name, 
-                        email: userExists.email 
-                    });
-                } catch (profileError) {
-                    console.error("Error initializing student profile:", profileError);
+                // Initialize or get student profile on login if student role
+                if (userExists.role === "student") {
+                    try {
+                        await StudentProfile.getOrCreateForUser(userExists._id, { 
+                            name: userExists.name, 
+                            email: userExists.email 
+                        });
+                    } catch (profileError) {
+                        console.error("Error initializing student profile:", profileError);
+                    }
                 }
 
                 res.status(200).json({
                     success: true, 
                     message: "Login Successful", 
                     token: await userExists.generateToken(), 
-                    user: {_id: userExists._id, name: userExists.name, email: userExists.email}});
+                    user: {_id: userExists._id, name: userExists.name, email: userExists.email, role: userExists.role}});
             }else{
                 res.status(400).json({success: false, message:"Invalid email or password."});
             }
@@ -188,7 +199,8 @@ const googleLogin = async (req, res) => {
                 _id: user._id, 
                 name: user.name, 
                 email: user.email, 
-                avatar: user.avatar 
+                avatar: user.avatar,
+                role: user.role
             }
         });
     } catch (error) {

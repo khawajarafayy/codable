@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
 import studentRoute from "./routes/studentRoute.js";
+import instructorRoute from "./routes/instructorRoute.js";
 import learningRoute from "./routes/learningRoute.js";
 import progressRoute from "./routes/progressRoute.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
@@ -60,6 +61,7 @@ app.use((req,res,next) => {
 // ------------------------
 app.use("/auth", authRoute);
 app.use("/student", studentRoute);
+app.use("/instructor", instructorRoute);
 app.use("/api/learning", learningRoute);
 app.use("/api/progress", progressRoute);
 // ------------------------

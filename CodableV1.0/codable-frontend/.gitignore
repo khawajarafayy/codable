@@ -1,4 +1,6 @@
+# =========================
 # Logs
+# =========================
 logs
 *.log
 npm-debug.log*
@@ -7,18 +9,46 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+dist/
+dist-ssr/
 *.local
 
-# Editor directories and files
+# =========================
+# Editor & OS files
+# =========================
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# =========================
+# Python (RAG related - relative paths)
+# =========================
+
+# Cache
+../rag-main/**/__pycache__/
+../rag-main/**/*.pyc
+
+# Chroma DB (VERY IMPORTANT)
+../rag-main/rag/chroma_db/
+../rag-main/**/*.sqlite3
+../rag-main/**/*.bin
+
+# Optional: if you ever add virtual env inside project
+../.venv/
+../venv/
+
+# =========================
+# Misc
+# =========================
+.env
+.env.*

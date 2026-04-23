@@ -25,7 +25,8 @@ function Signup() {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "student"
   });
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,7 +82,11 @@ function Signup() {
         
         if (data.success && data.token) {
           login(data.token, data.user);
-          navigate('/student');
+          let redirectPath = "/";
+          if (data.user?.role === "instructor") {
+            redirectPath = "/instructor/dashboard";
+          }
+          navigate(redirectPath);
         } else {
           setError(data.message || "Google sign-up failed");
         }
@@ -106,16 +111,18 @@ function Signup() {
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
       return;
     }
 
     if (!agreeTerms) {
       setError("Please accept the Terms & Conditions");
+      setLoading(false);
       return;
     }
 
     try {
-      const res = await api.signup(formData.fullName, formData.email, formData.password);
+      const res = await api.signup(formData.fullName, formData.email, formData.password, formData.role);
       navigate("/login");
     } catch (err) {
       setError(err?.message || err?.payload?.message || "Signup Failed");
@@ -239,6 +246,34 @@ function Signup() {
                   onChange={handleChange}
                   placeholder="••••••••"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-300 mb-2">Account Type</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer p-3 border border-gray-700 rounded-lg hover:border-cyan-500 transition" style={{flex: 1}}>
+                    <input
+                      type="radio"
+                      name="role"
+                      value="student"
+                      checked={formData.role === "student"}
+                      onChange={handleChange}
+                      className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    />
+                    <span className="text-gray-300 text-sm">Student</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer p-3 border border-gray-700 rounded-lg hover:border-cyan-500 transition" style={{flex: 1}}>
+                    <input
+                      type="radio"
+                      name="role"
+                      value="instructor"
+                      checked={formData.role === "instructor"}
+                      onChange={handleChange}
+                      className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    />
+                    <span className="text-gray-300 text-sm">Instructor</span>
+                  </label>
+                </div>
               </div>
 
               {error && <p className="text-sm text-rose-400">{error}</p>}

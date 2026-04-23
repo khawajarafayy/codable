@@ -21,9 +21,11 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-
+  // Get the role from URL params (set from role selection page)
+  const queryParams = new URLSearchParams(location.search);
+  const selectedRole = queryParams.get('role') || 'student'; // Default to student
   // Get the page user was trying to access before being redirected to login
-  const from = location.state?.from?.pathname || "/student";
+  const from = location.state?.from?.pathname || "/student/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -77,7 +79,11 @@ function Login() {
         
         if (data.success && data.token) {
           login(data.token, data.user);
-          navigate(from, { replace: true });
+          // Redirect based on role from URL params
+          const redirectPath = (selectedRole === "instructor" || data.user?.role === "instructor")
+            ? "/instructor/dashboard"
+            : "/student"; // Default to student module selection
+          navigate(redirectPath, { replace: true });
         } else {
           setError(data.message || "Google sign-in failed");
         }
@@ -102,12 +108,24 @@ function Login() {
 
     try{
       const data = await api.login(email, password);
+      
+      console.log("Login response:", data);
 
       if(data?.token){
+        console.log("Logging in with user data:", data.user);
         login(data.token, data.user);
+        
+        // Redirect based on role from URL params
+        let redirectPath = "/student"; // Default
+        if (selectedRole === "instructor" || data.user?.role === "instructor") {
+          redirectPath = "/instructor/dashboard";
+        }
+        
+        console.log("Redirecting to:", redirectPath);
+        navigate(redirectPath, { replace: true });
       }
-      navigate(from, { replace: true });
     } catch(err){
+      console.error("Login error:", err);
       setError(err.payload?.message || err.message || "Login Failed");
     } finally {
       setLoading(false);

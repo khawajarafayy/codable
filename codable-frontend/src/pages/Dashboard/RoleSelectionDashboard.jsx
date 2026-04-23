@@ -18,30 +18,24 @@ function RoleSelectionDashboard() {
 
   const handeGetStarted = () => {
     if(!selectedCard){
-      alert("Please select a role first!");
+      alert("Please select a module first!");
       return;
     }
 
-    if(selectedCard === "Workspace"){
+    // Route to selected module
+    if(selectedCard === "Learning Module") {
+      navigate("/student/dashboard");
+    } else if(selectedCard === "Classroom") {
+      navigate("/classroom");
+    } else if(selectedCard === "Workspace") {
       navigate("/workspace");
-      return;
     }
-    
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    const userToken = localStorage.getItem('userToken');
-
-    if(!isLoggedIn || !userToken){
-      navigate("/login");
-      return;
-    }
-    if(selectedCard === "Student") navigate("/student");
-    if(selectedCard === "Mentor") navigate("/mentor");
   }
 
   const cards = [
     {
       icon: <FaUser className="w-12 h-12"/>,
-      title: "Student",
+      title: "Learning Module",
       description:
         "Start your learning path, solve coding challenges, track your progress, and explore new technologies with personalized recommendations.",
       bgColor: "bg-blue-500/10",
@@ -51,9 +45,9 @@ function RoleSelectionDashboard() {
     },
     {
       icon: <GiTeacher className="w-12 h-12"/>,
-      title: "Mentor",
+      title: "Classroom",
       description:
-        "Guide aspiring developers, create engaging coding content, conduct code reviews, and share your valuable expertise with the community.",
+        "Join classes taught by instructors, collaborate with peers on assignments, and get personalized guidance to accelerate your learning.",
       bgColor: "bg-purple-500/10",
       borderColor: "border-purple-500/30",
       iconBg: "bg-purple-500/20",
@@ -63,7 +57,7 @@ function RoleSelectionDashboard() {
       icon: <BiCodeBlock className="w-12 h-12"/>,
       title: "Workspace",
       description:
-        "Manage team projects efficiently, collaborate seamlessly on code, integrate development tools, and bring your innovative ideas to life.",
+        "Write, test, and run your code with a full IDE experience. Experiment freely and bring your ideas to life.",
       bgColor: "bg-rose-500/10",
       borderColor: "border-rose-500/30",
       iconBg: "bg-rose-500/20",
@@ -88,7 +82,7 @@ function RoleSelectionDashboard() {
               Welcome To Codable
             </h2>
             <p className="text-lg text-slate-300 mb-8">
-              Choose your role to get started and dive into your coding journey. We are excited to have you with us
+              Choose a module to get started on your coding journey
             </p>
 
             <div className="scroll-container w-full overflow-x-auto pb-4 mt-4">

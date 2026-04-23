@@ -39,7 +39,7 @@ async function request(path, { method = 'GET', body, credentials = 'omit', heade
 export const api = {
     // no credentials by default -> easier CORS in development
     login: (email, password) => request('/auth/login', { method: 'POST', body: { email, password }, credentials: 'omit' }),
-    signup: (name, email, password) => request('/auth/signup', { method: 'POST', body: { name, email, password }, credentials: 'omit' }),
+    signup: (name, email, password, role) => request('/auth/signup', { method: 'POST', body: { name, email, password, role }, credentials: 'omit' }),
     me: () => request('/me'),
     runCode: (source_code, stdin) => request('/piston/run', { method: 'POST', body: { source_code, stdin }, credentials: 'omit' }),
     

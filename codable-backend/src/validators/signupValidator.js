@@ -12,7 +12,12 @@ const signUpSchema = z.object({
     .string({required_error: "Password is required"})
     .trim()
     .min(6, {message: "Password must have atleast 6 characters"})
-    .max(12, {message: "Password can not exceed 12 characters"})
+    .max(12, {message: "Password can not exceed 12 characters"}),
+    role: z
+    .enum(["student", "instructor"], {
+        errorMap: () => ({ message: "Role must be 'student' or 'instructor'" })
+    })
+    .default("student")
 });
 
 export default signUpSchema;

@@ -12,7 +12,11 @@ import SignupPage from "./pages/Auth/SignUp";
 import StudentLandingPage from "./pages/Student/LandingDashboard/LearningDashboard";
 import StudentLearningPage from "./pages/Student/LearningPages/LearningPage";
 import ProfileAndAnalytics from "./pages/Student/ProfileAndAnalytics/ProfileAndAnalytics";
-import MentorDashboard from "./pages/Mentor/MentorLandingDB/MentorDashboard";
+import MentorRoot from "./pages/Mentor/MentorLandingDB/MentorRoot";
+import Dashboard from "./pages/Mentor/MentorLandingDB/components/Dashboard";
+import Classes from "./pages/Mentor/MentorLandingDB/components/Classes";
+import ClassDetail from "./pages/Mentor/MentorLandingDB/components/ClassDetail";
+import Assignments from "./pages/Mentor/MentorLandingDB/components/Assignments";
 
 // Root route component - Role selection before login
 const RootRoute = () => {
@@ -152,18 +156,40 @@ function AppRoutes() {
       } />
 
       {/* Instructor Routes - INSTRUCTOR ONLY */}
-      <Route path="/instructor/dashboard" element={
+      <Route path="/instructor" element={
         <RoleProtectedRoute allowedRoles={["instructor"]}>
-          <MentorDashboard />
+          <MentorRoot />
         </RoleProtectedRoute>
-      } />
+      }>
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="classes" element={<Classes />} />
+        <Route path="classes/:classId" element={<ClassDetail />} />
+        <Route path="assignments" element={<Assignments />} />
+        <Route path="reports" element={
+          <div className="text-center py-20">
+            <p className="text-[#fdfdff]/60">Reports module coming soon...</p>
+          </div>
+        } />
+      </Route>
 
       {/* Backward Compatibility Route */}
       <Route path="/mentor" element={
         <RoleProtectedRoute allowedRoles={["instructor"]}>
-          <MentorDashboard />
+          <MentorRoot />
         </RoleProtectedRoute>
-      } />
+      }>
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="classes" element={<Classes />} />
+        <Route path="classes/:classId" element={<ClassDetail />} />
+        <Route path="assignments" element={<Assignments />} />
+        <Route path="reports" element={
+          <div className="text-center py-20">
+            <p className="text-[#fdfdff]/60">Reports module coming soon...</p>
+          </div>
+        } />
+      </Route>
     </Routes>
   );
 }

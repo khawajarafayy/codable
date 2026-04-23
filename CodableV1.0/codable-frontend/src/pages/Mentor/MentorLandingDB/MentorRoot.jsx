@@ -32,6 +32,7 @@ export default function MentorRoot() {
     { path: "classes", label: "Classes", icon: Users },
     { path: "assignments", label: "Assignments", icon: FileText },
     { path: "reports", label: "Reports", icon: BarChart3 },
+    { path: "profile", label: "Profile", icon: null }, // Special item, rendered separately
   ];
 
   return (
@@ -41,12 +42,15 @@ export default function MentorRoot() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <h1 className="text-xl font-bold text-[#fdfdff] tracking-tight">
-                Code<span className="text-blue-400">Learn</span>
-              </h1>
+              <div className="flex items-center gap-3">
+                <img src="/codable-logo.svg" alt="Codable" className="w-8 h-8" />
+                <h1 className="text-xl font-bold text-[#fdfdff] tracking-tight">
+                  Codable
+                </h1>
+              </div>
 
               <div className="flex items-center gap-2">
-                {navItems.map((item) => {
+                {navItems.slice(0, 4).map((item) => {
                   const Icon = item.icon;
                   const active = isActive(item.path);
                   const fullPath = item.path === "" ? basePath : `${basePath}/${item.path}`;
@@ -80,9 +84,23 @@ export default function MentorRoot() {
               </div>
             </div>
 
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-semibold text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]">
-              AI
-            </div>
+            {/* Profile Icon on Right */}
+            <Link
+              to={`${basePath}/profile`}
+              className={`
+                relative p-2 rounded-xl transition-all duration-300
+                ${
+                  isActive("profile")
+                    ? "bg-blue-500/20 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                    : "text-[#fdfdff]/70 hover:text-[#fdfdff] hover:bg-white/5"
+                }
+              `}
+              title="Profile"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-semibold text-white">
+                👤
+              </div>
+            </Link>
           </div>
         </div>
       </nav>

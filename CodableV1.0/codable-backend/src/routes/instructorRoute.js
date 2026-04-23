@@ -1,9 +1,9 @@
 import express from "express";
 const router = express.Router();
-import authMiddleware from "../middlewares/authMiddleware.js";
+import instructorProfileRoutes from "../instructor/routes/instructorRoutes.js";
 
-// Protect all routes with instructor role authorization
-router.use(authMiddleware.authorize(["instructor"]));
+// Mount instructor profile routes with auth middleware already applied
+router.use("/", instructorProfileRoutes);
 
 // TODO: Add instructor-specific endpoints here
 // Examples:

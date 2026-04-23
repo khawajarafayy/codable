@@ -10,6 +10,7 @@ import studentRoute from "./routes/studentRoute.js";
 import instructorRoute from "./routes/instructorRoute.js";
 import learningRoute from "./routes/learningRoute.js";
 import progressRoute from "./routes/progressRoute.js";
+import classRoutes from "./routes/classRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import { startWebSocketServer } from "./websocket/codeRunner.js";
 import http from 'http';
@@ -61,9 +62,10 @@ app.use((req,res,next) => {
 // ------------------------
 app.use("/auth", authRoute);
 app.use("/student", studentRoute);
-app.use("/instructor", instructorRoute);
+app.use("/api/instructor", instructorRoute);
 app.use("/api/learning", learningRoute);
 app.use("/api/progress", progressRoute);
+app.use("/api/classes", classRoutes);
 // ------------------------
 // ERROR HANDLING
 // ------------------------

@@ -18,6 +18,7 @@ import Classes from "./pages/Mentor/MentorLandingDB/components/Classes";
 import ClassDetail from "./pages/Mentor/MentorLandingDB/components/ClassDetail";
 import Assignments from "./pages/Mentor/MentorLandingDB/components/Assignments";
 import Reports from "./pages/Mentor/MentorLandingDB/components/Reports";
+import InstructorProfile from "./pages/Mentor/MentorLandingDB/components/InstructorProfile";
 
 // Root route component - Role selection before login
 const RootRoute = () => {
@@ -164,6 +165,7 @@ function AppRoutes() {
       }>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<InstructorProfile />} />
         <Route path="classes" element={<Classes />} />
         <Route path="classes/:classId" element={<ClassDetail />} />
         <Route path="assignments" element={<Assignments />} />
@@ -178,6 +180,7 @@ function AppRoutes() {
       }>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<InstructorProfile />} />
         <Route path="classes" element={<Classes />} />
         <Route path="classes/:classId" element={<ClassDetail />} />
         <Route path="assignments" element={<Assignments />} />

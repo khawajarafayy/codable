@@ -52,6 +52,23 @@ export const api = {
     me: () => request('/me'),
     runCode: (source_code, stdin) => request('/piston/run', { method: 'POST', body: { source_code, stdin }, credentials: 'omit' }),
     
+    // Class APIs
+    getClasses: (token) => {
+        return request('/classes/instructor', { 
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+    
+    getClassStudents: (classId, token) => {
+        return request(`/classes/${classId}/students`, { 
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+
     // Student Profile APIs
     getStudentProfile: () => {
         const token = localStorage.getItem('token');

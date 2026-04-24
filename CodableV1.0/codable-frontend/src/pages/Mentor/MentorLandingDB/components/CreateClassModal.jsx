@@ -54,6 +54,13 @@ export default function CreateClassModal({ isOpen, onClose, onClassCreated }) {
       setLoading(true);
       setError(null);
 
+      // Validate token exists
+      if (!user || !user.token) {
+        setError("Authentication token missing. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         className: formData.className.trim(),
         description: formData.description || "",
@@ -66,6 +73,8 @@ export default function CreateClassModal({ isOpen, onClose, onClassCreated }) {
       };
 
       console.log("Creating class with payload:", payload);
+      console.log("User token:", user.token ? "Token exists" : "NO TOKEN!");
+      console.log("User role:", user.role);
 
       const response = await request(
         "/api/classes",
@@ -75,6 +84,8 @@ export default function CreateClassModal({ isOpen, onClose, onClassCreated }) {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
+
+      console.log("Class creation response:", response);
 
       if (response.success) {
         setSuccessMessage("✓ Class created successfully!");
@@ -95,7 +106,22 @@ export default function CreateClassModal({ isOpen, onClose, onClassCreated }) {
       }
     } catch (err) {
       console.error("Error creating class:", err);
-      setError(err.message || "Error creating class");
+      console.error("Error status:", err.status);
+      console.error("Error payload:", err.payload);
+      
+      // Extract message from different error formats
+      let errorMessage = err.message || "Error creating class";
+      if (err.payload && err.payload.message) {
+        errorMessage = err.payload.message;
+      }
+      
+      if (err.status === 401) {
+        errorMessage = "Authentication failed. Please log in again.";
+      } else if (err.status === 403) {
+        errorMessage = "You don't have permission to create classes. Only instructors can create classes.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

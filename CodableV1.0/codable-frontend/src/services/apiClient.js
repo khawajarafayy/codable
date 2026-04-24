@@ -22,18 +22,27 @@ async function request(path, { method = 'GET', body, credentials = 'omit', heade
         }
     }
 
-    const res = await fetch(url, opts);
-    const text = await res.text();
-    let data = null;
-    try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+    console.log(`[API] ${method} ${url}`, { headers: opts.headers, body });
 
-    if (!res.ok) {
-        const err = new Error(data?.message || res.statusText || 'Request failed');
-        err.status = res.status;
-        err.payload = data;
-        throw err;
+    try {
+        const res = await fetch(url, opts);
+        const text = await res.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+        console.log(`[API Response] Status: ${res.status}`, data);
+
+        if (!res.ok) {
+            const err = new Error(data?.message || res.statusText || 'Request failed');
+            err.status = res.status;
+            err.payload = data;
+            throw err;
+        }
+        return data;
+    } catch (error) {
+        console.error(`[API Error] ${method} ${url}`, error);
+        throw error;
     }
-    return data;
 }
 
 export const api = {

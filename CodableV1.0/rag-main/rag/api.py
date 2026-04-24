@@ -18,7 +18,15 @@ from decision_router import AdaptiveRouter
 from remediation_generator import RemediationGenerator
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173", "http://localhost:3000"])
+CORS(
+    app,
+    origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+)
 
 # Initialize question generator
 question_gen = QuestionGenerator()
@@ -2992,6 +3000,250 @@ def get_remediation_questions():
     except Exception as e:
         print(f"⚠️ Remediation questions error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def _difficulty_lmh_to_prompt(difficulty: str) -> str:
+    d = (difficulty or "M").upper()
+    if d == "L":
+        return "LOW (L): recall and basic definitions; straightforward wording."
+    if d == "H":
+        return "HIGH (H): subtle distinctions, edge cases, or combining multiple ideas from the chapters."
+    return "MEDIUM (M): typical exam-level understanding; some reasoning required."
+
+
+def _fallback_instructor_mcqs(chapter_titles, difficulty: str, num_questions: int):
+    """Deterministic MCQs when no LLM is available or all providers fail."""
+    out = []
+    letters = ["A", "B", "C", "D"]
+    for i in range(num_questions):
+        ch = chapter_titles[i % len(chapter_titles)] if chapter_titles else "Java"
+        correct = letters[i % 4]
+        out.append({
+            "id": f"mcq-fb-{i + 1}",
+            "question": f"[{difficulty}] Which best reflects a core idea from \"{ch}\"?",
+            "options": {
+                "A": "A concept unrelated to this chapter.",
+                "B": "A plausible idea aligned with typical Java curriculum for this chapter.",
+                "C": "Java bytecode is always executed directly by the physical CPU with no VM.",
+                "D": "All Java types are primitives; there are no reference types.",
+            },
+            "correct": correct,
+        })
+    return out
+
+
+def _parse_instructor_mcq_json(response_text, num_questions, _json):
+    """Parse LLM output into normalized mcqs list, or None if invalid."""
+    if not response_text or not str(response_text).strip():
+        return None
+    try:
+        rt = str(response_text).strip()
+        if rt.startswith("```"):
+            parts = rt.split("```")
+            rt = parts[1] if len(parts) > 1 else rt
+            if rt.startswith("json"):
+                rt = rt[4:]
+        rt = rt.strip()
+        parsed = _json.loads(rt)
+        mcqs = parsed.get("mcqs") or []
+        normalized = []
+        for i, q in enumerate(mcqs[:num_questions]):
+            opts = q.get("options") or {}
+            normalized.append({
+                "id": str(q.get("id", i + 1)),
+                "question": str(q.get("question", "")),
+                "options": {
+                    "A": str(opts.get("A", "")),
+                    "B": str(opts.get("B", "")),
+                    "C": str(opts.get("C", "")),
+                    "D": str(opts.get("D", "")),
+                },
+                "correct": q.get("correct", "A") if q.get("correct") in ("A", "B", "C", "D") else "A",
+            })
+        return normalized if normalized else None
+    except Exception as e:
+        print(f"⚠️ Instructor MCQ JSON parse failed: {e}")
+        return None
+
+
+def generate_instructor_mcq_assignment(chapter_ids, difficulty, num_questions):
+    """
+    RAG + LLM: vector context from CHAPTER_TOPICS, then MCQs via Groq and/or Mistral
+    (whichever works — Groq first, then Mistral on failure or bad JSON).
+    """
+    import json as _json
+
+    chapters_resolved = []
+    for cid in chapter_ids:
+        try:
+            cid = int(cid)
+        except (TypeError, ValueError):
+            continue
+        if cid not in CHAPTER_TOPICS:
+            continue
+        chapters_resolved.append((cid, CHAPTER_TOPICS[cid]))
+
+    if not chapters_resolved:
+        return None, "No valid chapter_ids"
+
+    titles = [c[1]["title"] for c in chapters_resolved]
+    all_keywords = []
+    topic_lines = []
+    for cid, ch in chapters_resolved:
+        for t in ch.get("topics", []):
+            topic_lines.append(f"- {t.get('id', '')} {t.get('title', '')}: {t.get('description', '')}")
+            all_keywords.extend(t.get("keywords", []))
+    keywords_str = ", ".join(list(set(all_keywords))[:40])
+    combined_query = " ".join(titles) + " " + keywords_str
+
+    raw_docs = get_relevant_context(combined_query, k=8)
+    book_context = "\n\n".join(raw_docs) if raw_docs else ""
+
+    diff_prompt = _difficulty_lmh_to_prompt(difficulty)
+
+    if not GROQ_API_KEY and not MISTRAL_API_KEY:
+        print("⚠️ No GROQ_API_KEY or MISTRAL_API_KEY — using fallback MCQs for instructor assignment")
+        return {
+            "mcqs": _fallback_instructor_mcqs(titles, difficulty, num_questions),
+            "meta": {"source": "fallback-local", "retrieved_chars": len(book_context)},
+        }, None
+
+    from langchain_core.prompts import ChatPromptTemplate
+
+    prompt_template = """You are an expert Java instructor. Create EXACTLY {num_questions} multiple-choice questions.
+
+CHAPTERS (student curriculum): {chapter_titles}
+DIFFICULTY: {diff_prompt}
+
+TOPIC OUTLINE:
+{topic_outline}
+
+RELEVANT BOOK EXCERPTS (RAG context — stay faithful to these ideas):
+{book_context}
+
+RULES:
+- ONLY multiple choice: exactly 4 options labeled A, B, C, D.
+- One correct letter per question: "correct" must be "A", "B", "C", or "D".
+- Questions must be appropriate for the listed chapters only.
+- Return ONLY valid JSON (no markdown), shape:
+{{"mcqs":[{{"id":"1","question":"...","options":{{"A":"...","B":"...","C":"...","D":"..."}},"correct":"A"}}]}}
+"""
+
+    prompt = ChatPromptTemplate.from_template(prompt_template)
+    invoke_args = {
+        "num_questions": num_questions,
+        "chapter_titles": ", ".join(titles),
+        "diff_prompt": diff_prompt,
+        "topic_outline": "\n".join(topic_lines[:80]),
+        "book_context": book_context[:6000],
+    }
+
+    providers_tried = []
+
+    if GROQ_API_KEY:
+        try:
+            from langchain_groq import ChatGroq
+            groq_model = ChatGroq(
+                model="llama-3.3-70b-versatile",
+                groq_api_key=GROQ_API_KEY,
+                temperature=0.25,
+                max_tokens=8192,
+            )
+            result = (prompt | groq_model).invoke(invoke_args)
+            text = (result.content or "").strip()
+            providers_tried.append("groq")
+            normalized = _parse_instructor_mcq_json(text, num_questions, _json)
+            if normalized:
+                return {
+                    "mcqs": normalized,
+                    "meta": {"source": "groq-rag", "retrieved_chars": len(book_context), "providers": providers_tried},
+                }, None
+            print("⚠️ Groq returned empty or unparseable MCQ JSON; trying Mistral if configured")
+        except Exception as e:
+            print(f"⚠️ Groq instructor MCQ failed: {e}")
+            providers_tried.append("groq:error")
+
+    if MISTRAL_API_KEY:
+        try:
+            from langchain_mistralai import ChatMistralAI
+            mistral_model = ChatMistralAI(
+                model="mistral-small-latest",
+                mistral_api_key=MISTRAL_API_KEY,
+                temperature=0.2,
+                max_tokens=8192,
+            )
+            result = (prompt | mistral_model).invoke(invoke_args)
+            text = (result.content or "").strip()
+            providers_tried.append("mistral")
+            normalized = _parse_instructor_mcq_json(text, num_questions, _json)
+            if normalized:
+                return {
+                    "mcqs": normalized,
+                    "meta": {"source": "mistral-rag", "retrieved_chars": len(book_context), "providers": providers_tried},
+                }, None
+            print("⚠️ Mistral returned empty or unparseable MCQ JSON")
+        except Exception as e:
+            print(f"⚠️ Mistral instructor MCQ failed: {e}")
+            providers_tried.append("mistral:error")
+
+    return {
+        "mcqs": _fallback_instructor_mcqs(titles, difficulty, num_questions),
+        "meta": {
+            "source": "fallback-local",
+            "retrieved_chars": len(book_context),
+            "providers": providers_tried,
+        },
+    }, None
+
+
+@app.route('/api/generate-mcq-assignment', methods=['POST'])
+def generate_mcq_assignment():
+    """
+    Instructor workflow: MCQs only, backed by RAG (vector store) + Groq and/or Mistral.
+
+    JSON body:
+      chapter_ids: list[int]  — ids from GET /api/chapters (same as CHAPTER_TOPICS keys)
+      difficulty: "L" | "M" | "H"
+      num_questions: int (1–50)
+    """
+    try:
+        data = request.json or {}
+        chapter_ids = data.get("chapter_ids") or data.get("chapters")
+        difficulty = (data.get("difficulty") or "M").upper()
+        if difficulty not in ("L", "M", "H"):
+            difficulty = "M"
+        num_questions = int(data.get("num_questions") or data.get("num") or 5)
+        num_questions = max(1, min(50, num_questions))
+
+        if not chapter_ids or not isinstance(chapter_ids, list):
+            return jsonify({"success": False, "error": "chapter_ids must be a non-empty list"}), 400
+
+        payload, err = generate_instructor_mcq_assignment(chapter_ids, difficulty, num_questions)
+        if err:
+            return jsonify({"success": False, "error": err}), 400
+
+        titles = []
+        for cid in chapter_ids:
+            try:
+                cid = int(cid)
+            except (TypeError, ValueError):
+                continue
+            if cid in CHAPTER_TOPICS:
+                titles.append(CHAPTER_TOPICS[cid]["title"])
+
+        return jsonify({
+            "success": True,
+            "chapter_titles": titles,
+            "difficulty": difficulty,
+            "num_questions": num_questions,
+            "mcqs": payload["mcqs"],
+            "meta": payload.get("meta", {}),
+        })
+    except Exception as e:
+        print(f"❌ generate_mcq_assignment: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 if __name__ == '__main__':

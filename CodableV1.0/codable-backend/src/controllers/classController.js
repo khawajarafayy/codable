@@ -1,4 +1,6 @@
 import Class from "../instructor/models/Class.js";
+import ClassRequest from "../instructor/models/ClassRequest.js";
+import userModel from "../models/User.js";
 import mongoose from "mongoose";
 
 // ============= CREATE CLASS =============
@@ -247,6 +249,108 @@ export const deleteClass = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting class",
+      error: error.message,
+    });
+  }
+};
+
+// ============= ADD STUDENT BY EMAIL =============
+export const addStudentByEmail = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const { email } = req.body;
+    const instructorId = req.userId;
+
+    console.log("=== ADD STUDENT BY EMAIL ===");
+    console.log("Class ID:", classId);
+    console.log("Student Email:", email);
+    console.log("Instructor ID:", instructorId);
+
+    // Validate inputs
+    if (!email || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(classId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid class ID format",
+      });
+    }
+
+    // Get class and verify instructor ownership
+    const classDoc = await Class.findById(classId)
+      .populate("instructorId", "name email");
+
+    if (!classDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Class not found",
+      });
+    }
+
+    if (classDoc.instructorId._id.toString() !== instructorId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have permission to add students to this class",
+      });
+    }
+
+    // Find student by email
+    const student = await userModel.findOne({
+      email: email.toLowerCase().trim(),
+      role: "student",
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student with this email not found",
+      });
+    }
+
+    // Check if student already enrolled
+    if (classDoc.students.includes(student._id)) {
+      return res.status(409).json({
+        success: false,
+        message: "Student is already enrolled in this class",
+      });
+    }
+
+    // Add student to class
+    classDoc.students.push(student._id);
+    await classDoc.save();
+
+    // Create approved request record (for audit trail)
+    const classRequest = new ClassRequest({
+      studentId: student._id,
+      classId: classDoc._id,
+      instructorId: classDoc.instructorId._id,
+      status: "approved",
+      respondedAt: new Date(),
+      instructorNotes: "Student added by instructor via email"
+    });
+    await classRequest.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Student added to class successfully",
+      data: {
+        studentId: student._id,
+        studentName: student.name,
+        studentEmail: student.email,
+        className: classDoc.className,
+        status: "added",
+      },
+    });
+  } catch (error) {
+    console.error("Error adding student by email:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding student to class",
       error: error.message,
     });
   }

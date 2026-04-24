@@ -23,7 +23,7 @@ const classSchema = new mongoose.Schema(
     // Instructor Reference
     instructorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: [true, "Instructor ID is required"],
     },
 
@@ -64,7 +64,7 @@ const classSchema = new mongoose.Schema(
     students: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "user",
       },
     ],
 

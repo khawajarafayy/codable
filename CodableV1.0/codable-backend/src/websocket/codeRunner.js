@@ -3,13 +3,33 @@ import { spawn, exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
 import { analyzeComplexity } from '../utils/complexityAnalyzer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(__dirname, '../temp');
 
+// Map to store user connections: userId -> Set of WebSocket connections
+const userConnections = new Map();
+
 if (!fs.existsSync(TEMP_DIR)) {
   fs.mkdirSync(TEMP_DIR, { recursive: true });
+}
+
+/**
+ * Broadcast a message to a specific user's all WebSocket connections
+ * @param {string} userId - The user ID to broadcast to
+ * @param {Object} message - The message object to send
+ */
+export function broadcastToUser(userId, message) {
+  const userSockets = userConnections.get(userId);
+  if (userSockets) {
+    userSockets.forEach((ws) => {
+      if (ws.readyState === 1) { // 1 = OPEN
+        ws.send(JSON.stringify(message));
+      }
+    });
+  }
 }
 
 /**
@@ -47,6 +67,66 @@ function getProcessMemory(pid) {
 
 export function startWebSocketServer(server) {
   const wss = new WebSocketServer({ server, path: '/ws/code' });
+
+  // Also create a separate WebSocket server for classroom notifications
+  const notificationWss = new WebSocketServer({ server, path: '/ws/notifications' });
+
+  notificationWss.on('connection', (ws, req) => {
+    try {
+      // Extract token from query params or Authorization header
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      let token = url.searchParams.get('token');
+
+      if (!token && req.headers.authorization) {
+        const authHeader = req.headers.authorization;
+        if (authHeader.startsWith('Bearer ')) {
+          token = authHeader.substring(7);
+        }
+      }
+
+      if (!token) {
+        ws.close(4001, 'Token required');
+        return;
+      }
+
+      // Verify token and extract user ID
+      let userId;
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.userId;
+      } catch (error) {
+        ws.close(4003, 'Invalid token');
+        return;
+      }
+
+      console.log(`✅ User ${userId} connected to notifications`);
+
+      // Add user to the connections map
+      if (!userConnections.has(userId)) {
+        userConnections.set(userId, new Set());
+      }
+      userConnections.get(userId).add(ws);
+
+      // Handle user disconnect
+      ws.on('close', () => {
+        console.log(`❌ User ${userId} disconnected from notifications`);
+        const userSockets = userConnections.get(userId);
+        if (userSockets) {
+          userSockets.delete(ws);
+          if (userSockets.size === 0) {
+            userConnections.delete(userId);
+          }
+        }
+      });
+
+      ws.on('error', (error) => {
+        console.error(`WebSocket error for user ${userId}:`, error);
+      });
+    } catch (error) {
+      console.error('Error in notification WebSocket connection:', error);
+      ws.close(4000, 'Server error');
+    }
+  });
 
   wss.on('connection', (ws) => {
     let javaProcess = null;

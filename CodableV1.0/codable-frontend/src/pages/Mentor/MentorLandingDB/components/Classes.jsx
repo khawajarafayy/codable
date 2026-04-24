@@ -1,26 +1,53 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Users, Plus, Copy, Trash2, AlertCircle, Loader } from "lucide-react";
+import { Users, Plus, Copy, Trash2, AlertCircle, Loader, UserCheck } from "lucide-react";
 import CreateClassModal from "./CreateClassModal.jsx";
+import StudentApprovalModal from "./StudentApprovalModal.jsx";
 import { request } from "../../../../services/apiClient.js";
 import { useAuth } from "../../../../context/AuthContext.jsx";
 
 export default function Classes() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [pendingCounts, setPendingCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch classes on component mount
+  // Fetch classes when user is loaded
   useEffect(() => {
+    if (authLoading) {
+      // Still loading auth, don't fetch yet
+      return;
+    }
+    
+    if (!user || !user.token) {
+      console.warn("No user or token available");
+      setError("Please log in to view classes");
+      setLoading(false);
+      return;
+    }
+    
     fetchClasses();
-  }, []);
+  }, [user, authLoading]);
 
   const fetchClasses = async () => {
     try {
       setLoading(true);
       setError(null);
+
+      // Validate token exists
+      if (!user || !user.token) {
+        console.error("No token found. User:", user);
+        setError("Authentication token missing. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Fetching classes with user:", { userId: user._id, role: user.role });
+      console.log("Authorization header:", `Bearer ${user.token ? "TOKEN_EXISTS" : "NO_TOKEN"}`);
 
       const response = await request(
         "/api/classes/instructor",
@@ -30,17 +57,84 @@ export default function Classes() {
         }
       );
 
+      console.log("Fetch classes response:", response);
+
       if (response.success) {
         setClasses(response.data || []);
+        // Fetch pending request counts for each class
+        fetchPendingRequestsCounts(response.data || []);
       } else {
+        console.error("Server returned success: false", response);
         setError(response.message || "Failed to fetch classes");
       }
     } catch (err) {
       console.error("Error fetching classes:", err);
-      setError("Error loading classes");
+      console.error("Error status:", err.status);
+      console.error("Error payload:", err.payload);
+      
+      let errorMessage = "Error loading classes";
+      if (err.payload && err.payload.message) {
+        errorMessage = err.payload.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      if (err.status === 401) {
+        errorMessage = "Session expired. Please log in again.";
+      } else if (err.status === 403) {
+        errorMessage = "You don't have permission to view classes.";
+      }
+      
+      setError(errorMessage);
+      setClasses([]); // Clear classes on error
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchPendingRequestsCounts = async (classList) => {
+    try {
+      const counts = {};
+      for (const cls of classList) {
+        try {
+          const response = await request(
+            `/api/instructor/class-requests/${cls._id}?status=pending`,
+            {
+              method: "GET",
+              headers: { Authorization: `Bearer ${user.token}` },
+            }
+          );
+          counts[cls._id] = response.success ? (response.data || []).length : 0;
+        } catch (err) {
+          console.error(`Error fetching pending requests for class ${cls._id}:`, err);
+          counts[cls._id] = 0;
+        }
+      }
+      setPendingCounts(counts);
+    } catch (err) {
+      console.error("Error fetching pending counts:", err);
+    }
+  };
+
+  const openApprovalModal = (cls, e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSelectedClass(cls);
+    setIsApprovalModalOpen(true);
+  };
+
+  const handleApprovalModalClose = () => {
+    setIsApprovalModalOpen(false);
+    setSelectedClass(null);
+  };
+
+  const handleApprovalUpdate = () => {
+    // Refresh pending counts after approval/rejection
+    if (selectedClass) {
+      fetchPendingRequestsCounts([selectedClass]);
+    }
+    // Also refresh classes to update student count
+    fetchClasses();
   };
 
   const handleClassCreated = (newClass) => {
@@ -126,7 +220,9 @@ export default function Classes() {
       ) : (
         /* Classes Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {classes.map((cls, index) => (
+          {classes.map((cls, index) => {
+            const pendingCount = pendingCounts[cls._id] || 0;
+            return (
             <div
               key={cls._id}
               className="group relative rounded-2xl"
@@ -172,16 +268,36 @@ export default function Classes() {
                     <Copy className="w-4 h-4" />
                   </button>
                 </div>
+
+                <div className="mt-4 pt-4 border-t border-blue-500/20 flex items-center justify-between">
+                  <button
+                    onClick={(e) => openApprovalModal(cls, e)}
+                    className="px-3 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-sm font-medium transition-colors flex items-center gap-2"
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    <span>Manage Requests</span>
+                  </button>
+
+                  {pendingCount > 0 && (
+                    <span className="px-2.5 py-1 rounded-full bg-amber-500/25 text-amber-200 text-xs font-semibold">
+                      {pendingCount} pending
+                    </span>
+                  )}
+                </div>
               </Link>
 
-              <button
-                onClick={(e) => deleteClass(cls._id, e)}
-                className="absolute top-4 right-4 p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {/* Action Buttons */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                <button
+                  onClick={(e) => deleteClass(cls._id, e)}
+                  className="p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -191,6 +307,18 @@ export default function Classes() {
         onClose={() => setIsModalOpen(false)}
         onClassCreated={handleClassCreated}
       />
+
+      {/* Student Approval Modal */}
+      {selectedClass && (
+        <StudentApprovalModal
+          classId={selectedClass._id}
+          className={selectedClass.className}
+          isOpen={isApprovalModalOpen}
+          onClose={handleApprovalModalClose}
+          onUpdate={handleApprovalUpdate}
+          userToken={user?.token}
+        />
+      )}
     </div>
   );
 }

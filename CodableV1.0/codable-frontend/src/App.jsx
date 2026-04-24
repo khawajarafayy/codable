@@ -6,7 +6,8 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { RefreshProvider } from "./context/RefreshContext";
 import RoleSelectionDashboard from "./pages/Dashboard/RoleSelectionDashboard";
-import ClassroomComingSoon from "./pages/Classroom/ClassroomComingSoon";
+import Classroom from "./pages/Student/Classroom/Classroom";
+import ClassroomDetails from "./pages/Student/Classroom/ClassroomDetails";
 import Workspace from "./pages/Workspace/Workspace";
 import LoginPage from "./pages/Auth/Login";
 import SignupPage from "./pages/Auth/SignUp";
@@ -147,7 +148,14 @@ function AppRoutes() {
       {/* Classroom Route - STUDENT ONLY */}
       <Route path="/classroom" element={
         <RoleProtectedRoute allowedRoles={["student"]}>
-          <ClassroomComingSoon />
+          <Classroom />
+        </RoleProtectedRoute>
+      } />
+
+      {/* Classroom Detail Route - STUDENT ONLY */}
+      <Route path="/classroom/:classId" element={
+        <RoleProtectedRoute allowedRoles={["student"]}>
+          <ClassroomDetails />
         </RoleProtectedRoute>
       } />
 

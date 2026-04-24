@@ -7,7 +7,9 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
 import studentRoute from "./routes/studentRoute.js";
+import studentClassRoutes from "./routes/studentClassRoutes.js";
 import instructorRoute from "./routes/instructorRoute.js";
+import instructorClassRequestRoutes from "./routes/instructorClassRequestRoutes.js";
 import learningRoute from "./routes/learningRoute.js";
 import progressRoute from "./routes/progressRoute.js";
 import classRoutes from "./routes/classRoutes.js";
@@ -62,7 +64,9 @@ app.use((req,res,next) => {
 // ------------------------
 app.use("/auth", authRoute);
 app.use("/student", studentRoute);
+app.use("/api/student-class", studentClassRoutes);
 app.use("/api/instructor", instructorRoute);
+app.use("/api/instructor/class-requests", instructorClassRequestRoutes);
 app.use("/api/learning", learningRoute);
 app.use("/api/progress", progressRoute);
 app.use("/api/classes", classRoutes);
@@ -79,7 +83,20 @@ app.get("/test", (req, res) => res.json({ ok: true }));
 startWebSocketServer(server);
 
 connectDB().then(() => {
-  server.listen(PORT, () =>
-    console.log(`Server running at http://localhost:${PORT}`)
-  );
+  server.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ ERROR: Port ${PORT} is already in use!`);
+      console.error(`\nTo fix this, run: taskkill /F /IM node.exe`);
+      console.error(`Or find the process: netstat -ano | findstr :${PORT}\n`);
+      process.exit(1);
+    } else {
+      console.error('Server error:', err);
+      process.exit(1);
+    }
+  });
+}).catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

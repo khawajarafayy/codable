@@ -84,14 +84,16 @@ const authorize = (allowedRoles = []) => async (req, res, next) => {
     }
 
     if (!token) {
-      return res.json({ success: false, message: "Token not found. Login again" });
+      return res.status(401).json({ success: false, message: "Token not found. Login again" });
     }
 
     const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Token decoded in authorize:", tokenDecode);
 
     if (tokenDecode.userId) {
       // Check if role is allowed
       if (allowedRoles.length > 0 && !allowedRoles.includes(tokenDecode.role)) {
+        console.log(`User role '${tokenDecode.role}' not in allowed roles:`, allowedRoles);
         return res.status(403).json({ 
           success: false, 
           message: `Access denied. This resource requires one of these roles: ${allowedRoles.join(', ')}` 
@@ -102,10 +104,11 @@ const authorize = (allowedRoles = []) => async (req, res, next) => {
       req.userRole = tokenDecode.role;
       return next();
     } else {
-      return res.json({ success: false, message: "Not authorized. login again" });
+      return res.status(401).json({ success: false, message: "Not authorized. login again" });
     }
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    console.error("Authorization error:", error.message);
+    return res.status(401).json({ success: false, message: error.message });
   }
 };
 

@@ -6,7 +6,7 @@ import { PracticeEditor } from './PracticeEditor';
 import { FeedbackPanel } from './FeedbackPanel';
 import learningApi from '../../../../services/learningApi';
 
-export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
+export function PracticeMode({ onBackToLearning, chapterId, topicTitle, onChapterComplete }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [viewMode, setViewMode] = useState('editor');
   const [metrics, setMetrics] = useState(null);
@@ -17,6 +17,7 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
   const [difficulty, setDifficulty] = useState('easy');
   const [code, setCode] = useState('');
   const [lastOutput, setLastOutput] = useState('');
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
 
   // Fetch questions when component mounts or difficulty changes
   useEffect(() => {
@@ -137,6 +138,18 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
   };
 
   const handleNextQuestion = () => {
+    // Count this as a correct answer if validation result is correct
+    if (validationResult?.isCorrect) {
+      const newCorrectCount = correctAnswersCount + 1;
+      setCorrectAnswersCount(newCorrectCount);
+      
+      // If all questions are answered correctly, complete the chapter
+      if (newCorrectCount === questions.length && onChapterComplete) {
+        onChapterComplete();
+        return;
+      }
+    }
+    
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setViewMode('editor');
@@ -157,6 +170,12 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
   const handleDifficultyChange = (newDifficulty) => {
     setDifficulty(newDifficulty);
     setCurrentQuestionIndex(0);
+  };
+
+  const handleChapterComplete = () => {
+    if (onChapterComplete) {
+      onChapterComplete();
+    }
   };
 
   if (loading) {
@@ -250,6 +269,7 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle }) {
               validationResult={validationResult}
               question={currentQuestion}
               isLastQuestion={currentQuestionIndex >= questions.length - 1}
+              onChapterComplete={handleChapterComplete}
             />
           )}
         </div>

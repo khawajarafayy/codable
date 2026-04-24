@@ -4,6 +4,7 @@ import SplashScreen from "./components/splashScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { RefreshProvider } from "./context/RefreshContext";
 import RoleSelectionDashboard from "./pages/Dashboard/RoleSelectionDashboard";
 import ClassroomComingSoon from "./pages/Classroom/ClassroomComingSoon";
 import Workspace from "./pages/Workspace/Workspace";
@@ -213,9 +214,11 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <RefreshProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </RefreshProvider>
     </AuthProvider>
   );
 }

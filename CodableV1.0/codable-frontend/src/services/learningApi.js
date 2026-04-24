@@ -287,6 +287,22 @@ const learningApi = {
       console.error('Error fetching remedial questions:', error);
       throw error;
     }
+  },
+
+  // Emit analytics events to backend (practice submission, quiz completion, hint usage)
+  emitAnalyticsEvent: async (eventType, payload) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/student/metrics/event`,
+        { eventType, ...payload },
+        { headers: getAuthHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error emitting analytics event:', error);
+      // Don't throw - analytics errors shouldn't interrupt learning
+      return { success: false };
+    }
   }
 };
 

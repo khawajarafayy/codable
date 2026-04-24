@@ -46,7 +46,8 @@ export const api = {
     // Student Profile APIs
     getStudentProfile: () => {
         const token = localStorage.getItem('token');
-        return request('/student/profile', { 
+        // Add timestamp to prevent caching
+        return request('/student/profile?t=' + Date.now(), { 
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` },
             credentials: 'omit'

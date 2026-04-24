@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, BookOpen, Code, CheckCircle, Lightbulb, AlertCircle, GraduationCap, Lock, ArrowLeft, Zap, Target, FlameIcon } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import learningApi from '../../../../services/learningApi';
+import { useRefresh } from '../../../../context/RefreshContext';
 
 export function LearningContent({ onStartPractice, onStartChapterPractice, chapterId, initialTopicIndex }) {
   const navigate = useNavigate();
+  const { triggerRefresh } = useRefresh();
   const [topics, setTopics] = useState([]);
   const [chapterTitle, setChapterTitle] = useState('');
   const [currentTopicIndex, setCurrentTopicIndex] = useState(initialTopicIndex || 0);
@@ -88,6 +90,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
     try {
       await learningApi.completeTopic(chapterId, topic.id, timeSpent);
       console.log(`Topic ${topic.id} marked as completed`);
+      triggerRefresh('topic-completed-in-content');
     } catch (err) {
       console.error('Error saving topic completion:', err);
     }
@@ -98,6 +101,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
     try {
       await learningApi.completeChapter(chapterId);
       console.log(`Chapter ${chapterId} marked as completed`);
+      triggerRefresh('chapter-completed');
     } catch (err) {
       console.error('Error saving chapter completion:', err);
     }

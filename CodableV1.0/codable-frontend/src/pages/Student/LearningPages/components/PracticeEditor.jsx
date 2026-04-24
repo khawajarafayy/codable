@@ -3,7 +3,7 @@ import { Button } from '../../../../components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { parse } from 'java-parser';
-
+import  learningApi  from "../../../../services/learningApi.js"
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
 
 export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, question }) {
@@ -234,6 +234,16 @@ export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, questi
       case 'error':
         setOutput((prev) => prev + `\nError: ${data.data}`);
         break;
+      case 'metrics':
+        // Capture runtime metrics from execution
+        setExecutionMetrics((prev) => ({
+          ...prev,
+          execution_time_ms: data.data.execution_time_ms,
+          peak_memory_kb: data.data.peak_memory_kb,
+          time_complexity: data.data.time_complexity,
+          space_complexity: data.data.space_complexity
+        }));
+        break;
       case 'exit':
         setIsRunning(false);
         setExecutionMetrics({
@@ -321,6 +331,19 @@ export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, questi
 
     setIsSubmitting(false);
     onSubmit(metrics);
+    
+    // Emit analytics event to track practice submission
+    learningApi.emitAnalyticsEvent('practice_submission', {
+      topicId: question?.id || question?.topicId,
+      topicName: question?.title || question?.name,
+      attempts: attempts,
+      score: metrics.score,
+      syntaxErrorCount: syntaxErrors.length,
+      logicErrorCount: codeAnalysis.missingRequired?.length || 0,
+      runtimeErrorCount: 0,
+      edgeCaseFailureCount: 0,
+      outputMatched: outputMatch
+    }).catch(err => console.error('Analytics event failed:', err));
   };
 
   const analyzeCode = (code, question) => {

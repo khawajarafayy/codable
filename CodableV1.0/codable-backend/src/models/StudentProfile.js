@@ -117,11 +117,14 @@ const studentProfileSchema = new mongoose.Schema({
   // Learning Behavior Metrics
   behaviorMetrics: {
     totalProblemsAttempted: { type: Number, default: 0 },
+    totalAttemptsMade: { type: Number, default: 0 },
     totalHintsUsed: { type: Number, default: 0 },
     totalSessions: { type: Number, default: 0 },
     avgSessionDuration: { type: Number, default: 0 },
     consistencyScore: { type: Number, default: 0 },
-    lastActiveDate: { type: Date, default: null }
+    lastActiveDate: { type: Date, default: null },
+    activeDaysCount: { type: Number, default: 0 }, // Days active in last 30 days
+    activeDates: [{ type: Date }] // Last 30 days active dates for consistency calc
   },
 
   // Adaptive Learning - Concept Mastery (BKT)

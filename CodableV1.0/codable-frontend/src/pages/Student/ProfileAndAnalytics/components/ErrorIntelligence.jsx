@@ -16,7 +16,16 @@ export function ErrorIntelligence({ errorProfile, loading }) {
     );
   }
 
-  if (!errorProfile) return null;
+  console.log("ErrorIntelligence received errorProfile:", errorProfile);
+
+  if (!errorProfile) {
+    return (
+      <Card className="bg-black/40 backdrop-blur-xl border-0 p-6">
+        <h2 className="text-2xl font-bold text-white mb-6">Error Intelligence Panel</h2>
+        <p className="text-gray-400">No error data available yet. Complete some topics to see error patterns.</p>
+      </Card>
+    );
+  }
 
   const errorTypes = [
     {

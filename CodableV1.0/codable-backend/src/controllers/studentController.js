@@ -38,6 +38,8 @@ const getStudentProfile = async (req, res) => {
     let overallCorrectness = 0;
     let avgMastery = 0;
     
+    console.log("Computing skill rating - topicMastery count:", profile.topicMastery.length);
+    
     if (profile.topicMastery.length > 0) {
       const totalCorrect = profile.topicMastery.reduce((sum, t) => sum + t.correctAttempts, 0);
       const totalTopicAttempts = profile.topicMastery.reduce((sum, t) => sum + t.totalAttempts, 0);
@@ -66,14 +68,29 @@ const getStudentProfile = async (req, res) => {
       confidenceScore = totalProblems > 0 ? Math.round((totalFirstAttempts / totalProblems) * 100) : 0;
     }
     
-    // 4. Recent Growth Rate
+    console.log("Calculated metrics - Rating:", overallSkillRating, "Confidence:", confidenceScore, "Level:", proficiencyLevel);
+    
+    // 4. Recent Growth Rate (with proper date windowing)
     let recentGrowthRate = 0;
     const history = profile.performanceHistory || [];
-    if (history.length >= 2) {
-      const recent = history.slice(-7); // last 7 entries
-      const older = history.slice(-14, -7);
-      const recentAvg = recent.reduce((sum, h) => sum + h.avgScore, 0) / recent.length || 0;
-      const olderAvg = older.length > 0 ? older.reduce((sum, h) => sum + h.avgScore, 0) / older.length : 0;
+    
+    // Helper function to filter history by date range
+    const filterHistoryByDays = (historyArray, days) => {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      return historyArray.filter(h => h.date && new Date(h.date) >= cutoffDate);
+    };
+    
+    if (history.length >= 1) {
+      const last7Days = filterHistoryByDays(history, 7);
+      const days8to14 = filterHistoryByDays(history, 14).filter(h => {
+        const cutoff7 = new Date();
+        cutoff7.setDate(cutoff7.getDate() - 7);
+        return new Date(h.date) < cutoff7;
+      });
+      
+      const recentAvg = last7Days.length > 0 ? last7Days.reduce((sum, h) => sum + h.avgScore, 0) / last7Days.length : 0;
+      const olderAvg = days8to14.length > 0 ? days8to14.reduce((sum, h) => sum + h.avgScore, 0) / days8to14.length : 0;
       recentGrowthRate = olderAvg > 0 ? Math.round(((recentAvg - olderAvg) / olderAvg) * 100) : 0;
     }
     
@@ -111,46 +128,77 @@ const getStudentProfile = async (req, res) => {
     });
     
     // 6. Error Profile
+    // Ensure errorStats exists with proper initialization
+    if (!profile.errorStats) {
+      profile.errorStats = {
+        syntaxErrors: 0,
+        logicErrors: 0,
+        runtimeErrors: 0,
+        edgeCaseFailures: 0,
+        totalErrors: 0,
+        commonPatterns: []
+      };
+    }
+    
     const totalErrors = profile.errorStats.totalErrors || 1; // avoid division by zero
     const errorProfile = {
-      syntax_error_rate: Math.round((profile.errorStats.syntaxErrors / totalErrors) * 100) || 0,
-      logic_error_rate: Math.round((profile.errorStats.logicErrors / totalErrors) * 100) || 0,
-      runtime_error_rate: Math.round((profile.errorStats.runtimeErrors / totalErrors) * 100) || 0,
-      edge_case_failure_rate: Math.round((profile.errorStats.edgeCaseFailures / totalErrors) * 100) || 0,
+      syntax_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.syntaxErrors / totalErrors) * 100) : 0,
+      logic_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.logicErrors / totalErrors) * 100) : 0,
+      runtime_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.runtimeErrors / totalErrors) * 100) : 0,
+      edge_case_failure_rate: totalErrors > 0 ? Math.round((profile.errorStats.edgeCaseFailures / totalErrors) * 100) : 0,
       common_patterns: profile.errorStats.commonPatterns || []
     };
     
-    // 7. Learning Behavior
-    const avgAttemptsPerProblem = totalAttempts > 0 ? (totalAttempts / (profile.behaviorMetrics.totalProblemsAttempted || 1)).toFixed(1) : 0;
-    const hintDependency = totalAttempts > 0 ? ((profile.behaviorMetrics.totalHintsUsed / totalAttempts) * 100).toFixed(1) : 0;
+    // 7. Learning Behavior (with corrected formulas)
+    const totalProblemsAttempted = profile.behaviorMetrics.totalProblemsAttempted || 1;
+    const totalAttemptsMade = profile.behaviorMetrics.totalAttemptsMade || 0;
+    const totalHintsUsed = profile.behaviorMetrics.totalHintsUsed || 0;
+    
+    // Avg attempts per problem: total attempts divided by total unique problems
+    const avgAttemptsPerProblem = totalProblemsAttempted > 0 ? (totalAttemptsMade / totalProblemsAttempted).toFixed(1) : 0;
+    
+    // Hint dependency: how many hints per attempt (total hints / total attempts)
+    const hintDependency = totalAttemptsMade > 0 ? ((totalHintsUsed / totalAttemptsMade) * 100).toFixed(1) : 0;
     
     // Persistence score (inversely related to hints and attempts)
-    const persistenceScore = Math.max(0, 100 - (hintDependency * 0.5) - (avgAttemptsPerProblem * 5));
+    const persistenceScore = Math.max(0, 100 - (parseFloat(hintDependency) * 0.5) - (parseFloat(avgAttemptsPerProblem) * 5));
     
     // Improvement velocity (growth over time)
     const improvementVelocity = recentGrowthRate > 0 ? 'increasing' : recentGrowthRate < 0 ? 'decreasing' : 'stable';
+    
+    // Consistency score: calculate from active dates in last 30 days
+    let consistencyScore = 0;
+    if (profile.behaviorMetrics.activeDates && profile.behaviorMetrics.activeDates.length > 0) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const activeDatesLast30 = profile.behaviorMetrics.activeDates.filter(d => new Date(d) >= thirtyDaysAgo);
+      consistencyScore = Math.round((activeDatesLast30.length / 30) * 100);
+    }
     
     const learningBehavior = {
       avg_attempts_per_problem: parseFloat(avgAttemptsPerProblem),
       hint_dependency_ratio: parseFloat(hintDependency),
       problem_solving_persistence_score: Math.round(persistenceScore),
-      consistency_score: profile.behaviorMetrics.consistencyScore || 0,
+      consistency_score: consistencyScore,
       improvement_velocity: improvementVelocity
     };
     
-    // 8. Performance Trends
-    const last7Days = history.slice(-7);
-    const last30Days = history.slice(-30);
+    // 8. Performance Trends (with date-windowed data)
+    const last7Days = filterHistoryByDays(history, 7);
+    const last30Days = filterHistoryByDays(history, 30);
     
     const last7DaysAvg = last7Days.length > 0 ? Math.round(last7Days.reduce((sum, h) => sum + h.avgScore, 0) / last7Days.length) : 0;
     const last30DaysAvg = last30Days.length > 0 ? Math.round(last30Days.reduce((sum, h) => sum + h.avgScore, 0) / last30Days.length) : 0;
     
     // Performance stability (low variance = high stability)
     let performanceStability = 0;
-    if (last30Days.length > 0) {
+    if (last30Days.length > 1) {
       const mean = last30DaysAvg;
       const variance = last30Days.reduce((sum, h) => sum + Math.pow(h.avgScore - mean, 2), 0) / last30Days.length;
-      performanceStability = Math.max(0, 100 - Math.sqrt(variance));
+      const stdDev = Math.sqrt(variance);
+      performanceStability = Math.max(0, Math.min(100, 100 - (stdDev * 2))); // normalize std dev to 0-100 scale
+    } else if (last30Days.length === 1) {
+      performanceStability = 100; // perfect stability with single data point
     }
     
     const performanceTrends = {
@@ -176,6 +224,13 @@ const getStudentProfile = async (req, res) => {
       }));
     
     // === BUILD RESPONSE ===
+    console.log("Building response with skill_overview:", {
+      overall_skill_rating: overallSkillRating,
+      proficiency_level: proficiencyLevel,
+      confidence_score: confidenceScore,
+      recent_growth_rate: recentGrowthRate
+    });
+    
     res.status(200).json({
       success: true,
       user_profile: {
@@ -397,10 +452,199 @@ const upgradeMembership = async (req, res) => {
   }
 };
 
+// Handle analytics events from frontend (practice submissions, quiz answers, hint usage)
+const updateStudentAnalytics = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { eventType, topicId, topicName, attempts, score, syntaxErrorCount, logicErrorCount, runtimeErrorCount, edgeCaseFailureCount, outputMatched, responses, total, isRemediation, hintIndex } = req.body;
+    
+    // Get or create student profile
+    let profile = await StudentProfile.findOne({ userId });
+    if (!profile) {
+      profile = new StudentProfile({ userId });
+    }
+    
+    // Update last active date and add to active dates for consistency tracking
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    profile.behaviorMetrics.lastActiveDate = new Date();
+    
+    // Track active date for consistency (keep only last 30 days)
+    if (!profile.behaviorMetrics.activeDates) {
+      profile.behaviorMetrics.activeDates = [];
+    }
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    profile.behaviorMetrics.activeDates = profile.behaviorMetrics.activeDates.filter(d => new Date(d) >= thirtyDaysAgo);
+    
+    // Add today's date if not already present
+    const todayExists = profile.behaviorMetrics.activeDates.some(d => {
+      const date = new Date(d);
+      return date.toDateString() === today.toDateString();
+    });
+    if (!todayExists) {
+      profile.behaviorMetrics.activeDates.push(today);
+    }
+    
+    // Handle different event types
+    if (eventType === 'practice_submission') {
+      // Update topic mastery
+      if (topicId && topicName) {
+        let topicData = profile.topicMastery.find(t => t.topicId === topicId);
+        if (!topicData) {
+          topicData = {
+            topicId,
+            topicName,
+            totalAttempts: 0,
+            correctAttempts: 0,
+            firstAttemptSuccesses: 0,
+            totalProblems: 0,
+            hintsUsed: 0,
+            codeQualityScores: [],
+            lastPracticed: null,
+            difficultyLevel: 'beginner'
+          };
+          profile.topicMastery.push(topicData);
+        }
+        
+        // Increment counters
+        topicData.totalAttempts += attempts || 1;
+        topicData.totalProblems = Math.max(topicData.totalProblems, topicData.totalAttempts); // at least as many as attempts
+        if (score >= 80) topicData.correctAttempts += 1;
+        if (attempts === 1 && score >= 80) topicData.firstAttemptSuccesses += 1;
+        if (outputMatched) topicData.codeQualityScores.push(Math.min(100, score));
+        topicData.lastPracticed = new Date();
+      }
+      
+      // Update error statistics
+      if (!profile.errorStats) {
+        profile.errorStats = {
+          syntaxErrors: 0,
+          logicErrors: 0,
+          runtimeErrors: 0,
+          edgeCaseFailures: 0,
+          totalErrors: 0,
+          commonPatterns: []
+        };
+      }
+      
+      profile.errorStats.syntaxErrors += syntaxErrorCount || 0;
+      profile.errorStats.logicErrors += logicErrorCount || 0;
+      profile.errorStats.runtimeErrors += runtimeErrorCount || 0;
+      profile.errorStats.edgeCaseFailures += edgeCaseFailureCount || 0;
+      profile.errorStats.totalErrors = profile.errorStats.syntaxErrors + profile.errorStats.logicErrors + profile.errorStats.runtimeErrors + profile.errorStats.edgeCaseFailures;
+      
+      // Update behavior metrics
+      profile.behaviorMetrics.totalProblemsAttempted += 1;
+      profile.behaviorMetrics.totalAttemptsMade += attempts || 1;
+      
+      // Update performance history (one entry per day per topic)
+      if (!profile.performanceHistory) {
+        profile.performanceHistory = [];
+      }
+      const today_str = today.toISOString();
+      let todayEntry = profile.performanceHistory.find(h => h.date && new Date(h.date).toDateString() === today.toDateString());
+      if (!todayEntry) {
+        todayEntry = {
+          date: today,
+          problemsSolved: 0,
+          avgScore: 0,
+          timeSpent: 0
+        };
+        profile.performanceHistory.push(todayEntry);
+      }
+      // Update daily aggregate
+      const existingCount = todayEntry.problemsSolved || 0;
+      todayEntry.avgScore = ((todayEntry.avgScore * existingCount) + score) / (existingCount + 1);
+      todayEntry.problemsSolved = existingCount + 1;
+      
+    } else if (eventType === 'quiz_complete') {
+      // Track quiz attempt
+      if (!profile.quizAttempts) {
+        profile.quizAttempts = [];
+      }
+      
+      profile.quizAttempts.push({
+        attemptedAt: new Date(),
+        totalQuestions: total || 0,
+        correctAnswers: responses ? responses.filter(r => r.is_correct).length : 0,
+        score: score || 0,
+        isRemediation: isRemediation || false,
+        detailedResponses: responses || []
+      });
+      
+      // Update topic mastery from quiz responses
+      if (responses && Array.isArray(responses)) {
+        responses.forEach(response => {
+          const conceptTags = response.concept_tags || [];
+          conceptTags.forEach(concept => {
+            let topicData = profile.topicMastery.find(t => t.topicId === concept);
+            if (!topicData) {
+              topicData = {
+                topicId: concept,
+                topicName: concept,
+                totalAttempts: 0,
+                correctAttempts: 0,
+                firstAttemptSuccesses: 0,
+                totalProblems: 0,
+                hintsUsed: 0,
+                codeQualityScores: [],
+                lastPracticed: new Date(),
+                difficultyLevel: 'beginner'
+              };
+              profile.topicMastery.push(topicData);
+            }
+            topicData.totalAttempts += 1;
+            if (response.is_correct) topicData.correctAttempts += 1;
+          });
+        });
+      }
+      
+      profile.behaviorMetrics.totalProblemsAttempted += 1;
+      
+    } else if (eventType === 'hint_used') {
+      // Track hint usage
+      profile.behaviorMetrics.totalHintsUsed += 1;
+      
+      // Update topic mastery hint count
+      if (topicId) {
+        let topicData = profile.topicMastery.find(t => t.topicId === topicId);
+        if (topicData) {
+          topicData.hintsUsed += 1;
+        }
+      }
+    }
+    
+    // Save updated profile
+    await profile.save();
+    
+    // Return the updated metrics
+    res.status(200).json({
+      success: true,
+      message: `Analytics event '${eventType}' recorded successfully`,
+      profile: {
+        userId: profile.userId,
+        totalProblemsAttempted: profile.behaviorMetrics.totalProblemsAttempted,
+        totalHintsUsed: profile.behaviorMetrics.totalHintsUsed,
+        topicCount: profile.topicMastery.length
+      }
+    });
+    
+  } catch (error) {
+    console.error("Error updating student analytics:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to record analytics event",
+      error: error.message
+    });
+  }
+};
+
 export default {
   getStudentProfile,
   createStudentProfile,
   updateStudentProfile,
   deleteStudentProfile,
-  upgradeMembership
+  upgradeMembership,
+  updateStudentAnalytics
 };

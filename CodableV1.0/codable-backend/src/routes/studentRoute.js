@@ -15,4 +15,8 @@ router.route("/profile")
 router.route("/membership/upgrade")
   .put(authMiddleware.userAuth, studentController.upgradeMembership);
 
+// Analytics event ingestion (tracks practice, quiz, hint usage)
+router.route("/metrics/event")
+  .post(authMiddleware.userAuth, studentController.updateStudentAnalytics);
+
 export default router;

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ArrowLeft, ChevronRight, CheckCircle, XCircle, HelpCircle, Loader2, Trophy } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
+import  learningApi from "../../../../services/learningApi.js"
+
 
 export function TopicPractice({
   questions,
@@ -241,7 +243,17 @@ export function TopicPractice({
                   is_correct: selectedAnswers[q.id] === q.correctAnswer,
                   concept_tags: q.concept_tags || [],
                 }));
-                onComplete({ responses: detailedResponses, score, total: questions.length });
+                
+                const completionData = { responses: detailedResponses, score, total: questions.length };
+                onComplete(completionData);
+                
+                // Emit quiz completion analytics event
+                learningApi.emitAnalyticsEvent('quiz_complete', {
+                  responses: detailedResponses,
+                  score: score,
+                  total: questions.length,
+                  isRemediation: isRemediation
+                }).catch(err => console.error('Failed to track quiz completion:', err));
               }}
               className={`bg-gradient-to-r ${isRemediation ? 'from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' : 'from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'}`}
             >

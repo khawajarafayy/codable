@@ -20,7 +20,8 @@ export function FeedbackPanel({
   metrics, 
   validationResult,
   question,
-  isLastQuestion 
+  isLastQuestion,
+  onChapterComplete 
 }) {
   const isCorrect = validationResult?.isCorrect || false;
   const score = validationResult?.score || metrics?.score || 0;
@@ -297,7 +298,7 @@ export function FeedbackPanel({
             Try Again
           </Button>
         )}
-        {!isLastQuestion && (
+        {!isLastQuestion && isCorrect && (
           <Button
             onClick={onNextQuestion}
             className="gap-2 bg-[#6C63FF] hover:bg-[#5a52d5]"
@@ -312,11 +313,11 @@ export function FeedbackPanel({
               🎉 Congratulations! You've completed all questions!
             </div>
             <Button
-              onClick={onTryAgain}
-              variant="outline"
-              className="gap-2 border-[#6C63FF] text-[#6C63FF] hover:bg-[#6C63FF]/20"
+              onClick={onChapterComplete}
+              className="gap-2 bg-green-600 hover:bg-green-700"
             >
-              Practice More
+              Continue to Next Chapter
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
         )}

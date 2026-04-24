@@ -19,7 +19,7 @@ export function Navbar() {
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
   const navItems = [
-    { key: "dashboard", label: "Dashboard", icon: Home, path: "/student" },
+    { key: "dashboard", label: "Dashboard", icon: Home, path: "/student/dashboard" },
     { key: "progress", label: "Progress", icon: TrendingUp, path: "/student/profile-and-analytics" },
     { key: "practice", label: "Practice", icon: Dumbbell, path: "/practice" },
     { key: "compiler", label: "Compiler", icon: Terminal, path: "/workspace" }

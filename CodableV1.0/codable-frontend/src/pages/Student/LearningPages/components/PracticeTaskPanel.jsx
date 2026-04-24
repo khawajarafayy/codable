@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, Lightbulb, Target, BookOpen } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { useState } from 'react';
+import learningApi from "../../../../services/learningApi.js"
 
 export function PracticeTaskPanel({ question, currentIndex, totalQuestions, onPrevious, onNext }) {
   const [showHints, setShowHints] = useState(false);
@@ -22,6 +23,12 @@ export function PracticeTaskPanel({ question, currentIndex, totalQuestions, onPr
   const showNextHint = () => {
     if (currentHintIndex < (question?.hints?.length || 0) - 1) {
       setCurrentHintIndex(currentHintIndex + 1);
+      
+      // Emit analytics event for hint usage
+      learningApi.emitAnalyticsEvent('hint_used', {
+        topicId: question?.id || question?.topicId,
+        hintIndex: currentHintIndex + 1
+      }).catch(err => console.error('Failed to track hint usage:', err));
     }
   };
 

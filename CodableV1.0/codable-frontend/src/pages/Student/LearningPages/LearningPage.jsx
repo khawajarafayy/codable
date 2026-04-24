@@ -5,9 +5,11 @@ import { PracticeMode } from './components/PracticeMode';
 import { TopicPractice } from './components/TopicPractice';
 import { RemediationContent } from './components/RemediationContent';
 import learningApi from '../../../services/learningApi';
+import { useRefresh } from '../../../context/RefreshContext';
 
 export default function LearningPage() {
   const [searchParams] = useSearchParams();
+  const { triggerRefresh } = useRefresh();
   const [mode, setMode] = useState('learning');
   const [chapterId, setChapterId] = useState(null);
   const [topicId, setTopicId] = useState(null);
@@ -81,6 +83,7 @@ export default function LearningPage() {
     try {
       if (topicId && chapterId) {
         await learningApi.completeTopic(chapterId, topicId, 0);
+        triggerRefresh('topic-completed-in-learning');
       }
     } catch (err) {
       console.error('Error saving topic completion:', err);
@@ -320,6 +323,24 @@ export default function LearningPage() {
     setMode('practice');
   };
 
+  const handleChapterPracticeComplete = async () => {
+    // Complete the current chapter
+    try {
+      await learningApi.completeChapter(chapterId);
+      triggerRefresh('chapter-completed-in-practice');
+      
+      // Move to the next chapter
+      const nextChapterId = chapterId + 1;
+      setChapterId(nextChapterId);
+      setTopicIndex(0);
+      setMode('learning');
+    } catch (err) {
+      console.error('Error completing chapter:', err);
+      // Still go back to learning mode even if the API call fails
+      setMode('learning');
+    }
+  };
+
   const handleBackToLearning = () => {
     setMode('learning');
   };
@@ -386,6 +407,7 @@ export default function LearningPage() {
           onBackToLearning={handleBackToLearning}
           chapterId={chapterId}
           topicTitle={topicTitle || `Chapter ${chapterId} Practice`}
+          onChapterComplete={handleChapterPracticeComplete}
         />
       )}
     </div>

@@ -73,3 +73,5 @@ export const api = {
         });
     }
 };
+
+export { request };

@@ -1,48 +1,82 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Users, Plus, X, Copy, Trash2 } from "lucide-react";
+import { Users, Plus, Copy, Trash2, AlertCircle, Loader } from "lucide-react";
+import CreateClassModal from "./CreateClassModal.jsx";
+import { request } from "../../../../services/apiClient.js";
+import { useAuth } from "../../../../context/AuthContext.jsx";
 
 export default function Classes() {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [className, setClassName] = useState("");
-  const [description, setDescription] = useState("");
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [classes, setClasses] = useState([
-    { id: 1, name: "React Fundamentals", students: 45, joinCode: "REACT2024", description: "Learn React from scratch" },
-    { id: 2, name: "Python for Beginners", students: 38, joinCode: "PY101", description: "Introduction to Python programming" },
-    { id: 3, name: "JavaScript Advanced", students: 32, joinCode: "JS2024", description: "Advanced JavaScript concepts" },
-    { id: 4, name: "Data Structures", students: 41, joinCode: "DS2024", description: "Essential data structures and algorithms" },
-    { id: 5, name: "Web Development", students: 52, joinCode: "WEB101", description: "Full-stack web development" },
-    { id: 6, name: "Algorithm Design", students: 29, joinCode: "ALGO24", description: "Design and analysis of algorithms" },
-  ]);
+  // Fetch classes on component mount
+  useEffect(() => {
+    fetchClasses();
+  }, []);
 
-  const generateJoinCode = () => {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  const fetchClasses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await request(
+        "/api/classes/instructor",
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.success) {
+        setClasses(response.data || []);
+      } else {
+        setError(response.message || "Failed to fetch classes");
+      }
+    } catch (err) {
+      console.error("Error fetching classes:", err);
+      setError("Error loading classes");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreateClass = () => {
-    if (!className.trim()) return;
-
-    const newClass = {
-      id: classes.length + 1,
-      name: className,
-      students: 0,
-      joinCode: generateJoinCode(),
-      description: description || "No description",
-    };
-
-    setClasses([...classes, newClass]);
-    setClassName("");
-    setDescription("");
-    setIsModalOpen(false);
+  const handleClassCreated = (newClass) => {
+    // Add new class to the beginning of the list
+    setClasses([newClass, ...classes]);
   };
 
   const copyToClipboard = (code) => {
     navigator.clipboard.writeText(code);
   };
 
-  const deleteClass = (id) => {
-    setClasses(classes.filter((cls) => cls.id !== id));
+  const deleteClass = async (classId, e) => {
+    e.stopPropagation();
+    
+    if (!window.confirm("Are you sure you want to delete this class?")) {
+      return;
+    }
+
+    try {
+      const response = await request(
+        `/api/classes/${classId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.success) {
+        setClasses(classes.filter(cls => cls._id !== classId));
+      } else {
+        setError(response.message || "Failed to delete class");
+      }
+    } catch (err) {
+      console.error("Error deleting class:", err);
+      setError("Error deleting class");
+    }
   };
 
   return (
@@ -66,116 +100,98 @@ export default function Classes() {
         </button>
       </div>
 
-      {/* Classes Grid */}
-      <div className="grid grid-cols-3 gap-6">
-        {classes.map((cls, index) => (
-          <div
-            key={cls.id}
-            className="group relative rounded-2xl"
-            style={{ animationDelay: `${index * 60}ms` }}
-          >
-            <Link
-              to={`/mentor/classes/${cls.id}`}
-              className="block p-6 rounded-2xl backdrop-blur-sm bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/15 transition-all duration-300"
-            >
-              <h3 className="text-lg font-semibold text-[#fdfdff] mb-2">
-                {cls.name}
-              </h3>
-
-              <p className="text-sm text-[#fdfdff]/50 mb-3">
-                {cls.description}
-              </p>
-
-              <div className="flex items-center gap-2 text-[#fdfdff]/60">
-                <Users className="w-4 h-4" />
-                <span className="text-sm">{cls.students} students</span>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-blue-500/20 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-[#fdfdff]/50 mb-1">Join Code</p>
-                  <code className="text-sm text-blue-400 font-semibold">
-                    {cls.joinCode}
-                  </code>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    copyToClipboard(cls.joinCode);
-                  }}
-                  className="p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              </div>
-            </Link>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteClass(cls.id);
-              }}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 opacity-0 group-hover:opacity-100"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setIsModalOpen(false)}
-          />
-
-          <div className="relative w-full max-w-lg p-8 rounded-2xl bg-[#0A1428] border border-blue-500/30">
-            <div className="flex justify-between mb-6">
-              <h2 className="text-2xl font-bold text-[#fdfdff]">
-                Create New Class
-              </h2>
-              <button onClick={() => setIsModalOpen(false)}>
-                <X className="w-5 h-5 text-white/60" />
-              </button>
-            </div>
-
-            <div className="space-y-5">
-              <input
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                placeholder="Class Name"
-                className="w-full px-4 py-3 bg-blue-500/10 border border-blue-500/30 rounded-xl text-white"
-              />
-
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Description"
-                rows={3}
-                className="w-full px-4 py-3 bg-blue-500/10 border border-blue-500/30 rounded-xl text-white"
-              />
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCreateClass}
-                  className="flex-1 py-3 bg-blue-500/20 text-blue-400 rounded-xl"
-                >
-                  Create
-                </button>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3 bg-white/5 text-white/70 rounded-xl"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Error Alert */}
+      {error && (
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-rose-400 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-rose-300">{error}</p>
         </div>
       )}
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader className="w-8 h-8 text-blue-400 animate-spin" />
+        </div>
+      ) : classes.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-[#fdfdff]/60 mb-4">No classes yet</p>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+          >
+            Create your first class
+          </button>
+        </div>
+      ) : (
+        /* Classes Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {classes.map((cls, index) => (
+            <div
+              key={cls._id}
+              className="group relative rounded-2xl"
+              style={{ animationDelay: `${index * 60}ms` }}
+            >
+              <Link
+                to={`/mentor/classes/${cls._id}`}
+                className="block p-6 rounded-2xl backdrop-blur-sm bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/15 transition-all duration-300"
+              >
+                <h3 className="text-lg font-semibold text-[#fdfdff] mb-2">
+                  {cls.className}
+                </h3>
+
+                <p className="text-sm text-[#fdfdff]/50 mb-3 line-clamp-2">
+                  {cls.description || "No description"}
+                </p>
+
+                <div className="flex items-center gap-4 text-[#fdfdff]/60 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span className="text-sm">{cls.students?.length || 0} students</span>
+                  </div>
+                  <div className="text-sm px-2 py-1 rounded bg-blue-500/20 text-blue-300">
+                    {cls.category}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-blue-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-[#fdfdff]/50 mb-1">Join Code</p>
+                    <code className="text-sm text-blue-400 font-semibold">
+                      {cls.joinCode}
+                    </code>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      copyToClipboard(cls.joinCode);
+                    }}
+                    className="p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </Link>
+
+              <button
+                onClick={(e) => deleteClass(cls._id, e)}
+                className="absolute top-4 right-4 p-2 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Create Class Modal */}
+      <CreateClassModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onClassCreated={handleClassCreated}
+      />
     </div>
   );
 }
+

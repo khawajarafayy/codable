@@ -71,7 +71,7 @@ export default function Reports() {
     },
   ];
 
-  // Helper function for dynamic category styling
+  // Helper function for dynamic category styling (fixes Tailwind dynamic class issue)
   const getCategoryClasses = (color) => {
     const colorMap = {
       emerald: {

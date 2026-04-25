@@ -5,7 +5,10 @@ import AiSuggestions from "./components/AiSuggestions";
 import OutputConsole from "./components/OutputConsole";
 import IDENavbar from "./components/IDENavbar";
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
+const DEFAULT_WS_URL = `${(import.meta.env.VITE_API_URL || 'http://localhost:3000')
+  .replace(/^http/, 'ws')
+  .replace(/\/$/, '')}/ws/compiler`;
+const WS_URL = import.meta.env.VITE_WS_URL || DEFAULT_WS_URL;
 
 const Workspace = () => {
   const [code, setCode] = useState(`// Write your Java code here...

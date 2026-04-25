@@ -21,7 +21,6 @@ export function Navbar() {
   const navItems = [
     { key: "dashboard", label: "Dashboard", icon: Home, path: "/student/dashboard" },
     { key: "progress", label: "Progress", icon: TrendingUp, path: "/student/profile-and-analytics" },
-    { key: "practice", label: "Practice", icon: Dumbbell, path: "/practice" },
     { key: "compiler", label: "Compiler", icon: Terminal, path: "/workspace" }
   ];
 
@@ -104,12 +103,7 @@ export function Navbar() {
                   Billing
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  className="text-gray-300 focus:bg-gray-800 focus:text-white cursor-pointer"
-                  onClick={() => navigate("/preferences")}
-                >
-                  Preferences
-                </DropdownMenuItem>
+              
 
                 <DropdownMenuSeparator className="bg-gray-800" />
 

@@ -166,6 +166,20 @@ const studentProfileSchema = new mongoose.Schema({
     remediationCount: { type: Number, default: 0 },
     weakConcepts: [{ type: String }],
     lastUpdated: { type: Date, default: Date.now },
+  }],
+
+  // Chapter-level practice tracking (end-of-chapter practice tasks)
+  chapterPracticeAttempts: [{
+    chapterId: { type: Number, required: true },
+    chapterName: { type: String, default: '' },
+    questionId: { type: String, required: true },
+    questionTitle: { type: String, default: '' },
+    totalQuestionsInSet: { type: Number, default: 0 },
+    score: { type: Number, default: 0 },
+    isCorrect: { type: Boolean, default: false },
+    feedback: [{ type: String }],
+    suggestions: [{ type: String }],
+    submittedAt: { type: Date, default: Date.now }
   }]
 
 }, { timestamps: true });

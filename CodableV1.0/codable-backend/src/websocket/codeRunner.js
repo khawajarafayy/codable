@@ -66,10 +66,14 @@ function getProcessMemory(pid) {
 }
 
 export function startWebSocketServer(server) {
-  const wss = new WebSocketServer({ server, path: '/ws/code' });
+  // Keep compiler websocket on a dedicated endpoint.
+  // "/ws/code" is kept as a legacy alias for existing clients.
+  const codePaths = new Set(['/ws/compiler', '/ws/code']);
+  const notificationPath = '/ws/notifications';
 
-  // Also create a separate WebSocket server for classroom notifications
-  const notificationWss = new WebSocketServer({ server, path: '/ws/notifications' });
+  // Use explicit upgrade routing to avoid protocol/path collisions.
+  const wss = new WebSocketServer({ noServer: true });
+  const notificationWss = new WebSocketServer({ noServer: true });
 
   notificationWss.on('connection', (ws, req) => {
     try {
@@ -303,5 +307,31 @@ export function startWebSocketServer(server) {
     }
   });
 
-  console.log('WebSocket server started on /ws/code');
+  server.on('upgrade', (req, socket, head) => {
+    try {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const pathname = url.pathname;
+
+      if (codePaths.has(pathname)) {
+        wss.handleUpgrade(req, socket, head, (ws) => {
+          wss.emit('connection', ws, req);
+        });
+        return;
+      }
+
+      if (pathname === notificationPath) {
+        notificationWss.handleUpgrade(req, socket, head, (ws) => {
+          notificationWss.emit('connection', ws, req);
+        });
+        return;
+      }
+
+      socket.destroy();
+    } catch (error) {
+      console.error('Upgrade routing error:', error);
+      socket.destroy();
+    }
+  });
+
+  console.log('WebSocket server started on /ws/compiler (legacy alias: /ws/code)');
 }

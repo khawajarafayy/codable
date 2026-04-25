@@ -3,8 +3,10 @@ import { Button } from '../../../../components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { parse } from 'java-parser';
-import  learningApi  from "../../../../services/learningApi.js"
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws/code';
+const DEFAULT_WS_URL = `${(import.meta.env.VITE_API_URL || 'http://localhost:3000')
+  .replace(/^http/, 'ws')
+  .replace(/\/$/, '')}/ws/compiler`;
+const WS_URL = import.meta.env.VITE_WS_URL || DEFAULT_WS_URL;
 
 export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, question }) {
   const [output, setOutput] = useState('');
@@ -331,19 +333,6 @@ export function PracticeEditor({ code, onChange, onSubmit, onRunComplete, questi
 
     setIsSubmitting(false);
     onSubmit(metrics);
-    
-    // Emit analytics event to track practice submission
-    learningApi.emitAnalyticsEvent('practice_submission', {
-      topicId: question?.id || question?.topicId,
-      topicName: question?.title || question?.name,
-      attempts: attempts,
-      score: metrics.score,
-      syntaxErrorCount: syntaxErrors.length,
-      logicErrorCount: codeAnalysis.missingRequired?.length || 0,
-      runtimeErrorCount: 0,
-      edgeCaseFailureCount: 0,
-      outputMatched: outputMatch
-    }).catch(err => console.error('Analytics event failed:', err));
   };
 
   const analyzeCode = (code, question) => {

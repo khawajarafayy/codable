@@ -98,6 +98,36 @@ export const api = {
             headers: { 'Authorization': `Bearer ${token}` },
             credentials: 'omit'
         });
+    },
+
+    // Account Settings APIs
+    getAccountSettings: () => {
+        const token = localStorage.getItem('token');
+        return request('/account-settings', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+
+    updateAccountSettings: (settingsData) => {
+        const token = localStorage.getItem('token');
+        return request('/account-settings', {
+            method: 'PUT',
+            body: settingsData,
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+
+    upgradeMembership: (tier) => {
+        const token = localStorage.getItem('token');
+        return request('/student/membership/upgrade', {
+            method: 'PUT',
+            body: { tier },
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
     }
 };
 

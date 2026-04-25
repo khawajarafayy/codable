@@ -1,6 +1,19 @@
 import StudentProfile from "../models/StudentProfile.js";
 import User from "../models/User.js";
 
+const CHAPTER_TITLES = {
+  1: "Introduction to Computers, Programs, and Java",
+  2: "Elementary Programming",
+  3: "Selections",
+  4: "Mathematical Functions, Characters, and Strings",
+  5: "Loops",
+  6: "Methods",
+  7: "Single-Dimensional Arrays",
+  8: "Multidimensional Arrays",
+  9: "Objects and Classes",
+  10: "Thinking in Objects"
+};
+
 const getStudentProfile = async (req, res) => {
   try {
     const userId = req.userId; 
@@ -127,7 +140,78 @@ const getStudentProfile = async (req, res) => {
       };
     });
     
-    // 6. Error Profile with Chapter Breakdown and Recommendations
+    // 6. Chapter Mastery (from chapter practice questions + submission feedback)
+    const chapterAttempts = profile.chapterPracticeAttempts || [];
+    const chapterMasteryData = Object.values(
+      chapterAttempts.reduce((acc, attempt) => {
+        if (!attempt?.chapterId || !attempt?.questionId) return acc;
+
+        const chapterKey = String(attempt.chapterId);
+        if (!acc[chapterKey]) {
+          acc[chapterKey] = {
+            chapter_id: attempt.chapterId,
+            chapter_name: attempt.chapterName || CHAPTER_TITLES[attempt.chapterId] || `Chapter ${attempt.chapterId}`,
+            _questionStats: new Map(),
+            _feedbackCounts: new Map(),
+            _scoreSum: 0,
+            _correctCount: 0,
+            _maxQuestionSetSize: 0,
+            total_attempts: 0
+          };
+        }
+
+        const chapter = acc[chapterKey];
+        chapter.total_attempts += 1;
+        chapter._scoreSum += attempt.score || 0;
+        if (attempt.isCorrect) chapter._correctCount += 1;
+        if ((attempt.totalQuestionsInSet || 0) > chapter._maxQuestionSetSize) {
+          chapter._maxQuestionSetSize = attempt.totalQuestionsInSet || 0;
+        }
+
+        const qid = String(attempt.questionId);
+        const prevAttemptsForQuestion = chapter._questionStats.get(qid) || 0;
+        chapter._questionStats.set(qid, prevAttemptsForQuestion + 1);
+
+        (attempt.feedback || []).forEach((item) => {
+          if (!item) return;
+          const key = item.trim();
+          if (!key) return;
+          chapter._feedbackCounts.set(key, (chapter._feedbackCounts.get(key) || 0) + 1);
+        });
+
+        return acc;
+      }, {})
+    ).map((chapter) => {
+      const uniqueQuestions = chapter._questionStats.size;
+      const totalQuestions = Math.max(uniqueQuestions, chapter._maxQuestionSetSize || 0);
+      const avgAttemptsPerQuestion = uniqueQuestions > 0
+        ? chapter.total_attempts / uniqueQuestions
+        : 0;
+      const avgScore = chapter.total_attempts > 0
+        ? chapter._scoreSum / chapter.total_attempts
+        : 0;
+      const successRate = chapter.total_attempts > 0
+        ? (chapter._correctCount / chapter.total_attempts) * 100
+        : 0;
+
+      const mostCommonFeedback = Array.from(chapter._feedbackCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([message, count]) => ({ message, count }));
+
+      return {
+        chapter_id: chapter.chapter_id,
+        chapter_name: chapter.chapter_name,
+        total_questions: totalQuestions,
+        total_attempts: chapter.total_attempts,
+        avg_attempts_per_question: Number(avgAttemptsPerQuestion.toFixed(2)),
+        avg_score: Math.round(avgScore),
+        success_rate: Math.round(successRate),
+        most_common_feedback: mostCommonFeedback
+      };
+    }).sort((a, b) => a.chapter_id - b.chapter_id);
+
+    // 7. Error Profile with Chapter Breakdown and Recommendations
     // Ensure errorStats exists with proper initialization
     if (!profile.errorStats) {
       profile.errorStats = {
@@ -268,7 +352,7 @@ const getStudentProfile = async (req, res) => {
     };
 
     
-    // 7. Learning Behavior (with corrected formulas)
+    // 8. Learning Behavior (with corrected formulas)
     const totalProblemsAttempted = profile.behaviorMetrics.totalProblemsAttempted || 1;
     const totalAttemptsMade = profile.behaviorMetrics.totalAttemptsMade || 0;
     const totalHintsUsed = profile.behaviorMetrics.totalHintsUsed || 0;
@@ -302,7 +386,7 @@ const getStudentProfile = async (req, res) => {
       improvement_velocity: improvementVelocity
     };
     
-    // 8. Performance Trends (with date-windowed data)
+    // 9. Performance Trends (with date-windowed data)
     const last7Days = filterHistoryByDays(history, 7);
     const last30Days = filterHistoryByDays(history, 30);
     
@@ -327,7 +411,7 @@ const getStudentProfile = async (req, res) => {
       growth_trend: recentGrowthRate > 0 ? 'improving' : recentGrowthRate < 0 ? 'declining' : 'stable'
     };
     
-    // 9. Adaptive Recommendations
+    // 10. Adaptive Recommendations
     const weakTopics = topicMasteryData
       .filter(t => t.mastery_score < 60)
       .sort((a, b) => a.mastery_score - b.mastery_score)
@@ -372,6 +456,7 @@ const getStudentProfile = async (req, res) => {
           recent_growth_rate: recentGrowthRate
         },
         topic_mastery: topicMasteryData,
+        chapter_mastery: chapterMasteryData,
         error_profile: errorProfile,
         learning_behavior: learningBehavior,
         performance_trends: performanceTrends,
@@ -575,7 +660,30 @@ const upgradeMembership = async (req, res) => {
 const updateStudentAnalytics = async (req, res) => {
   try {
     const userId = req.userId;
-    const { eventType, topicId, topicName, attempts, score, syntaxErrorCount, logicErrorCount, runtimeErrorCount, edgeCaseFailureCount, outputMatched, responses, total, isRemediation, hintIndex } = req.body;
+    const {
+      eventType,
+      topicId,
+      topicName,
+      attempts,
+      score,
+      syntaxErrorCount,
+      logicErrorCount,
+      runtimeErrorCount,
+      edgeCaseFailureCount,
+      outputMatched,
+      responses,
+      total,
+      isRemediation,
+      hintIndex,
+      chapterId,
+      chapterName,
+      questionId,
+      questionTitle,
+      isCorrect,
+      feedback,
+      suggestions,
+      totalQuestionsInSet
+    } = req.body;
     
     // Get or create student profile
     let profile = await StudentProfile.findOne({ userId });
@@ -607,6 +715,25 @@ const updateStudentAnalytics = async (req, res) => {
     
     // Handle different event types
     if (eventType === 'practice_submission') {
+      // Record chapter-level attempts from end-of-chapter practice submissions
+      if (chapterId && questionId) {
+        if (!profile.chapterPracticeAttempts) {
+          profile.chapterPracticeAttempts = [];
+        }
+        profile.chapterPracticeAttempts.push({
+          chapterId: Number(chapterId),
+          chapterName: chapterName || CHAPTER_TITLES[Number(chapterId)] || '',
+          questionId: String(questionId),
+          questionTitle: questionTitle || '',
+          totalQuestionsInSet: Number(totalQuestionsInSet) || 0,
+          score: score || 0,
+          isCorrect: Boolean(isCorrect),
+          feedback: Array.isArray(feedback) ? feedback.slice(0, 10) : [],
+          suggestions: Array.isArray(suggestions) ? suggestions.slice(0, 10) : [],
+          submittedAt: new Date()
+        });
+      }
+
       // Update topic mastery
       if (topicId && topicName) {
         let topicData = profile.topicMastery.find(t => t.topicId === topicId);

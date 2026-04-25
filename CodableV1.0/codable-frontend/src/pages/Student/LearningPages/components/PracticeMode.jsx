@@ -96,6 +96,13 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle, onChapte
     
     // Validate the solution using embedding-based comparison for chapter practice
     // This uses semantic similarity to handle minor differences in output
+    let finalValidationResult = {
+      isCorrect: false,
+      score: submittedMetrics?.score || 0,
+      feedback: ['Unable to validate solution'],
+      suggestions: ['Please try again']
+    };
+
     try {
       const validation = await learningApi.validateChapterPractice(
         code,
@@ -106,28 +113,45 @@ export function PracticeMode({ onBackToLearning, chapterId, topicTitle, onChapte
       
       if (validation.success) {
         // Include similarity score in the result for user feedback
-        const result = {
+        finalValidationResult = {
           ...validation.validation,
           similarityScore: validation.validation.similarityScore
         };
-        setValidationResult(result);
+        setValidationResult(finalValidationResult);
       } else {
-        setValidationResult({
-          isCorrect: false,
-          score: 0,
-          feedback: ['Unable to validate solution'],
-          suggestions: ['Please try again']
-        });
+        setValidationResult(finalValidationResult);
       }
     } catch (err) {
       console.error('Validation error:', err);
-      setValidationResult({
+      finalValidationResult = {
         isCorrect: false,
         score: submittedMetrics.score || 0,
         feedback: ['Validation service unavailable'],
         suggestions: ['Your code ran successfully. Manual review may be needed.']
-      });
+      };
+      setValidationResult(finalValidationResult);
     }
+
+    // Emit analytics with chapter + feedback aware payload
+    learningApi.emitAnalyticsEvent('practice_submission', {
+      chapterId: chapterId,
+      chapterName: topicTitle,
+      totalQuestionsInSet: questions.length,
+      questionId: `${chapterId}-${currentQuestion?.id}`,
+      questionTitle: currentQuestion?.title || 'Practice Question',
+      topicId: `${chapterId}-${currentQuestion?.id}`,
+      topicName: currentQuestion?.title || currentQuestion?.name || 'Chapter Practice',
+      attempts: submittedMetrics?.attempts || 1,
+      score: finalValidationResult?.score ?? submittedMetrics?.score ?? 0,
+      isCorrect: Boolean(finalValidationResult?.isCorrect),
+      feedback: finalValidationResult?.feedback || [],
+      suggestions: finalValidationResult?.suggestions || [],
+      syntaxErrorCount: submittedMetrics?.syntaxErrors || 0,
+      logicErrorCount: submittedMetrics?.codeAnalysis?.missingRequired?.length || 0,
+      runtimeErrorCount: 0,
+      edgeCaseFailureCount: 0,
+      outputMatched: Boolean(submittedMetrics?.outputMatches)
+    }).catch(err => console.error('Analytics event failed:', err));
     
     setViewMode('feedback');
   };

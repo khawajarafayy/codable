@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SkillOverview } from "./components/SkillOverview";
-import { TopicMasteryTable } from "./components/TopicMasteryTable";
+import { ChapterMasteryTable } from "./components/TopicMasteryTable";
 import { ErrorIntelligence } from "./components/ErrorIntelligence";
 import { LearningBehavior } from "./components/LearningBehavior";
 import { PerformanceTrends } from "./components/PerformanceTrends";
@@ -168,7 +168,7 @@ export default function ProfileAndAnalytics() {
               value="mastery"
               className="data-[state=active]:bg-gray-700/80 data-[state=active]:text-white rounded-xl transition-all"
             >
-              Topic Mastery
+              Chapter Mastery
             </TabsTrigger>
             <TabsTrigger 
               value="behavior"
@@ -199,7 +199,7 @@ export default function ProfileAndAnalytics() {
           </TabsContent>
 
           <TabsContent value="mastery">
-            <TopicMasteryTable topicMastery={profileData?.topic_mastery} loading={loading} />
+            <ChapterMasteryTable chapterMastery={profileData?.chapter_mastery} loading={loading} />
           </TabsContent>
 
           <TabsContent value="behavior">

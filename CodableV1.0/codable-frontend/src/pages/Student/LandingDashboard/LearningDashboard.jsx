@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { javaBookTopics } from '../../../data/javaBookTopics';
 import learningApi from '../../../services/learningApi';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function ChatPopup({ open, onClose, chapterId }) {
 	const [messages, setMessages] = useState([
@@ -40,7 +42,7 @@ function ChatPopup({ open, onClose, chapterId }) {
 		setLoading(true);
 
 		try {
-			const response = await learningApi.askAssistant(content, chapterId || null);
+			const response = await learningApi.askAssistant(content, chapterId || null, messages);
 			const assistantText =
 				response?.response ||
 				"I am your Java Learning AI Assistant. Please ask Java/course-related questions only.";
@@ -110,7 +112,40 @@ function ChatPopup({ open, onClose, chapterId }) {
 										: "bg-white/10 backdrop-blur-md text-gray-200 border-white/10 rounded-tl-none"
 								}`}
 							>
-								<div>{msg.text}</div>
+								<div className="markdown-body text-gray-200">
+									{msg.role === "assistant" ? (
+										<ReactMarkdown
+											remarkPlugins={[remarkGfm]}
+											components={{
+												p: ({node, ...props}) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
+												ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1" {...props} />,
+												ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1" {...props} />,
+												li: ({node, ...props}) => <li className="mb-1" {...props} />,
+												code: ({node, inline, className, children, ...props}) => {
+													return inline ? (
+														<code className="bg-black/30 px-1.5 py-0.5 rounded text-purple-200 font-mono text-[11px]" {...props}>
+															{children}
+														</code>
+													) : (
+														<pre className="bg-black/50 p-3 rounded-lg overflow-x-auto mb-2 text-[11px] font-mono text-gray-200">
+															<code {...props}>{children}</code>
+														</pre>
+													);
+												},
+												strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
+												em: ({node, ...props}) => <em className="italic text-gray-300" {...props} />,
+												h1: ({node, ...props}) => <h1 className="text-sm font-bold mb-2 text-white" {...props} />,
+												h2: ({node, ...props}) => <h2 className="text-sm font-bold mb-2 text-white" {...props} />,
+												h3: ({node, ...props}) => <h3 className="text-xs font-bold mb-2 text-white" {...props} />,
+												a: ({node, ...props}) => <a className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+											}}
+										>
+											{msg.text}
+										</ReactMarkdown>
+									) : (
+										msg.text
+									)}
+								</div>
 								<div className="text-[10px] text-gray-300/80 mt-1">{msg.time}</div>
 							</div>
 						</div>

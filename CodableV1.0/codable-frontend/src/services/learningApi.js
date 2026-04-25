@@ -151,11 +151,11 @@ const learningApi = {
   },
 
   // Course-specific virtual assistant (Java learning only)
-  askAssistant: async (message, chapterId = null) => {
+  askAssistant: async (message, chapterId = null, history = []) => {
     try {
       const response = await axios.post(
         `${API_URL}/api/learning/assistant/chat`,
-        { message, chapter_id: chapterId },
+        { message, chapter_id: chapterId, history },
         { headers: getAuthHeader() }
       );
       return response.data;

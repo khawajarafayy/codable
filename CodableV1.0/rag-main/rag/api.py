@@ -3258,6 +3258,15 @@ def _is_course_java_query(user_text: str) -> bool:
         "syntax", "string", "scanner", "algorithm", "code", "coding",
         "program", "programming", "chapter", "topic", "assignment", "quiz"
     ]
+    
+    general_learning_keywords = [
+        "concise", "short", "detail", "explain", "clarify", "example",
+        "simplify", "summarize", "summary", "understand", "meaning",
+        "response", "answer", "question", "error", "bug", "fix", "issue",
+        "help", "yes", "no", "thanks", "thank you", "ok", "okay",
+        "what", "how", "why", "show", "give", "more", "less", "make it"
+    ]
+
     off_topic_signals = [
         "recipe", "cook", "cooking", "diet", "travel", "movie", "song",
         "politics", "crypto price", "stock", "football", "cricket score"
@@ -3266,9 +3275,13 @@ def _is_course_java_query(user_text: str) -> bool:
     if any(signal in text for signal in off_topic_signals) and not any(k in text for k in java_keywords):
         return False
 
-    # Allow short follow-up queries if they still look like study context.
-    if any(k in text for k in java_keywords):
+    if any(k in text for k in java_keywords) or any(k in text for k in general_learning_keywords):
         return True
+
+    # Allow short follow-up messages up to 5 words
+    if len(text.split()) <= 5:
+        return True
+
     return False
 
 
@@ -3276,31 +3289,16 @@ def _is_course_java_query(user_text: str) -> bool:
 def assistant_chat():
     """
     Virtual Java learning assistant endpoint.
-    Only responds to Java/course-related queries.
+    Uses LLM semantics to allow valid Java queries and conversation history.
     """
     try:
         data = request.json or {}
         user_message = (data.get("message") or "").strip()
         chapter_id = data.get("chapter_id")
+        history = data.get("history") or []
 
         if not user_message:
             return jsonify({"success": False, "error": "message is required"}), 400
-
-        if not _is_course_java_query(user_message):
-            return jsonify({
-                "success": True,
-                "off_topic": True,
-                "response": (
-                    "I am your Java Learning AI Assistant. I can help with Java concepts, "
-                    "course chapters, coding doubts, and practice questions only. "
-                    "Please ask a Java/course-related question."
-                ),
-                "suggestions": [
-                    "Explain polymorphism with a simple Java example.",
-                    "How does Scanner take integer input in Java?",
-                    "Give me a practice question from loops chapter."
-                ]
-            })
 
         chapter_hint = ""
         try:
@@ -3326,12 +3324,14 @@ def assistant_chat():
             })
 
         system_prompt = (
-            "You are a strict Java Learning AI Assistant for a course platform. "
-            "Rules: (1) Answer only Java/course/coding-learning related queries. "
-            "(2) If off-topic, reply with exactly: "
-            "'I am your Java Learning AI Assistant. Please ask Java/course-related questions only.' "
-            "(3) Keep answers concise, practical, and beginner-friendly unless user asks for depth. "
-            "(4) Use provided book context when relevant; do not fabricate chapter facts."
+            "You are a helpful and conversational Java Learning AI Assistant for a course platform. "
+            "Rules:\n"
+            "1. Answer Java, programming, and course-related queries, even broader discussions like 'Why Java is better' or comparisons.\n"
+            "2. Accept follow-up queries and conversational adjustments (e.g., 'make it concise', 'explain again', 'why?').\n"
+            "3. Reject ONLY clearly irrelevant, non-programming queries (e.g., sports, politics, cooking). If completely off-topic, reply politely: "
+            "'I can help with Java and programming topics. Could you clarify your question?'\n"
+            "4. Use clear Markdown formatting: bullet points, short paragraphs, and properly fenced code blocks. Do not dump raw text.\n"
+            "5. Use provided book context when relevant; do not fabricate chapter facts."
         )
 
         user_prompt = f"""
@@ -3350,7 +3350,7 @@ Book context:
         # Prefer langchain mistral client (already used elsewhere in this project).
         try:
             from langchain_mistralai import ChatMistralAI
-            from langchain_core.messages import SystemMessage, HumanMessage
+            from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
             model = ChatMistralAI(
                 model="mistral-small-latest",
@@ -3358,25 +3358,41 @@ Book context:
                 temperature=0.2,
                 max_tokens=1200
             )
-            # Invoke model directly with message objects to avoid template-variable parsing
-            # when user/context text contains curly braces.
-            result = model.invoke([
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_prompt),
-            ])
+            
+            messages_for_llm = [SystemMessage(content=system_prompt)]
+            
+            # Add conversation history
+            for msg in history:
+                role = msg.get("role")
+                text = msg.get("text") or ""
+                if role == "user":
+                    messages_for_llm.append(HumanMessage(content=text))
+                elif role == "assistant":
+                    messages_for_llm.append(AIMessage(content=text))
+                    
+            messages_for_llm.append(HumanMessage(content=user_prompt))
+
+            result = model.invoke(messages_for_llm)
             response_text = (result.content or "").strip()
+            
         except Exception as lc_err:
             print(f"⚠️ assistant_chat langchain mistral failed: {lc_err}")
             try:
                 from mistralai import Mistral
 
                 client = Mistral(api_key=MISTRAL_API_KEY)
+                
+                messages_for_sdk = [{"role": "system", "content": system_prompt}]
+                for msg in history:
+                    role = msg.get("role")
+                    if role in ["user", "assistant"]:
+                        messages_for_sdk.append({"role": role, "content": msg.get("text") or ""})
+                        
+                messages_for_sdk.append({"role": "user", "content": user_prompt})
+                
                 chat_response = client.chat.complete(
                     model="mistral-large-latest",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
+                    messages=messages_for_sdk,
                     temperature=0.2
                 )
                 response_text = (chat_response.choices[0].message.content or "").strip()

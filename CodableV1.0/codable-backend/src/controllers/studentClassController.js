@@ -2,6 +2,8 @@ import Class from "../instructor/models/Class.js";
 import ClassRequest from "../instructor/models/ClassRequest.js";
 import userModel from "../models/User.js";
 import mongoose from "mongoose";
+import ClassAssignment from "../instructor/models/ClassAssignment.js";
+import ClassAssignmentSubmission from "../models/ClassAssignmentSubmission.js";
 
 // ============= JOIN CLASS =============
 export const joinClass = async (req, res) => {
@@ -127,22 +129,48 @@ export const getStudentClasses = async (req, res) => {
       .populate("instructorId", "name email")
       .sort({ createdAt: -1 });
 
+    const classIds = classes.map(c => c._id);
+
+    // Get all published assignments for these classes
+    const assignmentsAggr = await ClassAssignment.aggregate([
+      { $match: { classId: { $in: classIds }, status: "published" } },
+      { $group: { _id: "$classId", count: { $sum: 1 } } }
+    ]);
+    const assignmentCounts = Object.fromEntries(assignmentsAggr.map(a => [String(a._id), a.count]));
+
+    // Get all submissions for this student for these classes
+    const submissionsAggr = await ClassAssignmentSubmission.aggregate([
+      { $match: { classId: { $in: classIds }, studentId: new mongoose.Types.ObjectId(studentId) } },
+      { $group: { _id: "$classId", count: { $sum: 1 } } }
+    ]);
+    const submissionCounts = Object.fromEntries(submissionsAggr.map(s => [String(s._id), s.count]));
+
     // Format response with progress info
-    const formattedClasses = classes.map((classDoc) => ({
-      id: classDoc._id,
-      classId: classDoc._id,
-      className: classDoc.className,
-      instructorName: classDoc.instructorId.name,
-      instructorId: classDoc.instructorId._id,
-      instructorEmail: classDoc.instructorId.email,
-      joinCode: classDoc.joinCode,
-      description: classDoc.description,
-      category: classDoc.category,
-      createdAt: classDoc.createdAt,
-      startDate: classDoc.startDate,
-      endDate: classDoc.endDate,
-      enrolledStudents: classDoc.students.length,
-    }));
+    const formattedClasses = classes.map((classDoc) => {
+      const classIdStr = String(classDoc._id);
+      const totalAssignments = assignmentCounts[classIdStr] || 0;
+      const completed = submissionCounts[classIdStr] || 0;
+      const progress = totalAssignments > 0 ? Math.round((completed / totalAssignments) * 100) : 0;
+
+      return {
+        id: classDoc._id,
+        classId: classDoc._id,
+        className: classDoc.className,
+        instructorName: classDoc.instructorId.name,
+        instructorId: classDoc.instructorId._id,
+        instructorEmail: classDoc.instructorId.email,
+        joinCode: classDoc.joinCode,
+        description: classDoc.description,
+        category: classDoc.category,
+        createdAt: classDoc.createdAt,
+        startDate: classDoc.startDate,
+        endDate: classDoc.endDate,
+        enrolledStudents: classDoc.students.length,
+        assignments: totalAssignments,
+        completed: completed,
+        progress: progress,
+      };
+    });
 
     res.status(200).json({
       success: true,

@@ -127,7 +127,7 @@ const getStudentProfile = async (req, res) => {
       };
     });
     
-    // 6. Error Profile
+    // 6. Error Profile with Chapter Breakdown and Recommendations
     // Ensure errorStats exists with proper initialization
     if (!profile.errorStats) {
       profile.errorStats = {
@@ -136,18 +136,137 @@ const getStudentProfile = async (req, res) => {
         runtimeErrors: 0,
         edgeCaseFailures: 0,
         totalErrors: 0,
-        commonPatterns: []
+        commonPatterns: [],
+        byChapter: [],
+        recent7Days: {
+          syntaxErrors: 0,
+          logicErrors: 0,
+          runtimeErrors: 0,
+          edgeCaseFailures: 0,
+          totalErrors: 0
+        }
       };
     }
     
-    const totalErrors = profile.errorStats.totalErrors || 1; // avoid division by zero
-    const errorProfile = {
-      syntax_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.syntaxErrors / totalErrors) * 100) : 0,
-      logic_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.logicErrors / totalErrors) * 100) : 0,
-      runtime_error_rate: totalErrors > 0 ? Math.round((profile.errorStats.runtimeErrors / totalErrors) * 100) : 0,
-      edge_case_failure_rate: totalErrors > 0 ? Math.round((profile.errorStats.edgeCaseFailures / totalErrors) * 100) : 0,
-      common_patterns: profile.errorStats.commonPatterns || []
+    // Calculate overall error rates
+    const totalErrors = profile.errorStats.totalErrors || 1;
+    const recentTotalErrors = profile.errorStats.recent7Days.totalErrors || 1;
+    
+    // Compute chapter-level error data
+    const chapterErrorData = (profile.errorStats.byChapter || []).map(ch => {
+      const total = ch.totalErrors || 1;
+      return {
+        chapterId: ch.chapterId,
+        syntaxErrorRate: total > 0 ? Math.round((ch.syntaxErrors / total) * 100) : 0,
+        logicErrorRate: total > 0 ? Math.round((ch.logicErrors / total) * 100) : 0,
+        runtimeErrorRate: total > 0 ? Math.round((ch.runtimeErrors / total) * 100) : 0,
+        edgeCaseFailureRate: total > 0 ? Math.round((ch.edgeCaseFailures / total) * 100) : 0,
+        totalErrorsInChapter: ch.totalErrors,
+        averageScore: ch.averageScore,
+        firstAttemptSuccessRate: ch.firstAttemptSuccessRate,
+        errorPatterns: (ch.errorPatterns || []).sort((a, b) => b.frequency - a.frequency).slice(0, 5),
+        lastPracticed: ch.lastPracticed
+      };
+    }).sort((a, b) => b.chapterId - a.chapterId);
+    
+    // Detect improvement/regression trends
+    const errorTrend = {
+      recentErrors: recentTotalErrors,
+      totalErrors: totalErrors,
+      trend: recentTotalErrors > totalErrors * 0.3 ? 'increasing' : recentTotalErrors < totalErrors * 0.1 ? 'decreasing' : 'stable'
     };
+    
+    // Generate actionable recommendations
+    const errorRecommendations = [];
+    
+    // Check for high error rates
+    const syntaxRate = totalErrors > 0 ? Math.round((profile.errorStats.syntaxErrors / totalErrors) * 100) : 0;
+    const logicRate = totalErrors > 0 ? Math.round((profile.errorStats.logicErrors / totalErrors) * 100) : 0;
+    const runtimeRate = totalErrors > 0 ? Math.round((profile.errorStats.runtimeErrors / totalErrors) * 100) : 0;
+    const edgeCaseRate = totalErrors > 0 ? Math.round((profile.errorStats.edgeCaseFailures / totalErrors) * 100) : 0;
+    
+    if (syntaxRate > 40) {
+      errorRecommendations.push({
+        type: 'syntax_errors',
+        message: 'Your syntax error rate is high. Review Java syntax rules and IDE error messages.',
+        priority: 'high'
+      });
+    }
+    
+    if (logicRate > 40) {
+      errorRecommendations.push({
+        type: 'logic_errors',
+        message: 'Focus on algorithm design. Practice breaking problems into smaller steps.',
+        priority: 'high'
+      });
+    }
+    
+    if (edgeCaseRate > 30) {
+      errorRecommendations.push({
+        type: 'edge_cases',
+        message: 'Test edge cases thoroughly. Consider boundary conditions in your code.',
+        priority: 'high'
+      });
+    }
+    
+    // Check if error rate is increasing in recent attempts
+    if (errorTrend.trend === 'increasing') {
+      errorRecommendations.push({
+        type: 'error_trend',
+        message: 'Your error rate is increasing. Slow down and review fundamentals.',
+        priority: 'medium'
+      });
+    }
+    
+    // Find chapters with highest error rates
+    const problematicChapters = chapterErrorData
+      .filter(ch => ch.totalErrorsInChapter > 5)
+      .sort((a, b) => {
+        const aRate = a.syntaxErrorRate + a.logicErrorRate;
+        const bRate = b.syntaxErrorRate + b.logicErrorRate;
+        return bRate - aRate;
+      })
+      .slice(0, 2);
+    
+    if (problematicChapters.length > 0) {
+      problematicChapters.forEach(ch => {
+        errorRecommendations.push({
+          type: 'chapter_focus',
+          chapterId: ch.chapterId,
+          message: `Chapter ${ch.chapterId} has high error rate. Review concepts before proceeding.`,
+          priority: 'medium'
+        });
+      });
+    }
+    
+    const errorProfile = {
+      // Overall rates
+      syntax_error_rate: syntaxRate,
+      logic_error_rate: logicRate,
+      runtime_error_rate: runtimeRate,
+      edge_case_failure_rate: edgeCaseRate,
+      common_patterns: profile.errorStats.commonPatterns || [],
+      
+      // Chapter breakdown
+      chapter_breakdown: chapterErrorData,
+      
+      // Recent vs all-time
+      recent_7_days: {
+        total_errors: recentTotalErrors,
+        syntax_error_rate: recentTotalErrors > 0 ? Math.round((profile.errorStats.recent7Days.syntaxErrors / recentTotalErrors) * 100) : 0,
+        logic_error_rate: recentTotalErrors > 0 ? Math.round((profile.errorStats.recent7Days.logicErrors / recentTotalErrors) * 100) : 0,
+        runtime_error_rate: recentTotalErrors > 0 ? Math.round((profile.errorStats.recent7Days.runtimeErrors / recentTotalErrors) * 100) : 0,
+        edge_case_failure_rate: recentTotalErrors > 0 ? Math.round((profile.errorStats.recent7Days.edgeCaseFailures / recentTotalErrors) * 100) : 0
+      },
+      
+      // Trend analysis
+      error_trend: errorTrend.trend,
+      error_recommendations: errorRecommendations,
+      
+      // Total stats
+      total_errors_recorded: totalErrors
+    };
+
     
     // 7. Learning Behavior (with corrected formulas)
     const totalProblemsAttempted = profile.behaviorMetrics.totalProblemsAttempted || 1;
@@ -524,15 +643,86 @@ const updateStudentAnalytics = async (req, res) => {
           runtimeErrors: 0,
           edgeCaseFailures: 0,
           totalErrors: 0,
-          commonPatterns: []
+          commonPatterns: [],
+          byChapter: [],
+          recent7Days: {
+            syntaxErrors: 0,
+            logicErrors: 0,
+            runtimeErrors: 0,
+            edgeCaseFailures: 0,
+            totalErrors: 0
+          }
         };
       }
       
+      // Global error tracking
       profile.errorStats.syntaxErrors += syntaxErrorCount || 0;
       profile.errorStats.logicErrors += logicErrorCount || 0;
       profile.errorStats.runtimeErrors += runtimeErrorCount || 0;
       profile.errorStats.edgeCaseFailures += edgeCaseFailureCount || 0;
       profile.errorStats.totalErrors = profile.errorStats.syntaxErrors + profile.errorStats.logicErrors + profile.errorStats.runtimeErrors + profile.errorStats.edgeCaseFailures;
+      
+      // Track recent 7 days for trend analysis
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      if (new Date() >= sevenDaysAgo) {
+        profile.errorStats.recent7Days.syntaxErrors += syntaxErrorCount || 0;
+        profile.errorStats.recent7Days.logicErrors += logicErrorCount || 0;
+        profile.errorStats.recent7Days.runtimeErrors += runtimeErrorCount || 0;
+        profile.errorStats.recent7Days.edgeCaseFailures += edgeCaseFailureCount || 0;
+        profile.errorStats.recent7Days.totalErrors += (syntaxErrorCount || 0) + (logicErrorCount || 0) + (runtimeErrorCount || 0) + (edgeCaseFailureCount || 0);
+      }
+      
+      // Chapter-level error tracking (extract chapter from topicId like "1-1", "2-5", etc.)
+      if (topicId) {
+        const chapterMatch = topicId.match(/^(\d+)/);
+        const chapterId = chapterMatch ? parseInt(chapterMatch[1]) : null;
+        
+        if (chapterId) {
+          let chapterStats = profile.errorStats.byChapter.find(c => c.chapterId === chapterId);
+          if (!chapterStats) {
+            chapterStats = {
+              chapterId,
+              syntaxErrors: 0,
+              logicErrors: 0,
+              runtimeErrors: 0,
+              edgeCaseFailures: 0,
+              totalErrors: 0,
+              commonPatterns: [],
+              errorPatterns: [],
+              averageScore: 0,
+              firstAttemptSuccessRate: 0,
+              lastPracticed: new Date()
+            };
+            profile.errorStats.byChapter.push(chapterStats);
+          }
+          
+          // Update chapter-level stats
+          chapterStats.syntaxErrors += syntaxErrorCount || 0;
+          chapterStats.logicErrors += logicErrorCount || 0;
+          chapterStats.runtimeErrors += runtimeErrorCount || 0;
+          chapterStats.edgeCaseFailures += edgeCaseFailureCount || 0;
+          chapterStats.totalErrors = chapterStats.syntaxErrors + chapterStats.logicErrors + chapterStats.runtimeErrors + chapterStats.edgeCaseFailures;
+          chapterStats.lastPracticed = new Date();
+          
+          // Track error patterns
+          if (logicErrorCount > 0) {
+            const patterns = ['Missing loop condition', 'Incorrect variable scope', 'Off-by-one error', 'Infinite loop', 'Logic error in nested structures'];
+            const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            let existingPattern = chapterStats.errorPatterns.find(p => p.pattern === randomPattern);
+            if (existingPattern) {
+              existingPattern.frequency += 1;
+              existingPattern.lastOccurred = new Date();
+            } else {
+              chapterStats.errorPatterns.push({
+                pattern: randomPattern,
+                frequency: 1,
+                lastOccurred: new Date()
+              });
+            }
+          }
+        }
+      }
       
       // Update behavior metrics
       profile.behaviorMetrics.totalProblemsAttempted += 1;

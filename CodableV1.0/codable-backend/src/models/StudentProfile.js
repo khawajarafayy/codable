@@ -96,14 +96,40 @@ const studentProfileSchema = new mongoose.Schema({
     codeQualityScores: [{ type: Number }]
   }],
   
-  // Error Tracking
+  // Error Tracking - Global
   errorStats: {
     syntaxErrors: { type: Number, default: 0 },
     logicErrors: { type: Number, default: 0 },
     runtimeErrors: { type: Number, default: 0 },
     edgeCaseFailures: { type: Number, default: 0 },
     totalErrors: { type: Number, default: 0 },
-    commonPatterns: [{ type: String }]
+    commonPatterns: [{ type: String }],
+    // Chapter-level error tracking
+    byChapter: [{
+      chapterId: { type: Number, required: true },
+      syntaxErrors: { type: Number, default: 0 },
+      logicErrors: { type: Number, default: 0 },
+      runtimeErrors: { type: Number, default: 0 },
+      edgeCaseFailures: { type: Number, default: 0 },
+      totalErrors: { type: Number, default: 0 },
+      commonPatterns: [{ type: String }],
+      errorPatterns: [{
+        pattern: { type: String },
+        frequency: { type: Number, default: 1 },
+        lastOccurred: { type: Date, default: Date.now }
+      }],
+      averageScore: { type: Number, default: 0 },
+      firstAttemptSuccessRate: { type: Number, default: 0 },
+      lastPracticed: { type: Date, default: null }
+    }],
+    // Time-windowed error tracking for recent vs historical
+    recent7Days: {
+      syntaxErrors: { type: Number, default: 0 },
+      logicErrors: { type: Number, default: 0 },
+      runtimeErrors: { type: Number, default: 0 },
+      edgeCaseFailures: { type: Number, default: 0 },
+      totalErrors: { type: Number, default: 0 }
+    }
   },
   
   // Performance History

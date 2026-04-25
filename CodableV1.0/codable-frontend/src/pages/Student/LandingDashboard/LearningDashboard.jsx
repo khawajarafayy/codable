@@ -7,8 +7,65 @@ import { useState, useEffect } from 'react';
 import { javaBookTopics } from '../../../data/javaBookTopics';
 import learningApi from '../../../services/learningApi';
 
-function ChatPopup({ open, onClose }) {
+function ChatPopup({ open, onClose, chapterId }) {
+	const [messages, setMessages] = useState([
+		{
+			role: "assistant",
+			text: "Hi, I am your Java Learning AI Assistant. Ask me anything about your Java course, chapters, or code.",
+			time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+		},
+	]);
+	const [input, setInput] = useState("");
+	const [loading, setLoading] = useState(false);
+
 	if (!open) return null;
+
+	const quickPrompts = [
+		"Explain OOP in simple Java terms.",
+		"How do for and while loops differ in Java?",
+		"Give me one beginner Java practice task.",
+	];
+
+	const sendMessage = async (textOverride = null) => {
+		const content = (textOverride ?? input).trim();
+		if (!content || loading) return;
+
+		const userMsg = {
+			role: "user",
+			text: content,
+			time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+		};
+		setMessages((prev) => [...prev, userMsg]);
+		setInput("");
+		setLoading(true);
+
+		try {
+			const response = await learningApi.askAssistant(content, chapterId || null);
+			const assistantText =
+				response?.response ||
+				"I am your Java Learning AI Assistant. Please ask Java/course-related questions only.";
+			setMessages((prev) => [
+				...prev,
+				{
+					role: "assistant",
+					text: assistantText,
+					time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+				},
+			]);
+		} catch (error) {
+			setMessages((prev) => [
+				...prev,
+				{
+					role: "assistant",
+					text: "I am unable to respond right now. Please try again with your Java/course question.",
+					time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+				},
+			]);
+			console.error("Assistant chat error:", error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<div className="fixed z-[9999] bottom-24 right-16 pointer-events-auto">
@@ -44,27 +101,40 @@ function ChatPopup({ open, onClose }) {
 
 				{/* Chat Body */}
 				<div className="p-4 overflow-y-auto h-[calc(100%-150px)] space-y-4">
-					{/* Bot Bubble */}
-					<div className="flex justify-start">
-						<div className="max-w-[80%] bg-white/10 backdrop-blur-md text-gray-200 text-sm px-4 py-3 rounded-xl rounded-tl-none shadow-lg border border-white/10">
-							Hi there 👋  
-							<br />
-							How can I help you today?
-							<div className="text-[10px] text-gray-400 mt-1">4:46 PM</div>
+					{messages.map((msg, idx) => (
+						<div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+							<div
+								className={`max-w-[85%] text-sm px-4 py-3 rounded-xl shadow-lg border ${
+									msg.role === "user"
+										? "bg-gradient-to-r from-purple-600 to-blue-600 text-white border-transparent rounded-tr-none"
+										: "bg-white/10 backdrop-blur-md text-gray-200 border-white/10 rounded-tl-none"
+								}`}
+							>
+								<div>{msg.text}</div>
+								<div className="text-[10px] text-gray-300/80 mt-1">{msg.time}</div>
+							</div>
 						</div>
-					</div>
+					))}
 
-					{/* Suggestion Buttons */}
-					<div className="flex flex-col gap-2 mt-4">
-						<button className="self-start px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition">
-							What can this assistant do?
-						</button>
-						<button className="self-start px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition">
-							Tell me about your offerings
-						</button>
-						<button className="self-start px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition">
-							I have an issue
-						</button>
+					{loading && (
+						<div className="flex justify-start">
+							<div className="max-w-[80%] bg-white/10 text-gray-200 text-sm px-4 py-3 rounded-xl rounded-tl-none border border-white/10">
+								Thinking...
+							</div>
+						</div>
+					)}
+
+					<div className="flex flex-wrap gap-2 mt-4">
+						{quickPrompts.map((prompt) => (
+							<button
+								key={prompt}
+								onClick={() => sendMessage(prompt)}
+								disabled={loading}
+								className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition disabled:opacity-50"
+							>
+								{prompt}
+							</button>
+						))}
 					</div>
 				</div>
 
@@ -73,10 +143,19 @@ function ChatPopup({ open, onClose }) {
 					<input
 						type="text"
 						placeholder="Write your message..."
+						value={input}
+						onChange={(e) => setInput(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") sendMessage();
+						}}
 						className="flex-1 bg-gray-800/70 text-gray-200 placeholder-gray-500 px-4 py-2 rounded-full text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
 					/>
 
-					<button className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center hover:scale-105 transition">
+					<button
+						onClick={() => sendMessage()}
+						disabled={loading || !input.trim()}
+						className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center hover:scale-105 transition disabled:opacity-50 disabled:hover:scale-100"
+					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							className="w-5 h-5"
@@ -102,6 +181,7 @@ export default function LearningDashboard() {
 	const [loading, setLoading] = useState(true);
 	const [topics, setTopics] = useState(javaBookTopics);
 	const toggleChat = () => setChatOpen((v) => !v);
+	const activeChapter = chaptersProgress.find((ch) => ch.status === "in-progress");
 
 	// Fetch user's chapter progress on mount
 	useEffect(() => {
@@ -230,7 +310,11 @@ export default function LearningDashboard() {
 				<span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900"></span>
 			</button>
 
-			<ChatPopup open={chatOpen} onClose={() => setChatOpen(false)} />
+			<ChatPopup
+				open={chatOpen}
+				onClose={() => setChatOpen(false)}
+				chapterId={activeChapter?.chapterId || null}
+			/>
 		</div>
 	);
 }

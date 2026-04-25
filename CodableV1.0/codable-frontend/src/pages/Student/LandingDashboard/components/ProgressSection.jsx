@@ -6,11 +6,35 @@ import { useNavigate } from 'react-router-dom';
 export function ProgressSection({ chaptersProgress = [], stats = {}, topics = [] }) {
   const navigate = useNavigate();
 
-  const totalChapters = topics.length || chaptersProgress.length;
-  const completedChapters = chaptersProgress.filter(c => c.status === 'completed').length;
-  const overallProgress = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+  const totalChapters =
+    chaptersProgress.length ||
+    new Set(topics.map((t) => t.chapter)).size ||
+    topics.length ||
+    0;
+  const completedChapters = chaptersProgress.filter((c) => c.status === 'completed').length;
 
-  const totalTopicsCompleted = stats.totalTopicsCompleted || 0;
+  // Topic-weighted course progress (matches "Topics Completed" and partial chapter work).
+  const totalTopicsPlanned = chaptersProgress.reduce(
+    (sum, c) => sum + (c.totalTopics || 0),
+    0
+  );
+  const completedTopicsFromChapters = chaptersProgress.reduce(
+    (sum, c) => sum + (c.completedTopics || 0),
+    0
+  );
+  const totalTopicsCompleted =
+    stats.totalTopicsCompleted ?? completedTopicsFromChapters;
+
+  let overallProgress = 0;
+  if (totalTopicsPlanned > 0) {
+    // Same payload as denominator: completed topics per chapter vs planned topics per chapter.
+    overallProgress = Math.min(
+      100,
+      Math.round((completedTopicsFromChapters / totalTopicsPlanned) * 100)
+    );
+  } else if (totalChapters > 0) {
+    overallProgress = Math.round((completedChapters / totalChapters) * 100);
+  }
   const totalTimeSpent = stats.totalTimeSpent || 0;
   const timeHours = Math.floor(totalTimeSpent / 3600);
   const timeMinutes = Math.floor((totalTimeSpent % 3600) / 60);

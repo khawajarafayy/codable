@@ -3,7 +3,7 @@ import { RefreshCw } from "lucide-react";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SkillOverview } from "./components/SkillOverview";
 import { ChapterMasteryTable } from "./components/TopicMasteryTable";
-import { ErrorIntelligence } from "./components/ErrorIntelligence";
+import { LearningTrajectory } from "./components/LearningTrajectory";
 import { LearningBehavior } from "./components/LearningBehavior";
 import { PerformanceTrends } from "./components/PerformanceTrends";
 import { AdaptiveRecommendations } from "./components/AdaptiveRecommendations";
@@ -182,9 +182,14 @@ export default function ProfileAndAnalytics() {
             {/* Performance Trends */}
             <PerformanceTrends trendsData={profileData?.performance_trends} loading={loading} key={`trends-${refreshTrigger}`} />
             
-            {/* Error Intelligence and Adaptive Recommendations */}
+            {/* Learning Trajectory and Adaptive Recommendations */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ErrorIntelligence errorProfile={profileData?.error_profile} loading={loading} key={`error-${refreshTrigger}-${profileData?.error_profile?.syntax_error_rate}`} />
+              <LearningTrajectory
+                chapters={progressData?.chapters || []}
+                stats={progressData?.stats || {}}
+                loading={loading}
+                key={`trajectory-${refreshTrigger}-${progressData?.chapters?.length || 0}-${progressData?.stats?.totalTopicsCompleted || 0}`}
+              />
               <AdaptiveRecommendations recommendations={profileData?.adaptive_recommendations} loading={loading} key={`adaptive-${refreshTrigger}`} />
             </div>
           </TabsContent>

@@ -96,12 +96,12 @@ export function Navbar() {
                   Profile Settings
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   className="text-gray-300 focus:bg-gray-800 focus:text-white cursor-pointer"
                   onClick={() => navigate("/billing")}
                 >
                   Billing
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
 
               
 

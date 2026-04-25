@@ -150,6 +150,21 @@ const learningApi = {
     }
   },
 
+  // Course-specific virtual assistant (Java learning only)
+  askAssistant: async (message, chapterId = null) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/learning/assistant/chat`,
+        { message, chapter_id: chapterId },
+        { headers: getAuthHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error chatting with assistant:', error);
+      throw error;
+    }
+  },
+
   // ============ PROGRESS TRACKING ============
 
   // Get user's chapters progress (locked/unlocked status)

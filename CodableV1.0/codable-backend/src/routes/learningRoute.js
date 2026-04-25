@@ -134,6 +134,20 @@ router.post('/search', async (req, res) => {
   }
 });
 
+// Course-specific assistant chat (Java learning scope)
+router.post('/assistant/chat', async (req, res) => {
+  try {
+    const response = await axios.post(`${RAG_API_URL}/assistant/chat`, req.body);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error in assistant chat:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Assistant service temporarily unavailable'
+    });
+  }
+});
+
 // Validate student solution (proxies to RAG API)
 router.post('/validate-solution', async (req, res) => {
   try {

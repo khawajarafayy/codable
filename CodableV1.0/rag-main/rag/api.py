@@ -3246,6 +3246,169 @@ def generate_mcq_assignment():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+def _is_course_java_query(user_text: str) -> bool:
+    text = (user_text or "").strip().lower()
+    if not text:
+        return False
+
+    java_keywords = [
+        "java", "jdk", "jvm", "compiler", "javac", "class", "method",
+        "oop", "inheritance", "polymorphism", "encapsulation", "array",
+        "loop", "while", "for", "if", "switch", "exception", "runtime",
+        "syntax", "string", "scanner", "algorithm", "code", "coding",
+        "program", "programming", "chapter", "topic", "assignment", "quiz"
+    ]
+    off_topic_signals = [
+        "recipe", "cook", "cooking", "diet", "travel", "movie", "song",
+        "politics", "crypto price", "stock", "football", "cricket score"
+    ]
+
+    if any(signal in text for signal in off_topic_signals) and not any(k in text for k in java_keywords):
+        return False
+
+    # Allow short follow-up queries if they still look like study context.
+    if any(k in text for k in java_keywords):
+        return True
+    return False
+
+
+@app.route('/api/assistant/chat', methods=['POST'])
+def assistant_chat():
+    """
+    Virtual Java learning assistant endpoint.
+    Only responds to Java/course-related queries.
+    """
+    try:
+        data = request.json or {}
+        user_message = (data.get("message") or "").strip()
+        chapter_id = data.get("chapter_id")
+
+        if not user_message:
+            return jsonify({"success": False, "error": "message is required"}), 400
+
+        if not _is_course_java_query(user_message):
+            return jsonify({
+                "success": True,
+                "off_topic": True,
+                "response": (
+                    "I am your Java Learning AI Assistant. I can help with Java concepts, "
+                    "course chapters, coding doubts, and practice questions only. "
+                    "Please ask a Java/course-related question."
+                ),
+                "suggestions": [
+                    "Explain polymorphism with a simple Java example.",
+                    "How does Scanner take integer input in Java?",
+                    "Give me a practice question from loops chapter."
+                ]
+            })
+
+        chapter_hint = ""
+        try:
+            if chapter_id is not None:
+                cid = int(chapter_id)
+                if cid in CHAPTER_TOPICS:
+                    chapter_hint = CHAPTER_TOPICS[cid]["title"]
+        except Exception:
+            chapter_hint = ""
+
+        retrieval_query = f"Java programming {chapter_hint} {user_message}".strip()
+        relevant_content = get_relevant_context(retrieval_query, k=4)
+        book_context = "\n\n".join(relevant_content) if relevant_content else ""
+
+        if not MISTRAL_API_KEY:
+            return jsonify({
+                "success": True,
+                "off_topic": False,
+                "response": (
+                    "Java assistant is temporarily unavailable because the model key is not configured. "
+                    "Please try again later."
+                )
+            })
+
+        system_prompt = (
+            "You are a strict Java Learning AI Assistant for a course platform. "
+            "Rules: (1) Answer only Java/course/coding-learning related queries. "
+            "(2) If off-topic, reply with exactly: "
+            "'I am your Java Learning AI Assistant. Please ask Java/course-related questions only.' "
+            "(3) Keep answers concise, practical, and beginner-friendly unless user asks for depth. "
+            "(4) Use provided book context when relevant; do not fabricate chapter facts."
+        )
+
+        user_prompt = f"""
+Student question:
+{user_message}
+
+Chapter hint:
+{chapter_hint or 'N/A'}
+
+Book context:
+{book_context[:5000] if book_context else 'No retrieved context available.'}
+"""
+
+        response_text = ""
+
+        # Prefer langchain mistral client (already used elsewhere in this project).
+        try:
+            from langchain_mistralai import ChatMistralAI
+            from langchain_core.messages import SystemMessage, HumanMessage
+
+            model = ChatMistralAI(
+                model="mistral-small-latest",
+                mistral_api_key=MISTRAL_API_KEY,
+                temperature=0.2,
+                max_tokens=1200
+            )
+            # Invoke model directly with message objects to avoid template-variable parsing
+            # when user/context text contains curly braces.
+            result = model.invoke([
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=user_prompt),
+            ])
+            response_text = (result.content or "").strip()
+        except Exception as lc_err:
+            print(f"⚠️ assistant_chat langchain mistral failed: {lc_err}")
+            try:
+                from mistralai import Mistral
+
+                client = Mistral(api_key=MISTRAL_API_KEY)
+                chat_response = client.chat.complete(
+                    model="mistral-large-latest",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=0.2
+                )
+                response_text = (chat_response.choices[0].message.content or "").strip()
+            except Exception as sdk_err:
+                print(f"⚠️ assistant_chat mistral sdk failed: {sdk_err}")
+                # Final graceful fallback to avoid 500s in UI.
+                if book_context:
+                    response_text = (
+                        "I am your Java Learning AI Assistant. Model service is temporarily unavailable, "
+                        "but here is guidance from your course context:\n\n"
+                        f"{book_context[:700]}"
+                    )
+                else:
+                    response_text = (
+                        "I am your Java Learning AI Assistant. Model service is temporarily unavailable. "
+                        "Please ask again shortly."
+                    )
+
+        if not response_text:
+            response_text = "I can help with Java and course topics. Ask me a Java-related question."
+
+        return jsonify({
+            "success": True,
+            "off_topic": False,
+            "response": response_text
+        })
+
+    except Exception as e:
+        print(f"❌ assistant_chat error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 if __name__ == '__main__':
     print("=" * 50)
     print("🚀 Starting RAG Learning API")

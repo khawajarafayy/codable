@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { Save, Loader2, UserCircle2, BellRing, Globe } from "lucide-react";
+import { Save, Loader2, UserCircle2, BellRing, Globe, Camera, Upload, ImagePlus } from "lucide-react";
 import { Navbar } from "../LandingDashboard/components/Navbar";
 import { api } from "../../../services/apiClient";
+import { useAuth } from "../../../context/AuthContext";
+import {
+  extractProfileImage,
+  extractProfileImageFromStudentProfileResponse,
+  fileToDataUrl,
+  getInitialsFromName,
+  getProfileImageValidationMessage,
+  validateProfileImageFile
+} from "../../../utils/profileImage";
 
 const defaultSettings = {
   fullName: "",
@@ -12,6 +21,7 @@ const defaultSettings = {
   github: "",
   linkedin: "",
   twitter: "",
+  avatar: "",
   learningPath: "Java Programming",
   membershipTier: "free",
   notifications: {
@@ -37,6 +47,7 @@ const mapFromStudentProfile = (profileResponse) => {
     github: basic.social_links?.github || "",
     linkedin: basic.social_links?.linkedin || "",
     twitter: basic.social_links?.twitter || "",
+    avatar: extractProfileImage(basic),
     learningPath: basic.learning_path || "Java Programming",
     membershipTier: basic.membership_tier || "free"
   };
@@ -64,6 +75,7 @@ const mapFromAccountSettings = (settingsResponse) => {
     github: profile.github || profile.social_links?.github || "",
     linkedin: profile.linkedin || profile.social_links?.linkedin || "",
     twitter: profile.twitter || profile.social_links?.twitter || "",
+    avatar: extractProfileImage(profile),
     learningPath: profile.learningPath || profile.learning_path || "Java Programming",
     membershipTier: profile.membershipTier || profile.membership_tier || "free",
     notifications: {
@@ -79,11 +91,15 @@ const mapFromAccountSettings = (settingsResponse) => {
 };
 
 export default function AccountSettings() {
+  const { setProfileImage } = useAuth();
   const [settings, setSettings] = useState(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [profileImagePreview, setProfileImagePreview] = useState("");
+  const [profileImageDataUrl, setProfileImageDataUrl] = useState("");
+  const [profileImageError, setProfileImageError] = useState("");
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -91,11 +107,24 @@ export default function AccountSettings() {
       setError("");
       try {
         const response = await api.getAccountSettings();
-        setSettings(mapFromAccountSettings(response));
+        const mappedSettings = mapFromAccountSettings(response);
+        setSettings(mappedSettings);
+        setProfileImagePreview(mappedSettings.avatar || "");
+        setProfileImageDataUrl("");
+        if (mappedSettings.avatar) {
+          setProfileImage(mappedSettings.avatar);
+        }
       } catch (accountSettingsError) {
         try {
           const profileResponse = await api.getStudentProfile();
-          setSettings(mapFromStudentProfile(profileResponse));
+          const mappedProfile = mapFromStudentProfile(profileResponse);
+          const avatarFromProfile = extractProfileImageFromStudentProfileResponse(profileResponse);
+          setSettings({ ...mappedProfile, avatar: avatarFromProfile || mappedProfile.avatar });
+          setProfileImagePreview(avatarFromProfile || "");
+          setProfileImageDataUrl("");
+          if (avatarFromProfile) {
+            setProfileImage(avatarFromProfile);
+          }
         } catch {
           setError("Unable to load account settings.");
         }
@@ -147,6 +176,30 @@ export default function AccountSettings() {
     setSuccess("");
   };
 
+  const handleProfileImageChange = async (event) => {
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+
+    setProfileImageError("");
+    setError("");
+    setSuccess("");
+
+    const validation = await validateProfileImageFile(selectedFile);
+    if (!validation.valid) {
+      setProfileImageError(validation.message);
+      return;
+    }
+
+    try {
+      const imageDataUrl = await fileToDataUrl(selectedFile);
+      setProfileImageDataUrl(imageDataUrl);
+      setProfileImagePreview(imageDataUrl);
+      setSettings((prev) => ({ ...prev, avatar: imageDataUrl }));
+    } catch (readError) {
+      setProfileImageError(readError.message || "Failed to process selected image.");
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError("");
@@ -166,6 +219,7 @@ export default function AccountSettings() {
           linkedin: settings.linkedin,
           twitter: settings.twitter
         },
+        avatar: profileImageDataUrl || settings.avatar || "",
         learningPath: settings.learningPath,
         membershipTier: settings.membershipTier
       },
@@ -184,15 +238,34 @@ export default function AccountSettings() {
         github: settings.github,
         linkedin: settings.linkedin,
         twitter: settings.twitter
-      }
+      },
+      avatar: profileImageDataUrl || settings.avatar || ""
     };
 
     try {
       await api.updateAccountSettings(accountPayload);
+      if (profileImageDataUrl || settings.avatar) {
+        const latestAvatar = profileImageDataUrl || settings.avatar;
+        setProfileImage(latestAvatar);
+        setSettings((prev) => ({ ...prev, avatar: latestAvatar }));
+      }
+      setProfileImageDataUrl("");
       setSuccess("Settings saved successfully.");
     } catch {
       try {
-        await api.updateStudentProfile(profilePayload);
+        const profileResponse = await api.updateStudentProfile(profilePayload);
+        const updatedAvatar =
+          extractProfileImage(profileResponse?.data || {}) ||
+          profileImageDataUrl ||
+          settings.avatar ||
+          "";
+
+        if (updatedAvatar) {
+          setProfileImage(updatedAvatar);
+          setSettings((prev) => ({ ...prev, avatar: updatedAvatar }));
+          setProfileImagePreview(updatedAvatar);
+        }
+        setProfileImageDataUrl("");
         setSuccess("Profile settings saved successfully.");
       } catch (saveError) {
         setError(saveError?.message || "Failed to save settings.");
@@ -212,6 +285,60 @@ export default function AccountSettings() {
             Manage your student profile, preferences, and notifications.
           </p>
         </div>
+
+        <section className="bg-black/40 backdrop-blur-xl rounded-2xl border border-gray-800/70 p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <Camera className="h-5 w-5 text-cyan-300" />
+            <h2 className="text-lg font-semibold text-white">Profile Picture</h2>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            <div className="relative h-24 w-24 rounded-full overflow-hidden border border-gray-700 bg-gray-900/80 flex items-center justify-center">
+              {profileImagePreview ? (
+                <img
+                  src={profileImagePreview}
+                  alt="Profile preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-white text-2xl font-semibold">
+                  {getInitialsFromName(settings.fullName)}
+                </span>
+              )}
+              <div className="absolute inset-x-0 bottom-0 py-1 text-center text-[10px] bg-black/50 text-gray-200">
+                {profileImagePreview ? "Preview" : "No image"}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="profile-image-upload"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium cursor-pointer transition-colors"
+              >
+                <Upload className="h-4 w-4" />
+                Upload Picture
+              </label>
+              <input
+                id="profile-image-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleProfileImageChange}
+              />
+
+              <div className="flex items-start gap-2 text-xs text-gray-400">
+                <ImagePlus className="h-4 w-4 mt-0.5 text-gray-500" />
+                <p>{getProfileImageValidationMessage()}</p>
+              </div>
+            </div>
+          </div>
+
+          {profileImageError && (
+            <p className="mt-4 text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+              {profileImageError}
+            </p>
+          )}
+        </section>
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300">

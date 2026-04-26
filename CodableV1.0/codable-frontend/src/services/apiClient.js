@@ -89,6 +89,16 @@ export const api = {
             credentials: 'omit'
         });
     },
+
+    uploadStudentProfilePicture: (avatarDataUrl) => {
+        const token = localStorage.getItem('token');
+        return request('/student/profile', {
+            method: 'PUT',
+            body: { avatar: avatarDataUrl },
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
     
     createStudentProfile: (profileData) => {
         const token = localStorage.getItem('token');

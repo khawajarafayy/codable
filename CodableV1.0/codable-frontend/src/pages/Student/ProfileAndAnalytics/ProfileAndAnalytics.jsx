@@ -13,6 +13,8 @@ import { Navbar } from "../LandingDashboard/components/Navbar";
 import { api } from "../../../services/apiClient";
 import learningApi from "../../../services/learningApi";
 import { useRefresh } from "../../../context/RefreshContext";
+import { useAuth } from "../../../context/AuthContext";
+import { extractProfileImage } from "../../../utils/profileImage";
 
 export default function ProfileAndAnalytics() {
   const [profileData, setProfileData] = useState(null);
@@ -21,6 +23,7 @@ export default function ProfileAndAnalytics() {
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { refreshTrigger } = useRefresh();
+  const { setProfileImage } = useAuth();
 
   useEffect(() => {
     fetchAllData();
@@ -64,6 +67,10 @@ export default function ProfileAndAnalytics() {
         const userData = profileResponse.user_profile;
         console.log("Setting profileData with error_profile:", userData?.error_profile);
         setProfileData(userData);
+        const avatar = extractProfileImage(userData?.basic_info || {});
+        if (avatar) {
+          setProfileImage(avatar);
+        }
       } else {
         setError("Failed to load profile data");
         console.error("Unexpected response structure:", profileResponse);
@@ -84,9 +91,18 @@ export default function ProfileAndAnalytics() {
   };
 
   const handleProfileUpdate = (updatedData) => {
+    const avatar = extractProfileImage(updatedData || {});
+    if (avatar) {
+      setProfileImage(avatar);
+    }
+
     setProfileData((prev) => ({
       ...prev,
-      basic_info: { ...prev.basic_info, ...updatedData }
+      basic_info: {
+        ...prev.basic_info,
+        ...updatedData,
+        avatar: avatar || prev?.basic_info?.avatar || ""
+      }
     }));
   };
 
@@ -103,7 +119,9 @@ export default function ProfileAndAnalytics() {
     joinDate: profileData.basic_info?.join_date,
     membershipTier: profileData.basic_info?.membership_tier,
     bio: profileData.basic_info?.bio,
+    avatar: profileData.basic_info?.avatar,
     location: profileData.basic_info?.location,
+    socialLinks: profileData.basic_info?.social_links,
     fullLocation: profileData.basic_info?.location 
       ? [profileData.basic_info.location.city, profileData.basic_info.location.country]
           .filter(Boolean).join(', ') || 'Not specified'
@@ -121,17 +139,7 @@ export default function ProfileAndAnalytics() {
       {/* Main Content */}
       <div className="relative max-w-7xl mx-auto p-6 lg:p-8">
         
-        {/* Refresh Button */}
-        <div className="mb-6 flex justify-end">
-          <button
-            onClick={refreshMetrics}
-            disabled={isRefreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600/80 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg transition-colors"
-          >
-            <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh Metrics'}
-          </button>
-        </div>
+        
         
         {error && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">

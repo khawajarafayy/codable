@@ -22,9 +22,11 @@ import {
   Send,
   Eye,
   Bell,
+  MessageSquare,
 } from "lucide-react";
 import { request } from "../../../../services/apiClient";
 import { useAuth } from "../../../../context/AuthContext";
+import ChatSection from "../../../../components/Chat/ChatSection";
 
 /** Python RAG Flask app (`rag-main/rag/api.py`), default port 5001 */
 const RAG_API_BASE = (import.meta.env.VITE_RAG_API_URL ?? "http://localhost:5001").replace(/\/$/, "");
@@ -59,6 +61,7 @@ export default function ClassDetail() {
   const [classAssignments, setClassAssignments] = useState([]);
   const [instructorClasses, setInstructorClasses] = useState([]);
   const [expandedAssignmentId, setExpandedAssignmentId] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview"); // "overview" or "chat"
 
   // Modal States — RAG MCQ assignment builder
   const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
@@ -541,21 +544,57 @@ export default function ClassDetail() {
         </div>
       </div>
 
-      {submissionToast && (
-        <div className="flex items-start justify-between gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-200">
-          <div className="flex items-start gap-2 min-w-0">
-            <Bell className="w-5 h-5 shrink-0 mt-0.5" />
-            <span className="min-w-0">{submissionToast}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSubmissionToast("")}
-            className="text-emerald-200/80 hover:text-emerald-100 shrink-0"
-          >
-            Dismiss
-          </button>
+      {/* Tab Navigation */}
+      <div className="flex items-center gap-2 border-b border-white/10">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 border-b-2 ${
+            activeTab === "overview"
+              ? "text-blue-400 border-blue-400"
+              : "text-[#fdfdff]/60 hover:text-[#fdfdff] border-transparent hover:border-white/20"
+          }`}
+        >
+          <FileText className="w-4 h-4" />
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("chat")}
+          className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 border-b-2 ${
+            activeTab === "chat"
+              ? "text-purple-400 border-purple-400"
+              : "text-[#fdfdff]/60 hover:text-[#fdfdff] border-transparent hover:border-white/20"
+          }`}
+        >
+          <MessageSquare className="w-4 h-4" />
+          Chat
+        </button>
+      </div>
+
+      {/* Chat Tab */}
+      {activeTab === "chat" && (
+        <div className="min-h-[600px]">
+          <ChatSection classId={classId} className={currentClass.name} />
         </div>
       )}
+
+      {/* Overview Tab */}
+      {activeTab === "overview" && (
+        <>
+          {submissionToast && (
+            <div className="flex items-start justify-between gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-200">
+              <div className="flex items-start gap-2 min-w-0">
+                <Bell className="w-5 h-5 shrink-0 mt-0.5" />
+                <span className="min-w-0">{submissionToast}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSubmissionToast("")}
+                className="text-emerald-200/80 hover:text-emerald-100 shrink-0"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
 
       {/* Class Overview Analytics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -836,6 +875,8 @@ export default function ClassDetail() {
           )}
         </div>
       </div>
+        </>
+      )}
 
       {/* RAG MCQ assignment builder (rag-main API) */}
       {isAssignmentModalOpen && (

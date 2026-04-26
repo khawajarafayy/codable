@@ -10,6 +10,7 @@ import {
 } from './ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
+import { getInitialsFromName } from '../../../../utils/profileImage';
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -17,7 +18,8 @@ export function Navbar() {
 
   // Get user's display name and initials
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
-  const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const userInitials = getInitialsFromName(userName);
+  const profileImage = user?.profileImage || user?.avatar || "";
 
   const handleLogout = () => {
     logout();
@@ -50,7 +52,7 @@ export function Navbar() {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 hover:bg-gray-800 rounded-full pr-3 pl-1 py-1 transition-colors">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`} />
+                  <AvatarImage src={profileImage} alt={userName} />
                   <AvatarFallback>{userInitials}</AvatarFallback>
                 </Avatar>
                 <span className="text-gray-300 hidden sm:block">{userName}</span>

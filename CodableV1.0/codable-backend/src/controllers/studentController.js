@@ -1,6 +1,37 @@
 import StudentProfile from "../models/StudentProfile.js";
 import User from "../models/User.js";
 
+const ALLOWED_AVATAR_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+const validateAvatarValue = (avatarValue) => {
+  if (avatarValue === undefined || avatarValue === null || avatarValue === "") {
+    return { valid: true, message: "" };
+  }
+
+  if (typeof avatarValue !== "string") {
+    return { valid: false, message: "Avatar must be a string." };
+  }
+
+  if (/^https?:\/\//i.test(avatarValue)) {
+    return { valid: true, message: "" };
+  }
+
+  const dataUrlMatch = avatarValue.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/i);
+  if (!dataUrlMatch) {
+    return {
+      valid: false,
+      message: "Avatar must be a valid image data URL (jpeg, png, webp) or a direct image URL."
+    };
+  }
+
+  const mimeType = dataUrlMatch[1].toLowerCase();
+  if (!ALLOWED_AVATAR_MIME_TYPES.has(mimeType)) {
+    return { valid: false, message: "Unsupported avatar format. Use JPG, PNG, or WEBP." };
+  }
+
+  return { valid: true, message: "" };
+};
+
 const CHAPTER_TITLES = {
   1: "Introduction to Computers, Programs, and Java",
   2: "Elementary Programming",
@@ -478,6 +509,14 @@ const createStudentProfile = async (req, res) => {
     const userId = req.userId;
     const { fullName, avatar, bio, location, socialLinks } = req.body;
 
+    const avatarValidation = validateAvatarValue(avatar);
+    if (!avatarValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: avatarValidation.message
+      });
+    }
+
     // Check if profile already exists
     const existingProfile = await StudentProfile.findOne({ userId });
     if (existingProfile) {
@@ -537,6 +576,14 @@ const updateStudentProfile = async (req, res) => {
   try {
     const userId = req.userId;
     const { fullName, avatar, bio, location, socialLinks } = req.body;
+
+    const avatarValidation = validateAvatarValue(avatar);
+    if (!avatarValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: avatarValidation.message
+      });
+    }
 
     // Find profile
     const profile = await StudentProfile.findOne({ userId });

@@ -13,8 +13,10 @@ import instructorClassRequestRoutes from "./routes/instructorClassRequestRoutes.
 import learningRoute from "./routes/learningRoute.js";
 import progressRoute from "./routes/progressRoute.js";
 import classRoutes from "./routes/classRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import { startWebSocketServer } from "./websocket/codeRunner.js";
+import { initializeChatSocket } from "./websocket/chatSocket.js";
 import http from 'http';
 
 
@@ -70,6 +72,7 @@ app.use("/api/instructor/class-requests", instructorClassRequestRoutes);
 app.use("/api/learning", learningRoute);
 app.use("/api/progress", progressRoute);
 app.use("/api/classes", classRoutes);
+app.use("/api/chat", chatRoutes);
 // ------------------------
 // ERROR HANDLING
 // ------------------------
@@ -81,6 +84,7 @@ app.use(errorMiddleware);
 app.get("/test", (req, res) => res.json({ ok: true }));
 
 startWebSocketServer(server);
+initializeChatSocket(server);
 
 connectDB().then(() => {
   server.listen(PORT, () => {

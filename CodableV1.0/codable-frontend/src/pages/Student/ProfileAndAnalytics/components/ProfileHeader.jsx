@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
 import { Badge } from "../../../../components/ui/badge";
 import { Calendar, Mail, MapPin, Award } from "lucide-react";
 
@@ -23,6 +23,7 @@ export function ProfileHeader({ profileData }) {
   return (
     <div className="flex flex-col md:flex-row gap-6 items-start md:items-center mb-8">
       <Avatar className="h-24 w-24 border-0">
+        <AvatarImage src={profileData?.avatar || ""} alt={profileData?.fullName || "User"} />
         <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-3xl">
           {profileData?.initials || "U"}
         </AvatarFallback>

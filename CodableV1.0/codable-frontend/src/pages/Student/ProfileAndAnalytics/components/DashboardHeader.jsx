@@ -1,8 +1,15 @@
 import { Code2, Bell, User } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
-import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
+import { useAuth } from "../../../../context/AuthContext";
+import { getInitialsFromName } from "../../../../utils/profileImage";
 
 export function DashboardHeader() {
+  const { user } = useAuth();
+  const userName = user?.name || user?.email?.split("@")[0] || "User";
+  const userInitials = getInitialsFromName(userName);
+  const profileImage = user?.profileImage || user?.avatar || "";
+
   return (
     <header className="flex items-center justify-between mb-8">
       <div className="flex items-center gap-3">
@@ -18,8 +25,9 @@ export function DashboardHeader() {
           <span className="absolute top-2 right-2 h-2 w-2 bg-blue-500 rounded-full"></span>
         </Button>
         <Avatar className="h-9 w-9 border-2 border-border/50">
+          <AvatarImage src={profileImage} alt={userName} />
           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-            R
+            {userInitials}
           </AvatarFallback>
         </Avatar>
       </div>

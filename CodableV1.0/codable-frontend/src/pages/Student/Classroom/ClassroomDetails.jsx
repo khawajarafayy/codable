@@ -15,9 +15,11 @@ import {
   CheckCircle2,
   Sparkles,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  MessageSquare
 } from "lucide-react";
 import { request, api } from "../../../services/apiClient";
+import ChatSection from "../../../components/Chat/ChatSection";
 
 function mapStudentAssignment(row) {
   return {
@@ -50,6 +52,7 @@ export default function ClassroomDetails() {
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState(null);
+  const [activeTab, setActiveTab] = useState("assignments"); // "assignments" or "chat"
 
   useEffect(() => {
     let cancelled = false;
@@ -380,8 +383,42 @@ export default function ClassroomDetails() {
           </div>
         </div>
 
-        {/* Assignments Section */}
-        <div className="pt-4">
+        {/* Tab Navigation */}
+        <div className="flex items-center gap-2 border-b border-white/10">
+          <button
+            onClick={() => setActiveTab("assignments")}
+            className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 border-b-2 ${
+              activeTab === "assignments"
+                ? "text-amber-400 border-amber-400"
+                : "text-[#fdfdff]/60 hover:text-[#fdfdff] border-transparent hover:border-white/20"
+            }`}
+          >
+            <Target className="w-4 h-4" />
+            Assignments
+          </button>
+          <button
+            onClick={() => setActiveTab("chat")}
+            className={`flex items-center gap-2 px-4 py-3 font-medium transition-all duration-200 border-b-2 ${
+              activeTab === "chat"
+                ? "text-purple-400 border-purple-400"
+                : "text-[#fdfdff]/60 hover:text-[#fdfdff] border-transparent hover:border-white/20"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Chat
+          </button>
+        </div>
+
+        {/* Chat Tab */}
+        {activeTab === "chat" && (
+          <div className="min-h-[600px]">
+            <ChatSection classId={classId} className={currentClass.className} />
+          </div>
+        )}
+
+        {/* Assignments Tab */}
+        {activeTab === "assignments" && (
+          <div className="pt-4">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
               <Target className="w-6 h-6 text-amber-500" />
@@ -471,7 +508,7 @@ export default function ClassroomDetails() {
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Assignment Detail & Quiz Modal */}
       {selectedAssignmentId && (
@@ -682,5 +719,6 @@ export default function ClassroomDetails() {
         }
       `}} />
     </div>
+  </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Home, TrendingUp, Dumbbell, Terminal, User } from 'lucide-react';
+import { Home, TrendingUp, Dumbbell, Terminal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,8 @@ import {
 import codableLogo from "../../../../assets/codable-logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../../context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
+import { getInitialsFromName } from "../../../../utils/profileImage";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -17,6 +19,8 @@ export function Navbar() {
 
   // Get user's display name
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
+  const userInitials = getInitialsFromName(userName);
+  const profileImage = user?.profileImage || user?.avatar || "";
 
   const navItems = [
     { key: "dashboard", label: "Dashboard", icon: Home, path: "/student/dashboard" },
@@ -74,7 +78,12 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-800 transition-colors">
-                  <User className="w-5 h-5 text-gray-300" />
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={profileImage} alt={userName} />
+                    <AvatarFallback className="bg-cyan-700 text-white text-xs">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="text-gray-300 hidden sm:block">{userName}</span>
                 </button>
               </DropdownMenuTrigger>

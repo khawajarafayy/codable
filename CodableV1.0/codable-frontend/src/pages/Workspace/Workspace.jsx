@@ -11,15 +11,30 @@ const DEFAULT_WS_URL = `${(import.meta.env.VITE_API_URL || 'http://localhost:300
 const WS_URL = import.meta.env.VITE_WS_URL || DEFAULT_WS_URL;
 
 const Workspace = () => {
-  const [code, setCode] = useState(`// Write your Java code here...
+  const [files, setFiles] = useState([
+    {
+      id: "src/Main.java",
+      folderId: "src",
+      name: "Main.java",
+      content: `// Write your Java code here...\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}`,
+    },
+  ]);
+  const [folders, setFolders] = useState([
+    { id: "src", parentId: null, name: "src" },
+  ]);
+  const [selectedFileId, setSelectedFileId] = useState("src/Main.java");
 
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}`);
+  const selectedFileObj = files.find((f) => f.id === selectedFileId);
+  const code = selectedFileObj ? selectedFileObj.content : "";
+  const selectedFileName = selectedFileObj ? selectedFileObj.name : "";
+
+  const setCode = (newCode) => {
+    setFiles((prev) =>
+      prev.map((f) => (f.id === selectedFileId ? { ...f, content: newCode } : f))
+    );
+  };
+
   const [output, setOutput] = useState("");
-  const [selectedFile, setSelectedFile] = useState("Main.java");
   const [isRunning, setIsRunning] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const wsRef = useRef(null);
@@ -94,8 +109,16 @@ public class Main {
   };
 
   const handleSave = () => {
-    console.log("File saved:", selectedFile);
-    // TODO: Implement actual save functionality
+    if (!selectedFileObj) return;
+    const blob = new Blob([selectedFileObj.content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = selectedFileObj.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -106,7 +129,14 @@ public class Main {
         <div className="h-full flex gap-4">
           {/* Explorer */}
           <div className="w-64 flex-shrink-0">
-            <Explorer selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+            <Explorer 
+              files={files} 
+              setFiles={setFiles} 
+              folders={folders} 
+              setFolders={setFolders} 
+              selectedFileId={selectedFileId} 
+              setSelectedFileId={setSelectedFileId} 
+            />
           </div>
 
           {/* Editor + Console */}
@@ -118,7 +148,7 @@ public class Main {
                 handleRun={handleRun}
                 handleStop={handleStop}
                 handleSave={handleSave}
-                selectedFile={selectedFile}
+                selectedFile={selectedFileName}
                 isRunning={isRunning}
               />
             </div>

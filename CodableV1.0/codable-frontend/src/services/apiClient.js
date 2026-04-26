@@ -69,6 +69,15 @@ export const api = {
         });
     },
 
+    getStudentRecentActivity: () => {
+        const token = localStorage.getItem('token');
+        return request('/student-class/recent-activity', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+            credentials: 'omit'
+        });
+    },
+
     // Student Profile APIs
     getStudentProfile: () => {
         const token = localStorage.getItem('token');

@@ -15,6 +15,7 @@ import StudentLandingPage from "./pages/Student/LandingDashboard/LearningDashboa
 import StudentLearningPage from "./pages/Student/LearningPages/LearningPage";
 import ProfileAndAnalytics from "./pages/Student/ProfileAndAnalytics/ProfileAndAnalytics";
 import AccountSettings from "./pages/Student/AccountSettings/AccountSettings";
+import ClassroomProfile from "./pages/Student/Classroom/ClassroomProfile";
 import Billing from "./pages/Student/Billing/Billing";
 import MentorRoot from "./pages/Mentor/MentorLandingDB/MentorRoot";
 import Dashboard from "./pages/Mentor/MentorLandingDB/components/Dashboard";
@@ -165,6 +166,13 @@ function AppRoutes() {
       <Route path="/classroom" element={
         <RoleProtectedRoute allowedRoles={["student"]}>
           <Classroom />
+        </RoleProtectedRoute>
+      } />
+
+      {/* Classroom Profile Route - STUDENT ONLY */}
+      <Route path="/classroom/profile" element={
+        <RoleProtectedRoute allowedRoles={["student"]}>
+          <ClassroomProfile />
         </RoleProtectedRoute>
       } />
 

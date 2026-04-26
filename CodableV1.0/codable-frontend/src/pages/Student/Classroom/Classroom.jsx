@@ -24,8 +24,8 @@ export default function Classroom() {
         // Fetch User Profile
         try {
           const profileRes = await api.getStudentProfile();
-          if (profileRes && profileRes.data) {
-            setProfile(profileRes.data);
+          if (profileRes) {
+            setProfile(profileRes.user_profile?.basic_info || profileRes.data || profileRes);
           }
         } catch (err) {
           console.error("Failed to fetch profile", err);
@@ -155,6 +155,13 @@ export default function Classroom() {
   }
 
   const getInitials = () => {
+    if (profile?.full_name) {
+      const parts = profile.full_name.trim().split(' ');
+      if (parts.length > 1) {
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      }
+      return profile.full_name[0].toUpperCase();
+    }
     if (profile?.firstName && profile?.lastName) {
       return `${profile.firstName[0]}${profile.lastName[0]}`.toUpperCase();
     }
@@ -183,7 +190,10 @@ export default function Classroom() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4 bg-black/40 p-2 pr-6 rounded-full border border-white/5 hover:border-white/10 transition-colors cursor-pointer group">
+          <div 
+            onClick={() => navigate('/classroom/profile')}
+            className="flex items-center gap-4 bg-black/40 p-2 pr-6 rounded-full border border-white/5 hover:border-white/10 transition-colors cursor-pointer group"
+          >
             <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-inner relative overflow-hidden">
               <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
               <span className="text-white font-bold text-lg relative z-10 tracking-wider">
@@ -192,10 +202,10 @@ export default function Classroom() {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">
-                {profile?.firstName || profile?.name || 'Student'} {profile?.lastName || ''}
+                {profile?.full_name || (profile?.firstName ? `${profile.firstName} ${profile.lastName || ''}` : profile?.name) || 'Student'}
               </span>
               <span className="text-xs text-purple-400 font-medium capitalize">
-                {profile?.membershipTier || 'Free'} Member
+                {profile?.membership_tier || profile?.membershipTier || 'Free'} Member
               </span>
             </div>
           </div>

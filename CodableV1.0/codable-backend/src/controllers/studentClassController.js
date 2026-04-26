@@ -287,3 +287,64 @@ export const getClassDetails = async (req, res) => {
     });
   }
 };
+
+// ============= GET RECENT ACTIVITY =============
+export const getRecentActivity = async (req, res) => {
+  try {
+    const studentId = req.userId;
+
+    console.log("=== GET RECENT ACTIVITY ===");
+    console.log("Student ID:", studentId);
+
+    // Last joined class
+    const lastClass = await Class.findOne({
+      students: new mongoose.Types.ObjectId(studentId),
+    })
+      .populate("instructorId", "name email")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Last submitted assignment
+    const lastSubmission = await ClassAssignmentSubmission.findOne({
+      studentId: new mongoose.Types.ObjectId(studentId),
+    })
+      .populate("assignmentId", "title")
+      .populate("classId", "className")
+      .sort({ submittedAt: -1 })
+      .lean();
+
+    let lastAssignment = null;
+    if (lastSubmission) {
+      lastAssignment = {
+        title: lastSubmission.assignmentId?.title || "Unknown Assignment",
+        className: lastSubmission.classId?.className || "Unknown Class",
+        submittedAt: lastSubmission.submittedAt,
+        percentage: lastSubmission.percentage,
+        score: lastSubmission.score,
+        totalQuestions: lastSubmission.totalQuestions,
+      };
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        lastJoinedClass: lastClass
+          ? {
+              className: lastClass.className,
+              instructorName: lastClass.instructorId?.name || "Unknown Instructor",
+              joinedAt: lastClass.createdAt,
+              category: lastClass.category,
+            }
+          : null,
+        lastSubmittedAssignment: lastAssignment,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching recent activity",
+      error: error.message,
+    });
+  }
+};

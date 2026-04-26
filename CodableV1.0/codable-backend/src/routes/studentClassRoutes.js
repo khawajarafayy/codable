@@ -19,6 +19,13 @@ router.use(authMiddleware.authorize(["student"]));
 router.post("/join", studentClassController.joinClass);
 
 /**
+ * Get Recent Activity
+ * GET /api/student-class/recent-activity
+ * Returns last submitted assignment and last joined class
+ */
+router.get("/recent-activity", studentClassController.getRecentActivity);
+
+/**
  * Get Student Classes
  * GET /api/student-class/classes
  * Returns all classes the student has joined

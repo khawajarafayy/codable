@@ -159,18 +159,20 @@ function ChatPopup({ open, onClose, chapterId }) {
 						</div>
 					)}
 
-					<div className="flex flex-wrap gap-2 mt-4">
-						{quickPrompts.map((prompt) => (
-							<button
-								key={prompt}
-								onClick={() => sendMessage(prompt)}
-								disabled={loading}
-								className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition disabled:opacity-50"
-							>
-								{prompt}
-							</button>
-						))}
-					</div>
+					{messages.length === 1 && !loading && (
+						<div className="flex flex-wrap gap-2 mt-4">
+							{quickPrompts.map((prompt) => (
+								<button
+									key={prompt}
+									onClick={() => sendMessage(prompt)}
+									disabled={loading}
+									className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs shadow-md hover:opacity-90 transition disabled:opacity-50"
+								>
+									{prompt}
+								</button>
+							))}
+						</div>
+					)}
 				</div>
 
 				{/* Input Area */}

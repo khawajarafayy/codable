@@ -23,7 +23,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -66,6 +66,12 @@ export function Navbar() {
               <DropdownMenuItem className="text-gray-300 focus:bg-gray-800 focus:text-white">
                 Profile Settings
               </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-gray-300 focus:bg-gray-800 focus:text-white cursor-pointer"
+                onClick={() => navigate("/student")}
+              >
+                Change Module
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-gray-300 focus:bg-gray-800 focus:text-white">
                 Billing
               </DropdownMenuItem>
@@ -75,7 +81,7 @@ export function Navbar() {
 
               <DropdownMenuSeparator className="bg-gray-800" />
 
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-red-400 focus:bg-gray-800 focus:text-red-400 cursor-pointer"
                 onClick={handleLogout}
               >
@@ -92,11 +98,10 @@ export function Navbar() {
 function NavItem({ icon: Icon, label, active = false }) {
   return (
     <button
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-        active
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${active
           ? 'bg-purple-900/50 text-purple-300'
           : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-      }`}
+        }`}
     >
       <Icon className="w-4 h-4" />
       <span>{label}</span>

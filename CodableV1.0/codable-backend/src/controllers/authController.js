@@ -52,7 +52,7 @@ const registerUser = async (req, res) => {
 };
 
 const login = async (req, res) => {
-        const {email, password} = req.body;
+        const {email, password, role} = req.body;
 
         const userExists = await userModel.findOne({email: email});
         if(!userExists){
@@ -62,9 +62,13 @@ const login = async (req, res) => {
         try {
             const validUser = await userExists.comparePassword(password);
             if(validUser){
+                // Validate role matches
+                if (userExists.role && userExists.role !== role) {
+                    return res.status(400).json({success: false, message: "Invalid role selected for this account"});
+                }
                 // Ensure user has a role (for backward compatibility with existing users)
                 if (!userExists.role) {
-                    userExists.role = "student";
+                    userExists.role = role || "student";
                     await userExists.save();
                     console.log("Assigned default role 'student' to user:", userExists._id);
                 }
@@ -150,6 +154,12 @@ const googleLogin = async (req, res) => {
         });
         
         if (user) {
+            // Validate role matches
+            const selectedRole = req.body.role;
+            if (user.role && selectedRole && user.role !== selectedRole) {
+                return res.status(400).json({success: false, message: "Invalid role selected for this account"});
+            }
+
             // Update Google info if not set
             if (!user.googleId) {
                 user.googleId = googleId;
@@ -158,13 +168,15 @@ const googleLogin = async (req, res) => {
             }
         } else {
             // Create new user
+            const selectedRole = req.body.role || "student";
             user = new userModel({
                 name,
                 email,
                 password: `google_${googleId}_${Date.now()}`, // Placeholder password
                 googleId,
                 avatar: picture,
-                authProvider: 'google'
+                authProvider: 'google',
+                role: selectedRole
             });
             await user.save();
             

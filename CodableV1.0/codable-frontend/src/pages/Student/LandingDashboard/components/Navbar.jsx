@@ -105,6 +105,13 @@ export function Navbar() {
                   Profile Settings
                 </DropdownMenuItem>
 
+                <DropdownMenuItem
+                  className="text-gray-300 focus:bg-gray-800 focus:text-white cursor-pointer"
+                  onClick={() => navigate("/student")}
+                >
+                  Change Module
+                </DropdownMenuItem>
+
                 {/* <DropdownMenuItem
                   className="text-gray-300 focus:bg-gray-800 focus:text-white cursor-pointer"
                   onClick={() => navigate("/billing")}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserPlus, Github } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import CodableLogo from "../../assets/codable-logo.png";
 import { api } from "../../services/apiClient";
@@ -102,7 +102,7 @@ function Signup() {
     }
   });
 
-  const handleGithubSignUp = () => alert("GitHub sign-up coming soon");
+
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -327,14 +327,7 @@ function Signup() {
                 <span className="text-sm font-medium">Sign up with Google</span>
               </button>
 
-              <button
-                type="button"
-                onClick={handleGithubSignUp}
-                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-[#24292e] text-white hover:bg-black/80 border border-gray-700 transition cursor-pointer"
-              >
-                <Github size={18} />
-                <span className="text-sm font-medium">Sign up with GitHub</span>
-              </button>
+
             </div>
 
             <p className="text-center text-xs text-gray-400 pt-6">

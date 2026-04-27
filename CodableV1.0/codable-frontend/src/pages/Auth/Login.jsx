@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LogIn, Github } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import CodableLogo from "../../assets/codable-logo.png";
 import { api } from "../../services/apiClient";
@@ -72,7 +72,7 @@ function Login() {
         const response = await fetch(`${API_URL}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userInfo })
+          body: JSON.stringify({ userInfo, role: selectedRole })
         });
         
         const data = await response.json();
@@ -99,7 +99,7 @@ function Login() {
     }
   });
 
-  const handleGithubSignIn = () => alert("GitHub sign-in coming soon");
+
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -107,7 +107,7 @@ function Login() {
     setLoading(true);
 
     try{
-      const data = await api.login(email, password);
+      const data = await api.login(email, password, selectedRole);
       
       console.log("Login response:", data);
 
@@ -265,14 +265,7 @@ function Login() {
                 </svg>
                 <span className="text-sm font-medium">Sign in with Google</span>
               </button>
-              <button
-                type="button"
-                onClick={handleGithubSignIn}
-                className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 bg-[#24292e] text-white hover:bg-black/80 border border-gray-700 transition cursor-pointer"
-              >
-                <Github size={18} />
-                <span className="text-sm font-medium">Sign in with GitHub</span>
-              </button>
+
             </div>
 
             <p className="text-center text-xs text-gray-400 pt-6">

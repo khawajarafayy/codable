@@ -43,10 +43,10 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
   useEffect(() => {
     const loadProgress = async () => {
       if (!chapterId) return;
-      
+
       try {
         const response = await learningApi.getChapterTopicsProgress(chapterId);
-        
+
         if (response.success && response.topicsProgress) {
           // Restore completed topics from backend
           const completed = new Set();
@@ -59,7 +59,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
               }
             }
           });
-          
+
           if (completed.size > 0) {
             setCompletedTopics(completed);
           }
@@ -84,9 +84,9 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
   const saveTopicCompletion = async (topicIndex) => {
     const topic = topics[topicIndex];
     if (!topic) return;
-    
+
     const timeSpent = Math.floor((Date.now() - topicStartTime) / 1000);
-    
+
     try {
       await learningApi.completeTopic(chapterId, topic.id, timeSpent);
       console.log(`Topic ${topic.id} marked as completed`);
@@ -111,12 +111,12 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
   useEffect(() => {
     const loadTopics = async () => {
       if (!chapterId) return;
-      
+
       try {
         setLoading(true);
         setError(null);
         const response = await learningApi.getChapterTopics(chapterId);
-        
+
         if (response.success) {
           setTopics(response.topics);
           setChapterTitle(response.chapter_title);
@@ -138,15 +138,15 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
   useEffect(() => {
     const loadContent = async () => {
       if (topics.length === 0) return;
-      
+
       const currentTopic = topics[currentTopicIndex];
       if (!currentTopic) return;
-      
+
       try {
         setLoading(true);
         setError(null);
         const response = await learningApi.getTopicContent(currentTopic.id);
-        
+
         if (response.success) {
           setContent(response);
           // Scroll to top when loading new topic
@@ -244,7 +244,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
   // Separate sections into main content and sidebar
   const mainSectionOrder = ['introduction', 'explanation', 'code', 'summary'];
   const sidebarSectionTypes = ['keypoints'];
-  
+
   const mainSections = mainSectionOrder
     .flatMap(type => sections.filter(s => s.type === type));
   const sidebarSections = sections.filter(s => sidebarSectionTypes.includes(s.type));
@@ -285,7 +285,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
-                onClick={() => navigate('/student')}
+                onClick={() => navigate(-1)}
                 variant="ghost"
                 className="text-gray-400 hover:text-white hover:bg-gray-800/50 p-2"
               >
@@ -303,8 +303,8 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
               <Button
                 onClick={() => onStartChapterPractice(currentTopic?.id, currentTopic?.title)}
                 disabled={!allTopicsCompleted}
-                className={`${allTopicsCompleted 
-                  ? 'bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD]' 
+                className={`${allTopicsCompleted
+                  ? 'bg-gradient-to-r from-[#6C63FF] to-[#22D3EE] hover:from-[#5B52EE] hover:to-[#11C2DD]'
                   : 'bg-gray-700 cursor-not-allowed opacity-60'}`}
               >
                 {!allTopicsCompleted && <Lock className="w-4 h-4 mr-2" />}
@@ -333,21 +333,20 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
               const accessible = isTopicAccessible(index);
               const isCompleted = completedTopics.has(index);
               const isCurrent = index === currentTopicIndex;
-              
+
               return (
                 <div key={topic.id} className="relative group flex-shrink-0">
                   <button
                     onClick={() => handleTopicClick(index)}
                     disabled={!accessible}
-                    className={`px-4 py-2 rounded-lg text-sm transition-all ${
-                      isCurrent
-                        ? 'bg-[#6C63FF] text-white'
-                        : isCompleted
+                    className={`px-4 py-2 rounded-lg text-sm transition-all ${isCurrent
+                      ? 'bg-[#6C63FF] text-white'
+                      : isCompleted
                         ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-pointer'
                         : accessible
-                        ? 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 cursor-pointer'
-                        : 'bg-gray-900/50 text-gray-600 cursor-not-allowed opacity-60'
-                    }`}
+                          ? 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 cursor-pointer'
+                          : 'bg-gray-900/50 text-gray-600 cursor-not-allowed opacity-60'
+                      }`}
                   >
                     {!accessible && <Lock className="w-3 h-3 inline mr-1" />}
                     {isCompleted && <CheckCircle className="w-3 h-3 inline mr-1" />}
@@ -389,7 +388,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
               {/* Main Content Column */}
               <div className="flex-1 space-y-6 min-w-0">
                 {mainSections.map((section, index) => (
-                  <div 
+                  <div
                     key={index}
                     className={`bg-gradient-to-br ${getSectionStyle(section.type).gradient} rounded-2xl border ${getSectionStyle(section.type).borderColor} p-6 shadow-lg`}
                   >
@@ -447,8 +446,8 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
                       {section.points && section.points.length > 0 && (
                         <div className="mt-6 space-y-3">
                           {section.points.map((point, pointIdx) => (
-                            <div 
-                              key={pointIdx} 
+                            <div
+                              key={pointIdx}
                               className="flex items-start gap-3 bg-gray-800/30 rounded-lg p-3"
                             >
                               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center mt-0.5">
@@ -503,7 +502,7 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
               {sidebarSections.length > 0 && (
                 <div className="w-80 flex-shrink-0 space-y-4 sticky top-[180px] self-start max-h-[calc(100vh-220px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent pr-1">
                   {sidebarSections.map((section, index) => (
-                    <div 
+                    <div
                       key={index}
                       className={`bg-gradient-to-br ${getSectionStyle(section.type).gradient} rounded-xl border ${getSectionStyle(section.type).borderColor} p-4 shadow-lg`}
                     >
@@ -533,8 +532,8 @@ export function LearningContent({ onStartPractice, onStartChapterPractice, chapt
                       {section.points && section.points.length > 0 && (
                         <div className="space-y-2">
                           {section.points.map((point, pointIdx) => (
-                            <div 
-                              key={pointIdx} 
+                            <div
+                              key={pointIdx}
                               className="flex items-start gap-2 text-sm"
                             >
                               <span className={`flex-shrink-0 w-5 h-5 rounded-full ${getSectionStyle(section.type).iconBg} flex items-center justify-center`}>

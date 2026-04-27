@@ -70,6 +70,7 @@ const classAssignmentSubmissionSchema = new mongoose.Schema(
     attemptCount: { type: Number, default: 1 },
     timeTaken: { type: Number, default: 0 },
     submittedAt: { type: Date, default: Date.now },
+    status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
   },
   { timestamps: true }
 );

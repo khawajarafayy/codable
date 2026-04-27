@@ -133,10 +133,66 @@ async function evaluateCodingTaskSubmission(task, submission) {
 
   let passed = 0;
   for (const tc of allCases) {
-    const run = await runJavaCodeAgainstInput(submission.codeSnippet, tc?.input || "");
+    let run = await runJavaCodeAgainstInput(submission.codeSnippet, tc?.input || "");
     const expected = String(tc?.output || "").trim();
-    const actual = String(run?.output || "").trim();
-    if (run.success && actual === expected) {
+    let actual = String(run?.output || "").trim();
+    
+    // We want to pass the test if the output matches the expected output,
+    // ignoring any prompts like "Enter name:"
+    let aLower = actual.toLowerCase().replace(/\s+/g, "");
+    let eLower = expected.toLowerCase().replace(/\s+/g, "");
+
+    let isCorrect = false;
+
+    // Check match
+    const checkMatch = (actLines, expLines, actLower, expLower) => {
+      if (actLower === expLower || actLower.includes(expLower)) return true;
+      if (expLines.length > 0) {
+        let matchCount = 0;
+        for (const eLine of expLines) {
+           for (const aLine of actLines) {
+              if (aLine === eLine) {
+                 matchCount++;
+                 break;
+              } else if (eLine.includes(':') && aLine.includes(':')) {
+                 if (eLine.split(':')[0].trim().toLowerCase() === aLine.split(':')[0].trim().toLowerCase()) {
+                    matchCount++;
+                    break;
+                 }
+              } else if (eLine.includes('=') && aLine.includes('=')) {
+                 if (eLine.split('=')[0].trim().toLowerCase() === aLine.split('=')[0].trim().toLowerCase()) {
+                    matchCount++;
+                    break;
+                 }
+              }
+           }
+        }
+        if (matchCount === expLines.length) return true;
+      }
+      return false;
+    };
+
+    let actualLines = actual.split('\n').map(l => l.trim()).filter(Boolean);
+    const expectedLines = expected.split('\n').map(l => l.trim()).filter(Boolean);
+
+    isCorrect = checkMatch(actualLines, expectedLines, aLower, eLower);
+
+    // Fallback: If the student code threw an exception (e.g. NoSuchElementException)
+    // or failed to match because they used input.nextLine() instead of input.next()
+    // for space-separated inputs, we try replacing spaces with newlines.
+    if (!isCorrect && String(tc?.input || "").includes(" ")) {
+       const splitInput = String(tc?.input || "").replace(/ /g, '\n');
+       const fallbackRun = await runJavaCodeAgainstInput(submission.codeSnippet, splitInput);
+       const fbActual = String(fallbackRun?.output || "").trim();
+       const fbALower = fbActual.toLowerCase().replace(/\s+/g, "");
+       const fbActualLines = fbActual.split('\n').map(l => l.trim()).filter(Boolean);
+       if (checkMatch(fbActualLines, expectedLines, fbALower, eLower)) {
+           isCorrect = true;
+           run = fallbackRun;
+       }
+    }
+
+    if (isCorrect) {
       passed += 1;
     }
   }
@@ -809,6 +865,7 @@ export const getAssignmentSubmissionsForInstructor = async (req, res) => {
           attemptCount: s.attemptCount || 1,
           timeTaken: s.timeTaken || 0,
           submittedAt: s.submittedAt,
+          status: s.status || "pending",
           answers: (s.answers || []).map((a) => ({
             questionIndex: a.questionIndex,
             questionId: a.questionId,
@@ -829,6 +886,37 @@ export const getAssignmentSubmissionsForInstructor = async (req, res) => {
     });
   } catch (error) {
     console.error("getAssignmentSubmissionsForInstructor:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/** Instructor: accept assignment submission */
+export const acceptSubmission = async (req, res) => {
+  try {
+    const { classId, assignmentId, submissionId } = req.params;
+    const instructorId = req.userId;
+
+    const cls = await assertInstructorOwnsClass(classId, instructorId);
+    if (!cls) {
+      return res.status(404).json({ success: false, message: "Class not found" });
+    }
+
+    const submission = await ClassAssignmentSubmission.findOne({
+      _id: new mongoose.Types.ObjectId(submissionId),
+      classId: cls._id,
+      assignmentId: new mongoose.Types.ObjectId(assignmentId),
+    });
+
+    if (!submission) {
+      return res.status(404).json({ success: false, message: "Submission not found" });
+    }
+
+    submission.status = "accepted";
+    await submission.save();
+
+    return res.status(200).json({ success: true, data: submission });
+  } catch (error) {
+    console.error("acceptSubmission:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

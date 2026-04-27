@@ -82,6 +82,7 @@ export default function Assignments() {
   const [reportError, setReportError] = useState(null);
   const [reportData, setReportData] = useState(null);
   const [submissionNotice, setSubmissionNotice] = useState("");
+  const [previewingSubmission, setPreviewingSubmission] = useState(null);
   const previousSubmissionCountsRef = useRef({});
 
   const fetchAssignmentsFromApi = useCallback(async () => {
@@ -473,6 +474,32 @@ export default function Assignments() {
       setReportError(err.payload?.message || err.message || "Failed to load report");
     } finally {
       setReportLoading(false);
+    }
+  };
+
+  const acceptSubmission = async (submissionId) => {
+    if (!reportModalAssignment?.classId) return;
+    try {
+      const res = await request(
+        `/api/classes/${reportModalAssignment.classId}/assignments/${reportModalAssignment.id}/submissions/${submissionId}/accept`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${user.token}` }
+        }
+      );
+      if (res.success) {
+        setReportData(prev => ({
+          ...prev,
+          submissions: prev.submissions.map(sub => 
+            sub.id === submissionId ? { ...sub, status: "accepted" } : sub
+          )
+        }));
+        if (previewingSubmission?.id === submissionId) {
+          setPreviewingSubmission(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to accept submission", err);
     }
   };
 
@@ -1147,7 +1174,28 @@ export default function Assignments() {
                         )}
                         {Array.isArray(sub.codingSubmissions) && sub.codingSubmissions.length > 0 && (
                           <div className="mt-2 text-xs text-[#fdfdff]/75 border-t border-white/10 pt-2 space-y-1">
-                            <p className="text-[#fdfdff]/55">Coding analytics</p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-[#fdfdff]/55">Coding analytics</p>
+                              <div className="flex gap-2">
+                                <span className={`px-2 py-1 rounded text-[10px] ${sub.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300'}`}>
+                                  {sub.status === 'accepted' ? 'Accepted' : 'Pending'}
+                                </span>
+                                <button
+                                  onClick={() => setPreviewingSubmission(sub)}
+                                  className="text-purple-400 hover:text-purple-300 flex items-center gap-1 bg-purple-500/10 px-2 py-1 rounded"
+                                >
+                                  <Eye className="w-3 h-3" /> Preview Submission
+                                </button>
+                                {sub.status !== 'accepted' && (
+                                  <button
+                                    onClick={() => acceptSubmission(sub.id)}
+                                    className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3" /> Accept Report
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                             {sub.codingSubmissions.map((cs) => (
                               <p key={`${sub.id}-${cs.taskId}`}>
                                 Task {cs.taskId}: {cs.testCasesPassed}/{cs.totalTestCases} tests · attempts {sub.attemptCount || 1}
@@ -1165,6 +1213,66 @@ export default function Assignments() {
                 )}
               </div>
             ) : null}
+          </div>
+        </div>
+      )}
+
+      {previewingSubmission && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setPreviewingSubmission(null)}
+          />
+          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-[#0A1428] border border-purple-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-[#fdfdff]">Submission Preview: {previewingSubmission.studentName}</h3>
+              <button
+                type="button"
+                onClick={() => setPreviewingSubmission(null)}
+                className="p-2 rounded-lg hover:bg-white/10 text-[#fdfdff]/60"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              {previewingSubmission.codingSubmissions.map((cs, idx) => (
+                <div key={idx} className="bg-black/30 border border-white/10 rounded-xl p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-purple-300 font-medium">Task {cs.taskId} Code</h4>
+                    <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">
+                      Tests: {cs.testCasesPassed} / {cs.totalTestCases}
+                    </span>
+                  </div>
+                  <pre className="text-sm font-[JetBrains_Mono] text-[#fdfdff] bg-[#0b0d11] p-4 rounded-lg overflow-x-auto">
+                    {cs.codeSnippet || "// No code submitted"}
+                  </pre>
+                  {cs.aiCodeAnalysis?.score > 0 && (
+                     <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-xs text-indigo-200">
+                       <p className="font-semibold mb-1">AI Analysis Score: {cs.aiCodeAnalysis.score}/10</p>
+                       <p><span className="opacity-70">Logic:</span> {cs.aiCodeAnalysis.logic}</p>
+                       <p><span className="opacity-70">Quality:</span> {cs.aiCodeAnalysis.quality}</p>
+                     </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setPreviewingSubmission(null)}
+                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[#fdfdff]"
+              >
+                Close
+              </button>
+              {previewingSubmission.status !== "accepted" && (
+                <button
+                  onClick={() => acceptSubmission(previewingSubmission.id)}
+                  className="px-4 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Accept Report
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

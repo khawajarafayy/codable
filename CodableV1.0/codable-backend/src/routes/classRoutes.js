@@ -43,6 +43,10 @@ router.get(
 	"/:classId/assignments/:assignmentId/submissions",
 	assignmentController.getAssignmentSubmissionsForInstructor
 );
+router.patch(
+	"/:classId/assignments/:assignmentId/submissions/:submissionId/accept",
+	assignmentController.acceptSubmission
+);
 
 /**
  * Get Single Class

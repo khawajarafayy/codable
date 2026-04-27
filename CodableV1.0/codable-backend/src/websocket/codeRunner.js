@@ -8,6 +8,7 @@ import { analyzeComplexity } from '../utils/complexityAnalyzer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(__dirname, '../temp');
+const RUNNER_DEBUG_LOGS = process.env.CODE_RUNNER_DEBUG === 'true';
 
 // Map to store user connections: userId -> Set of WebSocket connections
 const userConnections = new Map();
@@ -49,7 +50,6 @@ function getProcessMemory(pid) {
         const match = stdout.match(/"[^"]+","[^"]+","[^"]+","[^"]+","([0-9,]+)\s*K"/);
         if (match) {
           const memoryKB = parseInt(match[1].replace(/,/g, ''));
-          console.log(`📊 Memory for PID ${pid}: ${memoryKB} KB`);
           resolve(memoryKB);
         } else {
           resolve(0);
@@ -138,12 +138,15 @@ export function startWebSocketServer(server) {
     let executionStartTime = null;
     let memoryMonitorInterval = null;
     let peakMemory = 0;
+    let pendingInputs = [];
 
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message);
 
         if (data.type === 'run') {
+          pendingInputs = [];
+
           // Create unique temp directory for this user's session
           userTempDir = path.join(TEMP_DIR, `session_${Date.now()}`);
           fs.mkdirSync(userTempDir, { recursive: true });
@@ -157,19 +160,25 @@ export function startWebSocketServer(server) {
           // Write code to the Java file with extracted class name
           fs.writeFileSync(tempFile, data.code);
 
-          console.log('\n=== CODE ANALYSIS START ===');
-          console.log('Code length:', data.code.length);
-          console.log('Code preview:', data.code.substring(0, 200));
+          if (RUNNER_DEBUG_LOGS) {
+            console.log('\n=== CODE ANALYSIS START ===');
+            console.log('Code length:', data.code.length);
+            console.log('Code preview:', data.code.substring(0, 200));
+          }
 
           // Analyze complexity before running
           const complexityAnalysis = analyzeComplexity(data.code);
-          console.log('📊 Complexity Analysis Result:', complexityAnalysis);
+          if (RUNNER_DEBUG_LOGS) {
+            console.log('📊 Complexity Analysis Result:', complexityAnalysis);
+          }
           
           ws.send(JSON.stringify({ 
             type: 'complexity', 
             data: complexityAnalysis 
           }));
-          console.log('✅ Sent complexity message to frontend');
+          if (RUNNER_DEBUG_LOGS) {
+            console.log('✅ Sent complexity message to frontend');
+          }
 
           // Compile Java
           const javac = spawn('javac', [tempFile]);
@@ -193,18 +202,35 @@ export function startWebSocketServer(server) {
 
             // Run Java (using the extracted class name)
             javaProcess = spawn('java', ['-cp', userTempDir, className]);
-            console.log('\n🚀 Java process started with PID:', javaProcess.pid, 'Class:', className);
+            if (RUNNER_DEBUG_LOGS) {
+              console.log('\n🚀 Java process started with PID:', javaProcess.pid, 'Class:', className);
+            }
 
-            // Monitor memory usage every 50ms
+            // If frontend sent input before java process was ready, flush now.
+            if (Array.isArray(pendingInputs) && pendingInputs.length > 0) {
+              pendingInputs.forEach((chunk) => {
+                javaProcess.stdin.write(chunk);
+              });
+              pendingInputs = [];
+            }
+
+            // Support non-interactive runs by accepting "input" in the run payload.
+            if (typeof data.input === 'string' && data.input.length > 0) {
+              javaProcess.stdin.write(data.input.endsWith('\n') ? data.input : `${data.input}\n`);
+            }
+
+            // Monitor memory usage in the background with low overhead.
             memoryMonitorInterval = setInterval(async () => {
               if (javaProcess && javaProcess.pid) {
                 const currentMemory = await getProcessMemory(javaProcess.pid);
                 if (currentMemory > 0) {
                   peakMemory = Math.max(peakMemory, currentMemory);
-                  console.log('💾 Memory sample:', currentMemory, 'KB, Peak:', peakMemory, 'KB');
+                  if (RUNNER_DEBUG_LOGS) {
+                    console.log('💾 Memory sample:', currentMemory, 'KB, Peak:', peakMemory, 'KB');
+                  }
                 }
               }
-            }, 50);
+            }, 250);
 
             javaProcess.stdout.on('data', (output) => {
               ws.send(JSON.stringify({ type: 'output', data: output.toString() }));
@@ -222,14 +248,17 @@ export function startWebSocketServer(server) {
 
               // Calculate execution time
               const executionEndTime = process.hrtime.bigint();
-              const executionTimeNs = executionEndTime - executionStartTime;
+              const start = typeof executionStartTime === 'bigint' ? executionStartTime : executionEndTime;
+              const executionTimeNs = executionEndTime - start;
               const executionTimeMs = Number(executionTimeNs) / 1_000_000;
 
-              console.log('\n=== EXECUTION METRICS ===');
-              console.log('Execution time:', executionTimeMs.toFixed(2), 'ms');
-              console.log('Peak memory:', peakMemory, 'KB');
-              console.log('Time complexity:', complexityAnalysis.timeComplexity);
-              console.log('Space complexity:', complexityAnalysis.spaceComplexity);
+              if (RUNNER_DEBUG_LOGS) {
+                console.log('\n=== EXECUTION METRICS ===');
+                console.log('Execution time:', executionTimeMs.toFixed(2), 'ms');
+                console.log('Peak memory:', peakMemory, 'KB');
+                console.log('Time complexity:', complexityAnalysis.timeComplexity);
+                console.log('Space complexity:', complexityAnalysis.spaceComplexity);
+              }
 
               // Send metrics
               const metricsData = {
@@ -241,7 +270,9 @@ export function startWebSocketServer(server) {
                 space_complexity: complexityAnalysis.spaceComplexity
               };
               
-              console.log('📤 Sending metrics:', metricsData);
+              if (RUNNER_DEBUG_LOGS) {
+                console.log('📤 Sending metrics:', metricsData);
+              }
               ws.send(JSON.stringify({ 
                 type: 'metrics', 
                 data: metricsData
@@ -255,6 +286,9 @@ export function startWebSocketServer(server) {
 
         if (data.type === 'input' && javaProcess) {
           javaProcess.stdin.write(data.data + '\n');
+        } else if (data.type === 'input' && !javaProcess) {
+          // Queue input until compiler + java process are ready.
+          pendingInputs.push((data.data || '') + '\n');
         }
 
         if (data.type === 'stop' && javaProcess) {
@@ -286,6 +320,7 @@ export function startWebSocketServer(server) {
       }
       executionStartTime = null;
       peakMemory = 0;
+      pendingInputs = [];
     }
 
     function formatExecutionTime(ms) {

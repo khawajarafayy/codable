@@ -11,6 +11,26 @@ const questionAttemptSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const codingTaskSubmissionSchema = new mongoose.Schema(
+  {
+    taskId: { type: String, required: true },
+    codeSnippet: { type: String, default: "" },
+    testCasesPassed: { type: Number, default: 0 },
+    totalTestCases: { type: Number, default: 0 },
+    aiCodeAnalysis: {
+      logic: { type: String, default: "" },
+      quality: { type: String, default: "" },
+      structure: { type: String, default: "" },
+      score: { type: Number, default: 0 }
+    },
+    complexityAnalysis: {
+      timeComplexity: { type: String, default: "" },
+      spaceComplexity: { type: String, default: "" }
+    }
+  },
+  { _id: false }
+);
+
 const classAssignmentSubmissionSchema = new mongoose.Schema(
   {
     classId: {
@@ -37,10 +57,18 @@ const classAssignmentSubmissionSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    assignmentType: {
+      type: String,
+      enum: ["mcq", "coding"],
+      default: "mcq",
+    },
     answers: { type: [questionAttemptSchema], default: [] },
+    codingSubmissions: { type: [codingTaskSubmissionSchema], default: [] },
     score: { type: Number, required: true, min: 0 },
     totalQuestions: { type: Number, required: true, min: 0 },
     percentage: { type: Number, required: true, min: 0, max: 100 },
+    attemptCount: { type: Number, default: 1 },
+    timeTaken: { type: Number, default: 0 },
     submittedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

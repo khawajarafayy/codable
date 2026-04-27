@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { request, api } from "../../../services/apiClient";
 import ChatSection from "../../../components/Chat/ChatSection";
+import CodingTaskEditor from "./components/CodingTaskEditor";
 
 function mapStudentAssignment(row) {
   return {
@@ -28,9 +29,11 @@ function mapStudentAssignment(row) {
     description: row.description || "",
     deadline: row.deadline,
     points: typeof row.points === "number" ? row.points : row.mcqs?.length ?? 0,
+    assignmentType: row.assignmentType || "mcq",
     difficulty: row.difficulty,
     topics: Array.isArray(row.topics) ? row.topics : [],
     mcqCount: Array.isArray(row.mcqs) ? row.mcqs.length : 0,
+    codingCount: Array.isArray(row.codingTasks) ? row.codingTasks.length : 0,
     hasSubmitted: Boolean(row.hasSubmitted),
     submissionSummary: row.submissionSummary || null,
   };
@@ -170,36 +173,43 @@ export default function ClassroomDetails() {
     setAnswers((prev) => ({ ...prev, [questionIndex]: option }));
   };
 
-  const submitAssignment = async () => {
+  const submitAssignment = async (codingSubmissions = null) => {
     if (!selectedAssignmentId || !assignmentDetail) return;
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const mcqs = assignmentDetail.mcqs || [];
-    const missing = mcqs.filter((_, i) => {
-      const v = answers[i];
-      return !v || !["A", "B", "C", "D"].includes(String(v).trim().toUpperCase());
-    });
-    if (missing.length > 0) {
-      setDetailError(`Please answer all ${mcqs.length} questions before submitting.`);
-      return;
+    if ((assignmentDetail.assignmentType || "mcq") === "mcq") {
+      const mcqs = assignmentDetail.mcqs || [];
+      const missing = mcqs.filter((_, i) => {
+        const v = answers[i];
+        return !v || !["A", "B", "C", "D"].includes(String(v).trim().toUpperCase());
+      });
+      if (missing.length > 0) {
+        setDetailError(`Please answer all ${mcqs.length} questions before submitting.`);
+        return;
+      }
     }
 
     setSubmitting(true);
     setDetailError(null);
+    let responseData = null;
     try {
       const res = await request(
         `/api/student-class/classes/${classId}/assignments/${selectedAssignmentId}/submit`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-          body: { answers },
+          body:
+            (assignmentDetail.assignmentType || "mcq") === "coding"
+              ? { codingSubmissions, timeTaken: 0 }
+              : { answers },
         }
       );
 
       if (!res.success || !res.data) {
         throw new Error(res.message || "Failed to submit assignment");
       }
+      responseData = res.data;
 
       setSubmitResult(res.data);
       setQuizStarted(false);
@@ -235,9 +245,11 @@ export default function ClassroomDetails() {
       );
     } catch (err) {
       setDetailError(err.payload?.message || err.message || "Failed to submit assignment");
+      throw err;
     } finally {
       setSubmitting(false);
     }
+    return responseData;
   };
 
   if (loading) {
@@ -493,10 +505,16 @@ export default function ClassroomDetails() {
                           <Target className="w-4 h-4 text-purple-400" />
                           <span className="font-semibold text-gray-300">{assignment.points} pts</span>
                         </div>
-                        {assignment.mcqCount > 0 && (
+                        {assignment.assignmentType === "mcq" && assignment.mcqCount > 0 && (
                           <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
                             <FileText className="w-4 h-4 text-emerald-400" />
                             <span className="font-semibold text-gray-300">{assignment.mcqCount} Qs</span>
+                          </div>
+                        )}
+                        {assignment.assignmentType === "coding" && assignment.codingCount > 0 && (
+                          <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                            <FileText className="w-4 h-4 text-blue-400" />
+                            <span className="font-semibold text-gray-300">{assignment.codingCount} Coding tasks</span>
                           </div>
                         )}
                       </div>
@@ -576,10 +594,12 @@ export default function ClassroomDetails() {
                     <div className="flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-xl">
                       <Target className="w-4 h-4 text-purple-400" />
                       <span className="text-sm font-semibold text-purple-200">
-                        Questions: {assignmentDetail.mcqs?.length || 0}
+                        {(assignmentDetail.assignmentType || "mcq") === "coding"
+                          ? `Tasks: ${assignmentDetail.codingTasks?.length || 0}`
+                          : `Questions: ${assignmentDetail.mcqs?.length || 0}`}
                       </span>
                     </div>
-                    {(submitResult || assignmentDetail.submissionSummary) && (
+                    {(submitResult || assignmentDetail.submissionSummary) && (assignmentDetail.assignmentType || "mcq") === "mcq" && (
                       <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         <span className="text-sm font-bold text-emerald-400">
@@ -591,7 +611,29 @@ export default function ClassroomDetails() {
                     )}
                   </div>
 
-                  {!quizStarted ? (
+                  {(assignmentDetail.assignmentType || "mcq") === "coding" ? (
+                    submitResult || assignmentDetail.hasSubmitted ? (
+                      <div className="text-center py-12 bg-gradient-to-b from-emerald-500/10 to-transparent rounded-3xl border border-emerald-500/20">
+                        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Congrats! Assignment submitted.</h3>
+                        <p className="text-gray-400">
+                          Submitted on{" "}
+                          {new Date(
+                            submitResult?.submittedAt ||
+                              assignmentDetail.submissionSummary?.submittedAt ||
+                              Date.now()
+                          ).toLocaleString()}
+                        </p>
+                      </div>
+                    ) : (
+                      <CodingTaskEditor
+                        assignment={assignmentDetail}
+                        onSubmitCodingAssignment={(codingSubmissions) => submitAssignment(codingSubmissions)}
+                      />
+                    )
+                  ) : !quizStarted ? (
                     <div className="mt-8">
                       {submitResult || assignmentDetail.hasSubmitted ? (
                         <div className="text-center py-12 bg-gradient-to-b from-emerald-500/10 to-transparent rounded-3xl border border-emerald-500/20">

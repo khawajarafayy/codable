@@ -3196,6 +3196,159 @@ RULES:
     }, None
 
 
+def _parse_coding_assignment_json(response_text, num_tasks, _json):
+    try:
+        text = str(response_text or "").strip()
+        if text.startswith("```"):
+            parts = text.split("```")
+            text = parts[1] if len(parts) > 1 else text
+            if text.startswith("json"):
+                text = text[4:]
+        parsed = _json.loads(text.strip())
+        tasks = parsed.get("codingTasks") or parsed.get("tasks") or []
+        normalized = []
+        for i, task in enumerate(tasks[:num_tasks]):
+            sample = task.get("sampleTestCases") or []
+            hidden = task.get("hiddenTestCases") or []
+            normalized.append({
+                "id": str(task.get("id", i + 1)),
+                "problemStatement": str(task.get("problemStatement", "")).strip(),
+                "inputFormat": str(task.get("inputFormat", "")).strip(),
+                "outputFormat": str(task.get("outputFormat", "")).strip(),
+                "sampleTestCases": [
+                    {"input": str(tc.get("input", "")), "output": str(tc.get("output", ""))}
+                    for tc in sample
+                ],
+                "hiddenTestCases": [
+                    {"input": str(tc.get("input", "")), "output": str(tc.get("output", ""))}
+                    for tc in hidden
+                ],
+                "expectedConcepts": [str(c) for c in (task.get("expectedConcepts") or [])][:10],
+            })
+        return normalized if normalized else None
+    except Exception as e:
+        print(f"⚠️ Coding assignment JSON parse failed: {e}")
+        return None
+
+
+def _fallback_coding_tasks(topics, difficulty, num_tasks):
+    diff_label = {"L": "easy", "M": "medium", "H": "hard"}.get(difficulty, "medium")
+    topic_str = ", ".join(topics[:3]) if topics else "Java programming"
+    tasks = []
+    for i in range(num_tasks):
+        idx = i + 1
+        tasks.append({
+            "id": str(idx),
+            "problemStatement": f"[{diff_label}] Task {idx}: Solve a Java problem related to {topic_str}.",
+            "inputFormat": "Read input from standard input (stdin) exactly as specified in the problem.",
+            "outputFormat": "Print only the required result to standard output (stdout).",
+            "sampleTestCases": [{"input": "5\n", "output": "5"}],
+            "hiddenTestCases": [{"input": "10\n", "output": "10"}],
+            "expectedConcepts": ["input parsing", "control flow", "problem solving"],
+        })
+    return tasks
+
+
+def generate_instructor_coding_assignment(num_tasks, difficulty, topics, instructions):
+    import json as _json
+    num_tasks = max(1, min(10, int(num_tasks or 3)))
+    difficulty = (difficulty or "M").upper()
+    if difficulty not in ("L", "M", "H"):
+        difficulty = "M"
+    topics = [str(t).strip() for t in (topics or []) if str(t).strip()]
+
+    combined_query = " ".join(topics) if topics else "java coding tasks"
+    raw_docs = get_relevant_context(combined_query, k=8)
+    book_context = "\n\n".join(raw_docs) if raw_docs else ""
+    diff_prompt = _difficulty_lmh_to_prompt(difficulty)
+    instructions = str(instructions or "").strip()
+
+    if not GROQ_API_KEY and not MISTRAL_API_KEY:
+        return {
+            "codingTasks": _fallback_coding_tasks(topics, difficulty, num_tasks),
+            "meta": {"source": "fallback-local", "retrieved_chars": len(book_context)},
+        }, None
+
+    from langchain_core.prompts import ChatPromptTemplate
+    prompt_template = """You are an expert Java instructor. Create EXACTLY {num_tasks} coding tasks.
+
+TOPICS: {topics}
+DIFFICULTY: {difficulty_prompt}
+ADDITIONAL INSTRUCTIONS: {instructions}
+
+RELEVANT BOOK EXCERPTS (RAG context):
+{book_context}
+
+Rules:
+- Each task must be solvable in Java using stdin/stdout.
+- Include realistic sample and hidden test cases.
+- Return ONLY valid JSON (no markdown), exactly in this shape:
+{{
+  "codingTasks": [
+    {{
+      "id": "1",
+      "problemStatement": "...",
+      "inputFormat": "...",
+      "outputFormat": "...",
+      "sampleTestCases": [{{"input":"...", "output":"..."}}],
+      "hiddenTestCases": [{{"input":"...", "output":"..."}}],
+      "expectedConcepts": ["...", "..."]
+    }}
+  ]
+}}
+"""
+    prompt = ChatPromptTemplate.from_template(prompt_template)
+    invoke_args = {
+        "num_tasks": num_tasks,
+        "topics": ", ".join(topics) if topics else "Core Java",
+        "difficulty_prompt": diff_prompt,
+        "instructions": instructions or "None",
+        "book_context": book_context[:7000],
+    }
+    providers = []
+
+    if GROQ_API_KEY:
+        try:
+            from langchain_groq import ChatGroq
+            model = ChatGroq(
+                model="llama-3.3-70b-versatile",
+                groq_api_key=GROQ_API_KEY,
+                temperature=0.25,
+                max_tokens=8192,
+            )
+            result = (prompt | model).invoke(invoke_args)
+            parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
+            providers.append("groq")
+            if parsed:
+                return {"codingTasks": parsed, "meta": {"source": "groq-rag", "providers": providers}}, None
+        except Exception as e:
+            print(f"⚠️ Groq coding assignment failed: {e}")
+            providers.append("groq:error")
+
+    if MISTRAL_API_KEY:
+        try:
+            from langchain_mistralai import ChatMistralAI
+            model = ChatMistralAI(
+                model="mistral-small-latest",
+                mistral_api_key=MISTRAL_API_KEY,
+                temperature=0.2,
+                max_tokens=8192,
+            )
+            result = (prompt | model).invoke(invoke_args)
+            parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
+            providers.append("mistral")
+            if parsed:
+                return {"codingTasks": parsed, "meta": {"source": "mistral-rag", "providers": providers}}, None
+        except Exception as e:
+            print(f"⚠️ Mistral coding assignment failed: {e}")
+            providers.append("mistral:error")
+
+    return {
+        "codingTasks": _fallback_coding_tasks(topics, difficulty, num_tasks),
+        "meta": {"source": "fallback-local", "providers": providers, "retrieved_chars": len(book_context)},
+    }, None
+
+
 @app.route('/api/generate-mcq-assignment', methods=['POST'])
 def generate_mcq_assignment():
     """
@@ -3244,6 +3397,121 @@ def generate_mcq_assignment():
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/generate-coding-assignment', methods=['POST'])
+def generate_coding_assignment():
+    try:
+        data = request.json or {}
+        num_tasks = int(data.get("num_tasks") or data.get("num") or 3)
+        difficulty = (data.get("difficulty") or "M").upper()
+        topics = data.get("topics") or []
+        instructions = data.get("instructions") or ""
+
+        if not isinstance(topics, list):
+            return jsonify({"success": False, "error": "topics must be an array"}), 400
+
+        payload, err = generate_instructor_coding_assignment(num_tasks, difficulty, topics, instructions)
+        if err:
+            return jsonify({"success": False, "error": err}), 400
+
+        return jsonify({
+            "success": True,
+            "difficulty": difficulty if difficulty in ("L", "M", "H") else "M",
+            "num_tasks": max(1, min(10, num_tasks)),
+            "topics": topics,
+            "codingTasks": payload.get("codingTasks", []),
+            "meta": payload.get("meta", {}),
+        })
+    except Exception as e:
+        print(f"❌ generate_coding_assignment: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/analyze-code-assignment', methods=['POST'])
+def analyze_code_assignment():
+    """Lightweight AI rubric for coding assignment submissions."""
+    try:
+        data = request.json or {}
+        code_snippet = str(data.get("codeSnippet") or "")
+        problem = str(data.get("problemStatement") or "")
+        expected_concepts = data.get("expectedConcepts") or []
+
+        if not code_snippet.strip():
+            return jsonify({"success": False, "error": "codeSnippet is required"}), 400
+
+        if not GROQ_API_KEY and not MISTRAL_API_KEY:
+            return jsonify({
+                "success": True,
+                "analysis": {
+                    "logic": "LLM unavailable; verify logic via test-case pass rate.",
+                    "quality": "LLM unavailable; fallback analysis only.",
+                    "structure": "LLM unavailable; fallback analysis only.",
+                    "score": 0,
+                },
+            })
+
+        from langchain_core.prompts import ChatPromptTemplate
+        import json as _json
+
+        prompt = ChatPromptTemplate.from_template(
+            """Evaluate this Java solution and return ONLY valid JSON:
+{{"logic":"...","quality":"...","structure":"...","score":0-10}}
+
+Problem:
+{problem}
+
+Expected concepts:
+{concepts}
+
+Code:
+{code}
+"""
+        )
+        invoke_args = {
+            "problem": problem[:2500],
+            "concepts": ", ".join([str(c) for c in expected_concepts][:20]),
+            "code": code_snippet[:9000],
+        }
+
+        content = None
+        if GROQ_API_KEY:
+            from langchain_groq import ChatGroq
+            model = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=GROQ_API_KEY, temperature=0.2, max_tokens=1024)
+            content = (prompt | model).invoke(invoke_args).content
+        elif MISTRAL_API_KEY:
+            from langchain_mistralai import ChatMistralAI
+            model = ChatMistralAI(model="mistral-small-latest", mistral_api_key=MISTRAL_API_KEY, temperature=0.2, max_tokens=1024)
+            content = (prompt | model).invoke(invoke_args).content
+
+        text = str(content or "").strip()
+        if text.startswith("```"):
+            parts = text.split("```")
+            text = parts[1] if len(parts) > 1 else text
+            if text.startswith("json"):
+                text = text[4:]
+        parsed = _json.loads(text.strip())
+
+        return jsonify({
+            "success": True,
+            "analysis": {
+                "logic": str(parsed.get("logic", "")),
+                "quality": str(parsed.get("quality", "")),
+                "structure": str(parsed.get("structure", "")),
+                "score": max(0, min(10, int(parsed.get("score", 0)))),
+            },
+        })
+    except Exception as e:
+        print(f"❌ analyze_code_assignment: {e}")
+        return jsonify({
+            "success": True,
+            "analysis": {
+                "logic": "Automatic AI analysis failed.",
+                "quality": "Automatic AI analysis failed.",
+                "structure": "Automatic AI analysis failed.",
+                "score": 0,
+            },
+        })
 
 
 def _is_course_java_query(user_text: str) -> bool:

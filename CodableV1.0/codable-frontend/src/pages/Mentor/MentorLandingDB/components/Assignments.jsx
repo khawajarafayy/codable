@@ -37,8 +37,11 @@ function mapAssignmentFromApi(row, classesById) {
     submissions: row.submissions ?? 0,
     total: published ? totalStudents : 0,
     topics: row.topics || [],
+    chapterIds: row.chapterIds || [],
     difficulty: row.difficulty,
+    assignmentType: row.assignmentType || "mcq",
     mcqs: row.mcqs || [],
+    codingTasks: row.codingTasks || [],
     ragMeta: row.ragMeta,
   };
 }
@@ -62,7 +65,13 @@ export default function Assignments() {
   const [ragChaptersLoading, setRagChaptersLoading] = useState(false);
   const [selectedChapterIds, setSelectedChapterIds] = useState([]);
   const [ragDifficulty, setRagDifficulty] = useState("M");
+  const [ragAssignmentType, setRagAssignmentType] = useState("mcq");
   const [numMcqs, setNumMcqs] = useState(5);
+  const [numCodingTasks, setNumCodingTasks] = useState(3);
+  const [codingInstructions, setCodingInstructions] = useState("");
+  const [codingCreationMode, setCodingCreationMode] = useState("ai"); // ai | manual
+  const [manualCodingTasks, setManualCodingTasks] = useState([]);
+  const [editingAssignment, setEditingAssignment] = useState(null);
   const [assignmentDeadline, setAssignmentDeadline] = useState("");
   const [ragGenerating, setRagGenerating] = useState(false);
   const [ragError, setRagError] = useState(null);
@@ -227,12 +236,36 @@ export default function Assignments() {
     }
   }, [isModalOpen, instructorClasses.length]);
 
+  useEffect(() => {
+    if (ragAssignmentType === "coding" && codingCreationMode === "manual") {
+      ensureManualTasks(numCodingTasks);
+    }
+  }, [ragAssignmentType, codingCreationMode, numCodingTasks]);
+
   const toggleChapterId = (chapterNumericId) => {
     setSelectedChapterIds((prev) =>
       prev.includes(chapterNumericId)
         ? prev.filter((id) => id !== chapterNumericId)
         : [...prev, chapterNumericId]
     );
+  };
+
+  const ensureManualTasks = (count) => {
+    const c = Math.max(1, Math.min(10, Number(count) || 1));
+    setManualCodingTasks((prev) => {
+      const next = Array.from({ length: c }, (_, idx) => {
+        const old = prev[idx];
+        return (
+          old || {
+            id: String(idx + 1),
+            problemStatement: "",
+            inputFormat: "",
+            outputFormat: "",
+          }
+        );
+      });
+      return next;
+    });
   };
 
   const resolveClassName = (classId, fallback) => {
@@ -252,32 +285,81 @@ export default function Assignments() {
     }
     const deadline = assignmentDeadline.trim() || defaultDeadline();
     const numQ = Math.min(50, Math.max(1, Number(numMcqs) || 5));
+    const numTasks = Math.min(10, Math.max(1, Number(numCodingTasks) || 3));
 
     setRagGenerating(true);
     try {
-      const res = await fetch(`${RAG_API_BASE}/api/generate-mcq-assignment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chapter_ids: selectedChapterIds,
-          difficulty: ragDifficulty,
-          num_questions: numQ,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.success || !Array.isArray(data.mcqs) || data.mcqs.length === 0) {
-        setRagError(data.error || data.message || `Generation failed (${res.status})`);
-        return;
+      let generatedMcqs = [];
+      let generatedCodingTasks = [];
+      let meta = {};
+      let chapterTitles = [];
+      if (ragAssignmentType === "coding" && codingCreationMode === "manual") {
+        const invalidTask = manualCodingTasks.find((t) => !String(t.problemStatement || "").trim());
+        if (invalidTask) {
+          setRagError("Each manual task must include a problem statement.");
+          return;
+        }
+        chapterTitles = ragChapters
+          .filter((ch) => selectedChapterIds.includes(ch.id))
+          .map((ch) => ch.title);
+        generatedCodingTasks = manualCodingTasks.map((t, idx) => ({
+          id: String(idx + 1),
+          problemStatement: String(t.problemStatement || "").trim(),
+          inputFormat: String(t.inputFormat || "").trim(),
+          outputFormat: String(t.outputFormat || "").trim(),
+          sampleTestCases: [],
+          hiddenTestCases: [],
+          expectedConcepts: [],
+        }));
+        meta = { source: "manual-instructor" };
+      } else {
+        const endpoint =
+          ragAssignmentType === "coding"
+            ? `${RAG_API_BASE}/api/generate-coding-assignment`
+            : `${RAG_API_BASE}/api/generate-mcq-assignment`;
+        const payload =
+          ragAssignmentType === "coding"
+            ? {
+                num_tasks: numTasks,
+                difficulty: ragDifficulty,
+                topics: selectedChapterIds.map(String),
+                instructions: codingInstructions.trim(),
+              }
+            : {
+                chapter_ids: selectedChapterIds,
+                difficulty: ragDifficulty,
+                num_questions: numQ,
+              };
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        generatedMcqs = Array.isArray(data.mcqs) ? data.mcqs : [];
+        generatedCodingTasks = Array.isArray(data.codingTasks) ? data.codingTasks : [];
+        const hasValid =
+          ragAssignmentType === "coding" ? generatedCodingTasks.length > 0 : generatedMcqs.length > 0;
+        if (!res.ok || !data.success || !hasValid) {
+          setRagError(data.error || data.message || `Generation failed (${res.status})`);
+          return;
+        }
+        chapterTitles = Array.isArray(data.chapter_titles) ? data.chapter_titles : [];
+        meta = data.meta || {};
       }
 
-      const chapterTitles = Array.isArray(data.chapter_titles) ? data.chapter_titles : [];
-      const title = `MCQ quiz — ${chapterTitles.slice(0, 2).join(", ")}${
-        chapterTitles.length > 2 ? ` +${chapterTitles.length - 2}` : ""
-      }`;
+      const titleBase = chapterTitles.slice(0, 2).join(", ");
+      const titleSuffix = chapterTitles.length > 2 ? ` +${chapterTitles.length - 2}` : "";
+      const title =
+        ragAssignmentType === "coding"
+          ? `Coding assignment — ${titleBase || "Java"}${titleSuffix}`
+          : `MCQ quiz — ${titleBase}${titleSuffix}`;
 
-      const createRes = await request(`/api/classes/${ragTargetClassId}/assignments`, {
-        method: "POST",
+      const endpoint = editingAssignment
+        ? `/api/classes/${ragTargetClassId}/assignments/${editingAssignment.id}`
+        : `/api/classes/${ragTargetClassId}/assignments`;
+      const createRes = await request(endpoint, {
+        method: editingAssignment ? "PATCH" : "POST",
         headers: { Authorization: `Bearer ${user.token}` },
         body: {
           title,
@@ -286,9 +368,11 @@ export default function Assignments() {
           difficulty: ragDifficulty,
           chapterIds: selectedChapterIds,
           topics: chapterTitles.length ? chapterTitles : selectedChapterIds.map(String),
-          mcqs: data.mcqs,
-          ragMeta: data.meta,
-          points: data.mcqs.length,
+          assignmentType: ragAssignmentType,
+          mcqs: ragAssignmentType === "mcq" ? generatedMcqs : [],
+          codingTasks: ragAssignmentType === "coding" ? generatedCodingTasks : [],
+          ragMeta: meta,
+          points: ragAssignmentType === "coding" ? generatedCodingTasks.length * 10 : generatedMcqs.length,
         },
       });
 
@@ -302,11 +386,38 @@ export default function Assignments() {
       setSelectedChapterIds([]);
       setAssignmentDeadline("");
       setNumMcqs(5);
+      setNumCodingTasks(3);
+      setCodingInstructions("");
+      setCodingCreationMode("ai");
+      setManualCodingTasks([]);
+      setEditingAssignment(null);
     } catch (err) {
       setRagError(err.message || "Request failed");
     } finally {
       setRagGenerating(false);
     }
+  };
+
+  const editAssignment = (assignment) => {
+    setEditingAssignment(assignment);
+    setRagTargetClassId(assignment.classId || "");
+    setSelectedChapterIds(Array.isArray(assignment.chapterIds) ? assignment.chapterIds : []);
+    setRagDifficulty(assignment.difficulty || "M");
+    setRagAssignmentType(assignment.assignmentType || "mcq");
+    setNumMcqs(Math.max(1, assignment.mcqs?.length || 5));
+    setNumCodingTasks(Math.max(1, assignment.codingTasks?.length || 3));
+    setAssignmentDeadline(assignment.deadline || "");
+    const isManual = assignment.assignmentType === "coding" && assignment.ragMeta?.source === "manual-instructor";
+    setCodingCreationMode(isManual ? "manual" : "ai");
+    setManualCodingTasks(
+      (assignment.codingTasks || []).map((t, idx) => ({
+        id: String(idx + 1),
+        problemStatement: t.problemStatement || "",
+        inputFormat: t.inputFormat || "",
+        outputFormat: t.outputFormat || "",
+      }))
+    );
+    setIsModalOpen(true);
   };
 
   const pushAssignmentToClass = async (assignment) => {
@@ -481,6 +592,7 @@ export default function Assignments() {
                     ? Math.round((assignment.submissions / assignment.total) * 100)
                     : 0;
                 const mcqCount = assignment.mcqs?.length ?? 0;
+                const codingCount = assignment.codingTasks?.length ?? 0;
                 const expanded = expandedAssignmentId === assignment.id;
 
                 return (
@@ -516,9 +628,15 @@ export default function Assignments() {
                                 <Calendar className="w-4 h-4 shrink-0" />
                                 Due: {new Date(assignment.deadline).toLocaleDateString()}
                               </span>
-                              {mcqCount > 0 && (
+                              {assignment.assignmentType === "mcq" && mcqCount > 0 && (
                                 <span className="text-[#fdfdff]/45">
                                   {mcqCount} MCQ{mcqCount !== 1 ? "s" : ""}
+                                  {assignment.difficulty ? ` · ${assignment.difficulty}` : ""}
+                                </span>
+                              )}
+                              {assignment.assignmentType === "coding" && codingCount > 0 && (
+                                <span className="text-[#fdfdff]/45">
+                                  {codingCount} Coding task{codingCount !== 1 ? "s" : ""}
                                   {assignment.difficulty ? ` · ${assignment.difficulty}` : ""}
                                 </span>
                               )}
@@ -537,16 +655,23 @@ export default function Assignments() {
                           </div>
                         </div>
 
-                        {mcqCount > 0 && (
+                        {(assignment.assignmentType === "mcq" && mcqCount > 0) ||
+                        (assignment.assignmentType === "coding" && codingCount > 0) ? (
                           <button
                             type="button"
                             onClick={() => setExpandedAssignmentId(expanded ? null : assignment.id)}
                             className="flex items-center gap-2 text-sm text-purple-300 hover:text-purple-200 mb-2"
                           >
                             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            {expanded ? "Hide questions" : "Preview questions"}
+                            {expanded
+                              ? assignment.assignmentType === "coding"
+                                ? "Hide tasks"
+                                : "Hide questions"
+                              : assignment.assignmentType === "coding"
+                                ? "Preview tasks"
+                                : "Preview questions"}
                           </button>
-                        )}
+                        ) : null}
 
                         {expanded && assignment.mcqs?.length > 0 && (
                           <ol className="space-y-4 border-l border-purple-500/20 ml-2 pl-4 mb-3">
@@ -567,6 +692,29 @@ export default function Assignments() {
                               </li>
                             ))}
                           </ol>
+                        )}
+                        {expanded && assignment.assignmentType === "coding" && assignment.codingTasks?.length > 0 && (
+                          <ol className="space-y-4 border-l border-blue-500/20 ml-2 pl-4 mb-3">
+                            {assignment.codingTasks.map((task, ti) => (
+                              <li key={task.id || ti} className="text-sm text-[#fdfdff]/85">
+                                <p className="font-medium text-[#fdfdff] mb-2">
+                                  {ti + 1}. {task.problemStatement}
+                                </p>
+                                <p className="text-xs text-[#fdfdff]/60">
+                                  Input: {task.inputFormat || "—"} | Output: {task.outputFormat || "—"}
+                                </p>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                        {expanded && isDraft && (
+                          <button
+                            type="button"
+                            onClick={() => editAssignment(assignment)}
+                            className="text-xs px-3 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-200"
+                          >
+                            Edit
+                          </button>
                         )}
 
                         {!isCompleted && !isDraft && assignment.total > 0 && (
@@ -651,9 +799,9 @@ export default function Assignments() {
           <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 rounded-2xl bg-[#0A1428] border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-[#fdfdff]">Generate MCQ assignment</h2>
+                <h2 className="text-2xl font-bold text-[#fdfdff]">Generate assignment</h2>
                 <p className="text-sm text-[#fdfdff]/50 mt-1">
-                  RAG: <code className="text-purple-300/90">{RAG_API_BASE}</code>
+                  Create MCQ or coding assignments for your class.
                 </p>
               </div>
               <button
@@ -721,6 +869,17 @@ export default function Assignments() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
+                  <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Assignment Type</label>
+                  <select
+                    value={ragAssignmentType}
+                    onChange={(e) => setRagAssignmentType(e.target.value)}
+                    className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff]"
+                  >
+                    <option value="mcq" className="bg-[#0A1428]">MCQ</option>
+                    <option value="coding" className="bg-[#0A1428]">Coding Tasks</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Difficulty</label>
                   <select
                     value={ragDifficulty}
@@ -738,18 +897,104 @@ export default function Assignments() {
                     </option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Number of MCQs</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={numMcqs}
-                    onChange={(e) => setNumMcqs(e.target.value)}
-                    className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff] font-[JetBrains_Mono]"
-                  />
-                </div>
               </div>
+
+              {ragAssignmentType === "mcq" ? (
+                <div className="space-y-4 border border-purple-500/20 rounded-xl p-4">
+                  <p className="text-sm text-purple-200 font-medium">MCQ Assignment Form</p>
+                  <div>
+                    <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Number of MCQs</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={50}
+                      value={numMcqs}
+                      onChange={(e) => setNumMcqs(e.target.value)}
+                      className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff] font-[JetBrains_Mono]"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4 border border-blue-500/20 rounded-xl p-4">
+                  <p className="text-sm text-blue-200 font-medium">Coding Assignment Form</p>
+                  <div>
+                    <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Creation Mode</label>
+                    <select
+                      value={codingCreationMode}
+                      onChange={(e) => setCodingCreationMode(e.target.value)}
+                      className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff]"
+                    >
+                      <option value="ai" className="bg-[#0A1428]">Generate with AI</option>
+                      <option value="manual" className="bg-[#0A1428]">Manual Assignment</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Number of Coding Tasks</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={numCodingTasks}
+                      onChange={(e) => {
+                        setNumCodingTasks(e.target.value);
+                        ensureManualTasks(e.target.value);
+                      }}
+                      className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff] font-[JetBrains_Mono]"
+                    />
+                  </div>
+                  {codingCreationMode === "ai" ? (
+                    <div>
+                      <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Instructions</label>
+                      <textarea
+                        value={codingInstructions}
+                        onChange={(e) => setCodingInstructions(e.target.value)}
+                        rows={3}
+                        className="w-full px-4 py-3 bg-purple-500/10 border border-purple-500/30 rounded-xl text-[#fdfdff]"
+                        placeholder="Optional constraints for AI generation"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {manualCodingTasks.map((task, idx) => (
+                        <div key={idx} className="p-3 rounded-lg border border-white/10 bg-black/20 space-y-2">
+                          <p className="text-xs text-[#fdfdff]/60">Task {idx + 1}</p>
+                          <textarea
+                            rows={3}
+                            placeholder="Problem statement"
+                            value={task.problemStatement}
+                            onChange={(e) =>
+                              setManualCodingTasks((prev) =>
+                                prev.map((x, i) => (i === idx ? { ...x, problemStatement: e.target.value } : x))
+                              )
+                            }
+                            className="w-full px-3 py-2 rounded-lg bg-[#0b0d11] border border-white/10 text-[#fdfdff]"
+                          />
+                          <input
+                            placeholder="Input format (optional)"
+                            value={task.inputFormat}
+                            onChange={(e) =>
+                              setManualCodingTasks((prev) =>
+                                prev.map((x, i) => (i === idx ? { ...x, inputFormat: e.target.value } : x))
+                              )
+                            }
+                            className="w-full px-3 py-2 rounded-lg bg-[#0b0d11] border border-white/10 text-[#fdfdff]"
+                          />
+                          <input
+                            placeholder="Output format (optional)"
+                            value={task.outputFormat}
+                            onChange={(e) =>
+                              setManualCodingTasks((prev) =>
+                                prev.map((x, i) => (i === idx ? { ...x, outputFormat: e.target.value } : x))
+                              )
+                            }
+                            className="w-full px-3 py-2 rounded-lg bg-[#0b0d11] border border-white/10 text-[#fdfdff]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-[#fdfdff]/80 mb-2">Due date (optional)</label>
@@ -784,7 +1029,7 @@ export default function Assignments() {
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5" />
-                      Generate
+                      {editingAssignment ? "Save Changes" : `Generate ${ragAssignmentType === "coding" ? "Coding Tasks" : "MCQs"}`}
                     </>
                   )}
                 </button>
@@ -794,6 +1039,7 @@ export default function Assignments() {
                   onClick={() => {
                     setIsModalOpen(false);
                     setRagError(null);
+                    setEditingAssignment(null);
                   }}
                   className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 text-[#fdfdff]/70 rounded-xl"
                 >
@@ -864,6 +1110,12 @@ export default function Assignments() {
                     <p className="text-2xl font-bold text-blue-300">{reportData.summary?.avgPercentage ?? 0}%</p>
                   </div>
                 </div>
+                {reportData.summary?.coding && (
+                  <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-xs text-indigo-200">
+                    Coding analytics: avg tests passed {reportData.summary.coding.averageTestCasesPassedPercent ?? 0}% · avg attempts{" "}
+                    {reportData.summary.coding.averageAttempts ?? 0}
+                  </div>
+                )}
 
                 {Array.isArray(reportData.submissions) && reportData.submissions.length > 0 ? (
                   <div className="space-y-3">
@@ -892,6 +1144,16 @@ export default function Assignments() {
                               </li>
                             ))}
                           </ul>
+                        )}
+                        {Array.isArray(sub.codingSubmissions) && sub.codingSubmissions.length > 0 && (
+                          <div className="mt-2 text-xs text-[#fdfdff]/75 border-t border-white/10 pt-2 space-y-1">
+                            <p className="text-[#fdfdff]/55">Coding analytics</p>
+                            {sub.codingSubmissions.map((cs) => (
+                              <p key={`${sub.id}-${cs.taskId}`}>
+                                Task {cs.taskId}: {cs.testCasesPassed}/{cs.totalTestCases} tests · attempts {sub.attemptCount || 1}
+                              </p>
+                            ))}
+                          </div>
                         )}
                       </div>
                     ))}

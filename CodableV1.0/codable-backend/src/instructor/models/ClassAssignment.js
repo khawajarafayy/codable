@@ -20,6 +20,27 @@ const mcqSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const codingTestCaseSchema = new mongoose.Schema(
+  {
+    input: { type: String, default: "" },
+    output: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const codingTaskSchema = new mongoose.Schema(
+  {
+    id: { type: String, default: "" },
+    problemStatement: { type: String, required: true },
+    inputFormat: { type: String, default: "" },
+    outputFormat: { type: String, default: "" },
+    sampleTestCases: { type: [codingTestCaseSchema], default: [] },
+    hiddenTestCases: { type: [codingTestCaseSchema], default: [] },
+    expectedConcepts: { type: [String], default: [] },
+  },
+  { _id: false }
+);
+
 const classAssignmentSchema = new mongoose.Schema(
   {
     classId: {
@@ -46,7 +67,9 @@ const classAssignmentSchema = new mongoose.Schema(
     difficulty: { type: String, enum: ["L", "M", "H"], default: "M" },
     chapterIds: [{ type: Number }],
     topics: [{ type: String }],
+    assignmentType: { type: String, enum: ["mcq", "coding"], default: "mcq" },
     mcqs: { type: [mcqSchema], default: [] },
+    codingTasks: { type: [codingTaskSchema], default: [] },
     points: { type: Number, default: 0 },
     ragMeta: { type: mongoose.Schema.Types.Mixed, default: null },
   },
@@ -54,8 +77,12 @@ const classAssignmentSchema = new mongoose.Schema(
 );
 
 classAssignmentSchema.pre("save", function () {
-  if (this.mcqs?.length && (!this.points || this.points === 0)) {
-    this.points = this.mcqs.length;
+  if (!this.points || this.points === 0) {
+    if (this.assignmentType === "coding" && this.codingTasks?.length) {
+      this.points = this.codingTasks.length * 10;
+    } else if (this.mcqs?.length) {
+      this.points = this.mcqs.length;
+    }
   }
 });
 

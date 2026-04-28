@@ -108,6 +108,21 @@ export const api = {
             credentials: 'omit'
         });
     },
+
+    // Admin APIs
+    adminLogin: (email, password) => request('/api/admin/login', { method: 'POST', body: { email, password } }),
+    getAdminMetrics: () => {
+        const token = localStorage.getItem('token');
+        return request('/api/admin/metrics', { method: 'GET', headers: { 'Authorization': `Bearer ${token}` } });
+    },
+    getAdminStudents: () => {
+        const token = localStorage.getItem('token');
+        return request('/api/admin/students', { method: 'GET', headers: { 'Authorization': `Bearer ${token}` } });
+    },
+    getAdminInstructors: () => {
+        const token = localStorage.getItem('token');
+        return request('/api/admin/instructors', { method: 'GET', headers: { 'Authorization': `Bearer ${token}` } });
+    },
     
     createStudentProfile: (profileData) => {
         const token = localStorage.getItem('token');

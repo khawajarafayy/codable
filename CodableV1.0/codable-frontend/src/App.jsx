@@ -24,6 +24,11 @@ import ClassDetail from "./pages/Mentor/MentorLandingDB/components/ClassDetail";
 import Assignments from "./pages/Mentor/MentorLandingDB/components/Assignments";
 import Reports from "./pages/Mentor/MentorLandingDB/components/Reports";
 import InstructorProfile from "./pages/Mentor/MentorLandingDB/components/InstructorProfile";
+import AdminRoot from "./pages/Admin/AdminRoot";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminStudents from "./pages/Admin/AdminStudents";
+import AdminInstructors from "./pages/Admin/AdminInstructors";
+import AdminLogin from "./pages/Admin/AdminLogin";
 
 // Root route component - Role selection before login
 const RootRoute = () => {
@@ -117,6 +122,7 @@ function AppRoutes() {
 
       {/* Auth Routes - Public */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/codable-admin/login" element={<AdminLogin />} />
       <Route path="/signup" element={<SignupPage />} />
 
       {/* Student Routes - STUDENT ONLY */}
@@ -203,6 +209,18 @@ function AppRoutes() {
         <Route path="classes/:classId" element={<ClassDetail />} />
         <Route path="assignments" element={<Assignments />} />
         <Route path="reports" element={<Reports />} />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route path="/codable-admin" element={
+        <RoleProtectedRoute allowedRoles={["admin"]}>
+          <AdminRoot />
+        </RoleProtectedRoute>
+      }>
+        <Route index element={<AdminDashboard />} />
+        <Route path="" element={<AdminDashboard />} />
+        <Route path="students" element={<AdminStudents />} />
+        <Route path="instructors" element={<AdminInstructors />} />
       </Route>
 
       {/* Backward Compatibility Route */}

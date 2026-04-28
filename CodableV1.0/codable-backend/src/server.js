@@ -14,6 +14,7 @@ import learningRoute from "./routes/learningRoute.js";
 import progressRoute from "./routes/progressRoute.js";
 import classRoutes from "./routes/classRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import { startWebSocketServer } from "./websocket/codeRunner.js";
 import { initializeChatSocket } from "./websocket/chatSocket.js";
@@ -73,6 +74,7 @@ app.use("/api/learning", learningRoute);
 app.use("/api/progress", progressRoute);
 app.use("/api/classes", classRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/admin", adminRoutes);
 // ------------------------
 // ERROR HANDLING
 // ------------------------

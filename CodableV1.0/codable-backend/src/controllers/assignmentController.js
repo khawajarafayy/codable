@@ -717,7 +717,7 @@ export const listPublishedAssignmentsForStudent = async (req, res) => {
           assignmentId: { $in: assignmentIds },
           studentId: new mongoose.Types.ObjectId(studentId),
         })
-          .select("assignmentId score totalQuestions percentage submittedAt")
+          .select("assignmentId score totalQuestions percentage submittedAt status")
           .lean()
       : [];
     const submissionByAssignmentId = Object.fromEntries(
@@ -726,13 +726,16 @@ export const listPublishedAssignmentsForStudent = async (req, res) => {
 
     const safeRows = rows.map((row) => {
       const submission = submissionByAssignmentId[String(row._id)];
+      const isAccepted = submission?.status === "accepted";
       return {
         ...row,
         assignmentType: row.assignmentType || "mcq",
         mcqs: row.assignmentType === "mcq" ? sanitizeMcqsForStudent(row.mcqs) : [],
         codingTasks: row.assignmentType === "coding" ? sanitizeCodingTasksForStudent(row.codingTasks) : [],
         hasSubmitted: Boolean(submission),
-        submissionSummary: submission
+        reportStatus: submission?.status || null,
+        marksPublished: Boolean(isAccepted),
+        submissionSummary: isAccepted
           ? {
               score: submission.score,
               totalQuestions: submission.totalQuestions,
@@ -782,8 +785,9 @@ export const getPublishedAssignmentForStudent = async (req, res) => {
       assignmentId: assignment._id,
       studentId: new mongoose.Types.ObjectId(studentId),
     })
-      .select("score totalQuestions percentage submittedAt")
+      .select("score totalQuestions percentage submittedAt status")
       .lean();
+    const isAccepted = submission?.status === "accepted";
 
     return res.status(200).json({
       success: true,
@@ -793,7 +797,16 @@ export const getPublishedAssignmentForStudent = async (req, res) => {
         mcqs: assignment.assignmentType === "mcq" ? sanitizeMcqsForStudent(assignment.mcqs) : [],
         codingTasks: assignment.assignmentType === "coding" ? sanitizeCodingTasksForStudent(assignment.codingTasks) : [],
         hasSubmitted: Boolean(submission),
-        submissionSummary: submission || null,
+        reportStatus: submission?.status || null,
+        marksPublished: Boolean(isAccepted),
+        submissionSummary: isAccepted
+          ? {
+              score: submission.score,
+              totalQuestions: submission.totalQuestions,
+              percentage: submission.percentage,
+              submittedAt: submission.submittedAt,
+            }
+          : null,
       },
     });
   } catch (error) {
@@ -1172,6 +1185,20 @@ export const acceptSubmission = async (req, res) => {
 
     submission.status = "accepted";
     await submission.save();
+
+    broadcastToUser(String(submission.studentId), {
+      type: "assignment_report_accepted",
+      data: {
+        classId: String(classId),
+        assignmentId: String(assignmentId),
+        submissionId: String(submission._id),
+        score: submission.score,
+        totalQuestions: submission.totalQuestions,
+        percentage: submission.percentage,
+        submittedAt: submission.submittedAt,
+        status: submission.status,
+      },
+    });
 
     return res.status(200).json({ success: true, data: submission });
   } catch (error) {

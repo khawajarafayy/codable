@@ -1344,7 +1344,7 @@ export default function Assignments() {
                                     onClick={() => acceptSubmission(sub.id)}
                                     className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded"
                                   >
-                                    <CheckCircle2 className="w-3 h-3" /> Accept Report
+                                    <CheckCircle2 className="w-3 h-3" /> Accept and Push
                                   </button>
                                 )}
                               </div>
@@ -1422,7 +1422,7 @@ export default function Assignments() {
                   className="px-4 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 flex items-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  Accept Report
+                  Accept and Push
                 </button>
               )}
             </div>

@@ -35,6 +35,8 @@ function mapStudentAssignment(row) {
     mcqCount: Array.isArray(row.mcqs) ? row.mcqs.length : 0,
     codingCount: Array.isArray(row.codingTasks) ? row.codingTasks.length : 0,
     hasSubmitted: Boolean(row.hasSubmitted),
+    reportStatus: row.reportStatus || null,
+    marksPublished: Boolean(row.marksPublished),
     submissionSummary: row.submissionSummary || null,
   };
 }
@@ -56,6 +58,71 @@ export default function ClassroomDetails() {
   const [submitting, setSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState(null);
   const [activeTab, setActiveTab] = useState("assignments"); // "assignments" or "chat"
+  const [assignmentFilter, setAssignmentFilter] = useState("all");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return undefined;
+
+    const apiBase = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
+    const wsUrl = apiBase.replace(/^http/, "ws");
+    const ws = new WebSocket(`${wsUrl}/ws/notifications?token=${encodeURIComponent(token)}`);
+
+    ws.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload?.type !== "assignment_report_accepted") return;
+        const data = payload.data || {};
+        if (String(data.classId) !== String(classId)) return;
+
+        setAssignments((prev) =>
+          prev.map((assignment) =>
+            String(assignment.id) === String(data.assignmentId)
+              ? {
+                  ...assignment,
+                  hasSubmitted: true,
+                  reportStatus: "accepted",
+                  marksPublished: true,
+                  submissionSummary: {
+                    score: data.score,
+                    totalQuestions: data.totalQuestions,
+                    percentage: data.percentage,
+                    submittedAt: data.submittedAt,
+                  },
+                }
+              : assignment
+          )
+        );
+
+        setAssignmentDetail((prev) =>
+          prev && String(prev._id || prev.id) === String(data.assignmentId)
+            ? {
+                ...prev,
+                hasSubmitted: true,
+                reportStatus: "accepted",
+                marksPublished: true,
+                submissionSummary: {
+                  score: data.score,
+                  totalQuestions: data.totalQuestions,
+                  percentage: data.percentage,
+                  submittedAt: data.submittedAt,
+                },
+              }
+            : prev
+        );
+      } catch {
+        // Ignore malformed websocket payloads
+      }
+    };
+
+    return () => {
+      try {
+        ws.close();
+      } catch {
+        // no-op
+      }
+    };
+  }, [classId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -218,12 +285,9 @@ export default function ClassroomDetails() {
           ? {
               ...prev,
               hasSubmitted: true,
-              submissionSummary: {
-                score: res.data.score,
-                totalQuestions: res.data.totalQuestions,
-                percentage: res.data.percentage,
-                submittedAt: res.data.submittedAt,
-              },
+              reportStatus: "pending",
+              marksPublished: false,
+              submissionSummary: null,
             }
           : prev
       );
@@ -233,12 +297,9 @@ export default function ClassroomDetails() {
             ? {
                 ...a,
                 hasSubmitted: true,
-                submissionSummary: {
-                  score: res.data.score,
-                  totalQuestions: res.data.totalQuestions,
-                  percentage: res.data.percentage,
-                  submittedAt: res.data.submittedAt,
-                },
+                reportStatus: "pending",
+                marksPublished: false,
+                submissionSummary: null,
               }
             : a
         )
@@ -282,6 +343,16 @@ export default function ClassroomDetails() {
   }
 
   const pendingCount = assignments.filter((a) => !a.hasSubmitted).length;
+  const completedUnmarkedCount = assignments.filter((a) => a.hasSubmitted && !a.marksPublished).length;
+  const markedCount = assignments.filter((a) => a.marksPublished).length;
+  const filteredAssignments =
+    assignmentFilter === "pending"
+      ? assignments.filter((a) => !a.hasSubmitted)
+      : assignmentFilter === "completed-unmarked"
+        ? assignments.filter((a) => a.hasSubmitted && !a.marksPublished)
+        : assignmentFilter === "marked"
+          ? assignments.filter((a) => a.marksPublished)
+          : assignments;
 
   const getInitials = () => {
     if (profile?.full_name) {
@@ -441,11 +512,30 @@ export default function ClassroomDetails() {
         {/* Assignments Tab */}
         {activeTab === "assignments" && (
           <div className="pt-4">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <Target className="w-6 h-6 text-amber-500" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <Target className="w-6 h-6 text-amber-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">Course Assignments</h2>
             </div>
-            <h2 className="text-2xl font-bold text-white">Course Assignments</h2>
+            <div className="flex flex-col gap-2 min-w-[260px]">
+              <label className="text-xs uppercase tracking-wide text-gray-400 font-semibold">
+                Assignment Status
+              </label>
+              <select
+                value={assignmentFilter}
+                onChange={(e) => setAssignmentFilter(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/15 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500/50"
+              >
+                <option value="all" className="bg-[#0A0A10]">All Assignments ({assignments.length})</option>
+                <option value="pending" className="bg-[#0A0A10]">Pending Assignments ({pendingCount})</option>
+                <option value="completed-unmarked" className="bg-[#0A0A10]">
+                  Completed but not marked ({completedUnmarkedCount})
+                </option>
+                <option value="marked" className="bg-[#0A0A10]">Marked Assignments ({markedCount})</option>
+              </select>
+            </div>
           </div>
 
           {assignments.length === 0 ? (
@@ -458,9 +548,10 @@ export default function ClassroomDetails() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {assignments.map((assignment, index) => {
+              {filteredAssignments.map((assignment, index) => {
                 const overdue = isOverdue(assignment.deadline);
                 const isCompleted = assignment.hasSubmitted;
+                const isMarked = assignment.marksPublished;
                 
                 return (
                   <button
@@ -468,16 +559,18 @@ export default function ClassroomDetails() {
                     key={assignment.id}
                     onClick={() => openAssignment(assignment.id)}
                     className={`group text-left p-1 rounded-3xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-4 hover:-translate-y-1 shadow-xl relative overflow-hidden ${
-                      isCompleted 
-                        ? 'bg-gradient-to-b from-emerald-500/20 to-transparent hover:from-emerald-500/40 hover:shadow-emerald-500/20' 
-                        : 'bg-gradient-to-b from-amber-500/20 to-transparent hover:from-amber-500/40 hover:shadow-amber-500/20'
+                      isMarked
+                        ? 'bg-gradient-to-b from-emerald-500/20 to-transparent hover:from-emerald-500/40 hover:shadow-emerald-500/20'
+                        : isCompleted
+                          ? 'bg-gradient-to-b from-blue-500/20 to-transparent hover:from-blue-500/40 hover:shadow-blue-500/20'
+                          : 'bg-gradient-to-b from-amber-500/20 to-transparent hover:from-amber-500/40 hover:shadow-amber-500/20'
                     }`}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="h-full bg-[#0A0A10] p-6 sm:p-8 rounded-[22px] border border-white/5 relative z-10 flex flex-col">
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex-1">
-                          <h3 className={`text-xl font-bold mb-2 group-hover:text-white transition-colors ${isCompleted ? 'text-emerald-50' : 'text-amber-50'}`}>
+                          <h3 className={`text-xl font-bold mb-2 group-hover:text-white transition-colors ${isMarked ? 'text-emerald-50' : isCompleted ? 'text-blue-50' : 'text-amber-50'}`}>
                             {assignment.title}
                           </h3>
                           {assignment.description && (
@@ -485,12 +578,14 @@ export default function ClassroomDetails() {
                           )}
                         </div>
                         <span className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border ${
-                            isCompleted
+                            isMarked
                               ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                              : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                              : isCompleted
+                                ? "bg-blue-500/10 text-blue-300 border-blue-500/30"
+                                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
                           }`}
                         >
-                          {isCompleted ? "Completed" : "Pending"}
+                          {isMarked ? "Marked" : isCompleted ? "Completed · Not Marked" : "Pending"}
                         </span>
                       </div>
 
@@ -527,12 +622,31 @@ export default function ClassroomDetails() {
                           </p>
                         </div>
                       )}
+                      {isMarked && assignment.submissionSummary && (
+                        <div className="mt-4 pt-4 border-t border-emerald-500/20">
+                          <p className="text-sm text-emerald-300 font-semibold">
+                            Marks: {assignment.submissionSummary.score}/{assignment.submissionSummary.totalQuestions} ({assignment.submissionSummary.percentage}%)
+                          </p>
+                        </div>
+                      )}
+                      {isCompleted && !isMarked && (
+                        <div className="mt-4 pt-4 border-t border-blue-500/20">
+                          <p className="text-sm text-blue-300/90 font-medium">
+                            Submitted. Waiting for instructor to mark.
+                          </p>
+                        </div>
+                      )}
                       
                       <div className="absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full transition-colors pointer-events-none -z-10 group-hover:opacity-50 opacity-20 bg-blue-500" />
                     </div>
                   </button>
                 );
               })}
+            </div>
+          )}
+          {assignments.length > 0 && filteredAssignments.length === 0 && (
+            <div className="p-10 rounded-3xl bg-white/[0.02] border border-white/5 border-dashed text-center">
+              <p className="text-gray-400">No assignments found for this filter.</p>
             </div>
           )}
         </div>
@@ -599,13 +713,13 @@ export default function ClassroomDetails() {
                           : `Questions: ${assignmentDetail.mcqs?.length || 0}`}
                       </span>
                     </div>
-                    {(submitResult || assignmentDetail.submissionSummary) && (assignmentDetail.assignmentType || "mcq") === "mcq" && (
+                    {assignmentDetail.submissionSummary && (assignmentDetail.assignmentType || "mcq") === "mcq" && (
                       <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         <span className="text-sm font-bold text-emerald-400">
-                          Score: {(submitResult?.score ?? assignmentDetail.submissionSummary?.score) ?? "0"}/
-                          {(submitResult?.totalQuestions ?? assignmentDetail.submissionSummary?.totalQuestions) ?? "0"} 
-                          ({(submitResult?.percentage ?? assignmentDetail.submissionSummary?.percentage) ?? "0"}%)
+                          Score: {assignmentDetail.submissionSummary?.score ?? "0"}/
+                          {assignmentDetail.submissionSummary?.totalQuestions ?? "0"} 
+                          ({assignmentDetail.submissionSummary?.percentage ?? "0"}%)
                         </span>
                       </div>
                     )}
@@ -644,15 +758,20 @@ export default function ClassroomDetails() {
                           <p className="text-gray-400 mb-6">
                             Submitted on {new Date(submitResult?.submittedAt || assignmentDetail.submissionSummary?.submittedAt || Date.now()).toLocaleString()}
                           </p>
-                          {(submitResult?.score != null || assignmentDetail.submissionSummary?.score != null) && (
+                          {(assignmentDetail.submissionSummary?.score != null) && (
                             <div className="inline-block px-8 py-4 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl">
                               <p className="text-emerald-400 font-extrabold text-2xl">
-                                Score: {submitResult?.score ?? assignmentDetail.submissionSummary?.score} / {submitResult?.totalQuestions ?? assignmentDetail.submissionSummary?.totalQuestions}
+                                Score: {assignmentDetail.submissionSummary?.score} / {assignmentDetail.submissionSummary?.totalQuestions}
                               </p>
                               <p className="text-emerald-300/80 font-semibold mt-1">
-                                {submitResult?.percentage ?? assignmentDetail.submissionSummary?.percentage}% Accuracy
+                                {assignmentDetail.submissionSummary?.percentage}% Accuracy
                               </p>
                             </div>
+                          )}
+                          {!assignmentDetail.submissionSummary && (
+                            <p className="text-amber-300/90 font-medium">
+                              Report submitted. Waiting for instructor approval to publish marks.
+                            </p>
                           )}
                         </div>
                       ) : (

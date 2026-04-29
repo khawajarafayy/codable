@@ -114,6 +114,23 @@ const learningApi = {
   },
 
   /**
+   * Chapter end practice: server runs test cases + quality/logic on submit only.
+   */
+  submitChapterPractice: async (code, question, clientMetrics = {}) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/learning/practice-chapter-submit`, {
+        code,
+        question,
+        clientMetrics,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error submitting chapter practice:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Compare two outputs using embedding-based similarity
    * Quick check without full validation - useful for testing
    * 

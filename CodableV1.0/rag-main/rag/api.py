@@ -2634,6 +2634,7 @@ def get_chapter_practice_questions(chapter_id):
         questions = load_chapter_practice_questions(chapter_id)
         
         if questions and len(questions) > 0:
+            questions = [_normalize_chapter_practice_question(q) for q in questions]
             return jsonify({
                 'success': True,
                 'chapter_id': chapter_id,
@@ -2656,7 +2657,9 @@ def get_chapter_practice_questions(chapter_id):
             difficulty=difficulty,
             num_questions=num_questions
         )
-        
+        if isinstance(questions, list):
+            questions = [_normalize_chapter_practice_question(q) for q in questions]
+
         return jsonify({
             'success': True,
             'chapter_id': chapter_id,
@@ -2671,6 +2674,33 @@ def get_chapter_practice_questions(chapter_id):
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def _normalize_chapter_practice_question(q):
+    """Ensure test case shape and taskType for backend evaluation (submit-only grading)."""
+    if not isinstance(q, dict):
+        return q
+    for key in ('testCases', 'hiddenTestCases'):
+        arr = q.get(key) or []
+        if not isinstance(arr, list):
+            continue
+        for tc in arr:
+            if not isinstance(tc, dict):
+                continue
+            if 'output' not in tc and 'expectedOutput' in tc:
+                tc['output'] = tc.get('expectedOutput') or ''
+            if 'input' not in tc:
+                tc['input'] = ''
+            tc['input'] = str(tc.get('input', ''))
+            tc['output'] = str(tc.get('output', '') or tc.get('expectedOutput', '') or '')
+    if not q.get('taskType'):
+        all_tc = (q.get('testCases') or []) + (q.get('hiddenTestCases') or [])
+        has_stdin = any(str(t.get('input', '')).strip() for t in all_tc if isinstance(t, dict))
+        if len(all_tc) >= 2 or has_stdin:
+            q['taskType'] = 'input-output'
+        else:
+            q['taskType'] = 'logic-based'
+    return q
 
 
 def generate_chapter_practice_questions(chapter_id, chapter_title, topics, difficulty, num_questions):
@@ -2695,7 +2725,7 @@ def generate_chapter_practice_questions(chapter_id, chapter_title, topics, diffi
     relevant_content = get_relevant_context(f"{chapter_title} {keywords_str}", k=5)
     book_context = '\n\n'.join(relevant_content) if relevant_content else ''
     
-    prompt_template = """You are an expert Java instructor creating chapter practice questions.
+    prompt_template = """You are an expert Java instructor creating chapter-end practice tasks.
 
 CHAPTER: {chapter_title}
 TOPICS COVERED:
@@ -2707,31 +2737,44 @@ DIFFICULTY: {difficulty}
 RELEVANT CONTENT:
 {book_context}
 
-Generate exactly {num_questions} Java coding practice questions as a JSON array. Each question should test different concepts from the chapter.
+Generate exactly {num_questions} Java tasks as a JSON array. Each item MUST include:
 
+- "taskType": either "input-output" OR "logic-based"
+  * Use "input-output" when the program reads stdin (Scanner) and prints deterministic results for given inputs (numbers, fixed strings, NOT the learner's personal name).
+  * Use "logic-based" for OOP/patterns/display tasks where automated I/O checks are not appropriate.
+
+For EVERY "input-output" task you MUST provide:
+- "testCases": array of at least 3 public sample cases: {{"input": "...", "output": "..."}} (use field name "output", not "expectedOutput")
+- "hiddenTestCases": array of at least 2 extra cases with the SAME shape (these are only used server-side on submit; do NOT repeat secrets from description text)
+- Inputs MUST be concrete (e.g. integers / fixed tokens). NEVER require output that embeds the student's real name or other user-specific free text.
+
+For "logic-based" tasks:
+- "testCases" and "hiddenTestCases" may be empty arrays
+- "description" must spell out what to implement; grading uses structure/logic heuristics.
+
+Also include: "examples" (1-2 sample I/O or behavior), "hints", "starterCode" (class name Solution, public static void main),
+"solutionKeywords", "mustContain", "mustNotContain", "constraints".
+
+JSON shape example:
 [
   {{
     "id": 1,
-    "title": "Clear descriptive title",
-    "topic": "Topic this tests",
+    "title": "...",
+    "topic": "...",
     "difficulty": "{difficulty}",
-    "description": "Detailed description of what to code",
-    "constraints": ["constraint 1", "constraint 2"],
-    "examples": [{{"input": "example", "output": "expected output"}}],
-    "hints": ["helpful hint 1", "helpful hint 2"],
-    "starterCode": "public class Solution {{\\n    public static void main(String[] args) {{\\n        // Your code here\\n    }}\\n}}",
-    "expectedOutput": "Exact expected output",
-    "testCases": [{{"input": "", "expectedOutput": "output"}}],
-    "solutionKeywords": ["keyword"],
+    "taskType": "input-output",
+    "description": "...",
+    "constraints": [],
+    "examples": [{{"input": "2\\n3", "output": "5"}}],
+    "hints": [],
+    "starterCode": "public class Solution {{\\n  public static void main(String[] args) {{\\n  }}\\n}}",
+    "testCases": [{{"input": "1\\n2", "output": "3"}}],
+    "hiddenTestCases": [{{"input": "10\\n20", "output": "30"}}],
+    "solutionKeywords": [],
     "mustContain": ["public class"],
     "mustNotContain": []
   }}
 ]
-
-DIFFICULTY GUIDELINES:
-- Easy: Basic syntax, simple print statements, variable declarations
-- Medium: Conditionals, simple loops, basic calculations
-- Hard: Nested structures, complex logic, multiple concepts
 
 Return ONLY valid JSON array, no other text."""
     
@@ -2754,18 +2797,24 @@ Return ONLY valid JSON array, no other text."""
             response_text = response_text.split('```')[1]
             if response_text.startswith('json'):
                 response_text = response_text[4:]
-        return json.loads(response_text.strip())
+        parsed = json.loads(response_text.strip())
+        if isinstance(parsed, list):
+            return [_normalize_chapter_practice_question(q) for q in parsed]
+        return parsed
     except:
         import re
         json_match = re.search(r'\[[\s\S]*\]', response_text)
         if json_match:
             try:
-                return json.loads(json_match.group())
+                parsed = json.loads(json_match.group())
+                if isinstance(parsed, list):
+                    return [_normalize_chapter_practice_question(q) for q in parsed]
+                return parsed
             except:
                 pass
         
         # Fallback questions
-        return [{
+        fallback = [{
             "id": i + 1,
             "title": f"Practice: {topics[i % len(topics)]['title']}",
             "topic": topics[i % len(topics)]['title'],
@@ -2781,6 +2830,7 @@ Return ONLY valid JSON array, no other text."""
             "mustContain": ["public class"],
             "mustNotContain": []
         } for i in range(num_questions)]
+        return [_normalize_chapter_practice_question(q) for q in fallback]
 
 
 def compare_outputs(expected, actual):

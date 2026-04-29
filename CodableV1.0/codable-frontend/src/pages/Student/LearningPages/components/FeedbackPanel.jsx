@@ -27,6 +27,10 @@ export function FeedbackPanel({
   const score = validationResult?.score || metrics?.score || 0;
   const feedback = validationResult?.feedback || [];
   const suggestions = validationResult?.suggestions || [];
+  const testsTotal = validationResult?.testCasesTotal ?? metrics?.testCasesTotal ?? 0;
+  const testsPassed = validationResult?.testCasesPassed ?? metrics?.testCasesPassed ?? 0;
+  const taskType = validationResult?.taskType || metrics?.taskType;
+  const gradedByTests = testsTotal > 0;
 
   const getScoreColor = (score) => {
     if (score >= 80) return 'text-green-400';
@@ -114,10 +118,20 @@ export function FeedbackPanel({
         <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800">
           <div className="flex items-center gap-2 text-gray-400 mb-2">
             <Trophy className="w-4 h-4" />
-            <span className="text-sm">Output Match</span>
+            <span className="text-sm">{gradedByTests ? 'Tests passed' : 'Result'}</span>
           </div>
-          <div className={`text-xl font-semibold ${metrics?.outputMatches ? 'text-green-400' : 'text-red-400'}`}>
-            {metrics?.outputMatches ? 'Yes' : 'No'}
+          <div
+            className={`text-xl font-semibold ${
+              gradedByTests
+                ? testsPassed === testsTotal
+                  ? 'text-green-400'
+                  : 'text-yellow-400'
+                : isCorrect
+                  ? 'text-green-400'
+                  : 'text-red-400'
+            }`}
+          >
+            {gradedByTests ? `${testsPassed} / ${testsTotal}` : isCorrect ? 'Pass' : 'Review'}
           </div>
         </div>
       </div>
@@ -159,12 +173,73 @@ export function FeedbackPanel({
       )}
 
       {/* Code Analysis */}
+      {Array.isArray(validationResult?.testCaseResults) && validationResult.testCaseResults.length > 0 && (
+        <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800 mb-4">
+          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+            <FileText className="w-4 h-4 text-cyan-400" />
+            Test cases (submit)
+          </h3>
+          <ul className="space-y-2 text-sm text-gray-300 max-h-48 overflow-y-auto">
+            {validationResult.testCaseResults.map((t) => (
+              <li
+                key={t.index}
+                className={`p-2 rounded border ${
+                  t.passed ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-rose-500/40 bg-rose-500/10'
+                }`}
+              >
+                <span className="font-mono text-xs text-gray-400">Case {t.index + 1}</span>
+                {t.input ? (
+                  <pre className="text-xs mt-1 whitespace-pre-wrap">In: {t.input}</pre>
+                ) : null}
+                <pre className="text-xs mt-1 whitespace-pre-wrap text-gray-400">
+                  Expected: {String(t.expectedOutput || '').slice(0, 200)}
+                  {String(t.expectedOutput || '').length > 200 ? '…' : ''}
+                </pre>
+                <pre className="text-xs mt-1 whitespace-pre-wrap">
+                  Yours: {String(t.actualOutput || '').slice(0, 200)}
+                  {String(t.actualOutput || '').length > 200 ? '…' : ''}
+                </pre>
+                {t.error ? <p className="text-xs text-rose-300 mt-1">{t.error}</p> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {metrics?.codeAnalysis && (
         <div className="bg-[#0d0d1a] rounded-lg p-4 border border-gray-800 mb-4">
           <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
             <Code className="w-4 h-4 text-[#6C63FF]" />
             Code Analysis
           </h3>
+          {(metrics.codeAnalysis.quality || metrics.codeAnalysis.logic) && (
+            <div className="mb-4 text-sm text-gray-300 space-y-1">
+              {metrics.codeAnalysis.quality?.logic != null && (
+                <p>
+                  <span className="text-purple-300">Structure / logic: </span>
+                  {metrics.codeAnalysis.quality.logic}
+                </p>
+              )}
+              {metrics.codeAnalysis.quality?.quality != null && (
+                <p>
+                  <span className="text-purple-300">Quality: </span>
+                  {metrics.codeAnalysis.quality.quality}
+                </p>
+              )}
+              {metrics.codeAnalysis.quality?.structure != null && (
+                <p>
+                  <span className="text-purple-300">Structure: </span>
+                  {metrics.codeAnalysis.quality.structure}
+                </p>
+              )}
+              {metrics.codeAnalysis.logic?.logic != null && (
+                <p>
+                  <span className="text-purple-300">Prompt alignment: </span>
+                  {metrics.codeAnalysis.logic.logic}
+                </p>
+              )}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             {metrics.codeAnalysis.containsRequired?.length > 0 && (
               <div>
@@ -245,43 +320,26 @@ export function FeedbackPanel({
             Question: {question.title}
           </h3>
           <p className="text-gray-400 text-sm mb-4">{question.description}</p>
-          
-          {/* Output Comparison */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#1a1a2e] rounded-lg p-3 border border-gray-700">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-green-400 text-sm font-medium">Expected Output:</span>
-              </div>
-              <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-[#0a0a15] p-2 rounded">
-                {question.expectedOutput || 'No expected output specified'}
-              </pre>
+
+          {gradedByTests ? (
+            <p className="text-sm text-gray-400 mb-2">
+              Grading used <span className="text-cyan-300 font-medium">{testsTotal}</span> official test case
+              {testsTotal !== 1 ? 's' : ''} (normalized line output). Your Run console is not used for scoring.
+            </p>
+          ) : (
+            <p className="text-sm text-gray-400 mb-2">
+              This task is graded as <span className="text-cyan-300 font-medium">{taskType || 'logic-based'}</span> using
+              structure and logic heuristics (no single-string output match).
+            </p>
+          )}
+
+          <div className="bg-[#1a1a2e] rounded-lg p-3 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400 text-sm font-medium">Your last Run output (reference only)</span>
             </div>
-            <div className="bg-[#1a1a2e] rounded-lg p-3 border border-gray-700">
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-sm font-medium ${metrics?.outputMatches ? 'text-green-400' : 'text-red-400'}`}>
-                  Your Output:
-                </span>
-                {metrics?.outputMatches ? (
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-red-400" />
-                )}
-              </div>
-              <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-[#0a0a15] p-2 rounded">
-                {metrics?.output || 'No output'}
-              </pre>
-            </div>
-          </div>
-          
-          {/* Match Status */}
-          <div className={`mt-3 p-2 rounded text-sm text-center ${
-            metrics?.outputMatches 
-              ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-              : 'bg-red-500/20 text-red-400 border border-red-500/30'
-          }`}>
-            {metrics?.outputMatches 
-              ? '✓ Output matches expected result!' 
-              : '✗ Output does not match expected result'}
+            <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap bg-[#0a0a15] p-2 rounded max-h-40 overflow-y-auto">
+              {metrics?.output || '—'}
+            </pre>
           </div>
         </div>
       )}

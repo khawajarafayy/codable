@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import { compareOutputs, validateSolution } from '../utils/outputComparator.js';
+import { evaluateChapterPracticeSubmission } from '../utils/chapterPracticeEvaluator.js';
 
 const router = express.Router();
 const RAG_API_URL = process.env.RAG_API_URL || 'http://localhost:5001/api';
@@ -174,6 +175,80 @@ router.post('/validate-solution', async (req, res) => {
  * @body {object} question - The question object containing expectedOutput and validation rules
  * @body {number} [threshold=0.92] - Optional custom similarity threshold
  */
+/**
+ * Chapter end practice: grade on submit only — runs hidden/public test cases server-side,
+ * plus structure/logic/complexity heuristics. Run in editor does not hit this route.
+ */
+router.post('/practice-chapter-submit', async (req, res) => {
+  try {
+    const { code, question, clientMetrics = {} } = req.body;
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ success: false, error: 'code is required' });
+    }
+    if (!question || typeof question !== 'object') {
+      return res.status(400).json({ success: false, error: 'question is required' });
+    }
+
+    const evaluation = await evaluateChapterPracticeSubmission(code, question);
+
+    const metrics = {
+      solutionTime: Number(clientMetrics.solutionTime) || 0,
+      attempts: Number(clientMetrics.attempts) || 1,
+      syntaxErrors: Number(clientMetrics.syntaxErrors) || 0,
+      executionMetrics: clientMetrics.executionMetrics || null,
+      complexity: evaluation.complexity || clientMetrics.complexity || null,
+      output: clientMetrics.lastOutput || '',
+      outputMatches: Boolean(evaluation.isCorrect),
+      codeAnalysis: {
+        containsRequired: [],
+        missingRequired: [],
+        containsForbidden: [],
+        keywordsFound: [],
+        quality: evaluation.quality,
+        logic: evaluation.logic,
+      },
+      testCasesPassed: evaluation.testCasesPassed,
+      testCasesTotal: evaluation.testCasesTotal,
+      taskType: evaluation.taskType,
+    };
+
+    (question.mustContain || []).forEach((pattern) => {
+      if (code.toLowerCase().includes(String(pattern).toLowerCase())) {
+        metrics.codeAnalysis.containsRequired.push(pattern);
+      } else {
+        metrics.codeAnalysis.missingRequired.push(pattern);
+      }
+    });
+    (question.solutionKeywords || []).forEach((keyword) => {
+      if (code.toLowerCase().includes(String(keyword).toLowerCase())) {
+        metrics.codeAnalysis.keywordsFound.push(keyword);
+      }
+    });
+
+    return res.json({
+      success: true,
+      validation: {
+        isCorrect: evaluation.isCorrect,
+        score: evaluation.score,
+        feedback: evaluation.feedback,
+        suggestions: evaluation.suggestions,
+        testCaseResults: evaluation.testCaseResults,
+        testCasesPassed: evaluation.testCasesPassed,
+        testCasesTotal: evaluation.testCasesTotal,
+        taskType: evaluation.taskType,
+      },
+      metrics,
+    });
+  } catch (error) {
+    console.error('Error in practice-chapter-submit:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Submission evaluation failed',
+    });
+  }
+});
+
 router.post('/validate-chapter-practice', async (req, res) => {
   try {
     const { code, actualOutput, question, threshold } = req.body;

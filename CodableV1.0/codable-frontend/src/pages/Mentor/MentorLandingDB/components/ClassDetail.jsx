@@ -917,13 +917,63 @@ export default function ClassDetail() {
                     {expanded && assignment.assignmentType === "coding" && assignment.codingTasks?.length > 0 && (
                       <ol className="space-y-4 border-l border-blue-500/20 ml-2 pl-4 mb-4">
                         {assignment.codingTasks.map((task, ti) => (
-                          <li key={task.id || ti} className="text-sm text-[#fdfdff]/85">
+                          <li key={task.id || ti} className="text-sm text-[#fdfdff]/85 space-y-2">
                             <p className="font-medium text-[#fdfdff] mb-1">
                               {ti + 1}. {task.problemStatement}
                             </p>
                             <p className="text-xs text-[#fdfdff]/60">
                               Input: {task.inputFormat || "—"} | Output: {task.outputFormat || "—"}
                             </p>
+                            
+                            {/* Constraints */}
+                            {task.constraints && task.constraints.length > 0 && (
+                              <div className="mt-2">
+                                <p className="text-xs font-medium text-[#fdfdff]/70 mb-1">Constraints:</p>
+                                <ul className="list-disc list-inside space-y-0.5 text-xs text-[#fdfdff]/60">
+                                  {task.constraints.map((constraint, ci) => (
+                                    <li key={ci}>{constraint}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            
+                            {/* Sample Test Cases */}
+                            {task.sampleTestCases && task.sampleTestCases.length > 0 && (
+                              <div className="mt-2">
+                                <p className="text-xs font-medium text-green-400 mb-1">
+                                  Sample Test Cases ({task.sampleTestCases.length}):
+                                </p>
+                                <div className="space-y-1 bg-black/30 rounded-lg p-2">
+                                  {task.sampleTestCases.map((tc, tci) => (
+                                    <div key={tci} className="text-xs font-[JetBrains_Mono] text-[#fdfdff]/60">
+                                      <span className="text-green-400/70">Input:</span> <span className="text-[#fdfdff]/80">{tc.input || "(empty)"}</span>
+                                      <span className="text-green-400/70 ml-2">→ Output:</span> <span className="text-[#fdfdff]/80">{tc.output}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Hidden Test Cases Count */}
+                            {task.hiddenTestCases && task.hiddenTestCases.length > 0 && (
+                              <div className="mt-2 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                <p className="text-xs font-medium text-blue-400">
+                                  🔒 Hidden Test Cases: {task.hiddenTestCases.length}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Reference Solution (collapsed by default) */}
+                            {task.referenceSolution && (
+                              <details className="mt-2 text-xs">
+                                <summary className="cursor-pointer text-purple-400 hover:text-purple-300 font-medium">
+                                  ✓ View Reference Solution
+                                </summary>
+                                <pre className="mt-2 p-2 rounded-lg bg-black/50 border border-purple-500/20 text-xs text-[#fdfdff]/70 overflow-x-auto max-h-48">
+                                  {task.referenceSolution}
+                                </pre>
+                              </details>
+                            )}
                           </li>
                         ))}
                       </ol>
@@ -1369,12 +1419,45 @@ export default function ClassDetail() {
                           </ul>
                         )}
                         {Array.isArray(sub.codingSubmissions) && sub.codingSubmissions.length > 0 && (
-                          <div className="mt-2 text-xs text-[#fdfdff]/75 border-t border-white/10 pt-2 space-y-1">
-                            <p className="text-[#fdfdff]/55">Coding analytics</p>
+                          <div className="mt-2 text-xs text-[#fdfdff]/75 border-t border-white/10 pt-2 space-y-2">
+                            <p className="text-[#fdfdff]/55 font-medium">Coding analytics</p>
                             {sub.codingSubmissions.map((cs) => (
-                              <p key={`${sub.id}-${cs.taskId}`}>
-                                Task {cs.taskId}: {cs.testCasesPassed}/{cs.totalTestCases} tests · attempts {sub.attemptCount || 1}
-                              </p>
+                              <div key={`${sub.id}-${cs.taskId}`} className="bg-black/30 rounded-lg p-2 space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium text-[#fdfdff]">Task {cs.taskId}</span>
+                                  <span className="font-[JetBrains_Mono]">
+                                    {cs.testCasesPassed}/{cs.totalTestCases} passed
+                                  </span>
+                                </div>
+                                
+                                {/* Test Case Results Breakdown */}
+                                {Array.isArray(cs.testCaseResults) && cs.testCaseResults.length > 0 && (
+                                  <div className="mt-1 space-y-0.5 text-xs">
+                                    {cs.testCaseResults.map((tcr, tcIdx) => (
+                                      <div key={tcIdx} className="flex items-start gap-2">
+                                        <span className={tcr.passed ? "text-emerald-400" : "text-rose-400"}>
+                                          {tcr.passed ? "✓" : "✗"}
+                                        </span>
+                                        <div className="flex-1 font-[JetBrains_Mono] text-[#fdfdff]/60">
+                                          <div>Case {tcIdx + 1}: <span className="text-[#fdfdff]/80">{tcr.input || "(empty)"}</span></div>
+                                          {!tcr.passed && (
+                                            <div className="ml-4 text-rose-400/80">
+                                              Expected: <span className="text-[#fdfdff]/70">{tcr.expectedOutput}</span>
+                                            </div>
+                                          )}
+                                          {!tcr.passed && (
+                                            <div className="ml-4 text-rose-400/80">
+                                              Got: <span className="text-[#fdfdff]/70">{tcr.actualOutput || tcr.error || "(no output)"}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                <p className="text-[#fdfdff]/50 pt-1">Attempts: {sub.attemptCount || 1}</p>
+                              </div>
                             ))}
                           </div>
                         )}

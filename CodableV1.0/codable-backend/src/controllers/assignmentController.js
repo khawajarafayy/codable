@@ -9,6 +9,7 @@ import User from "../models/User.js";
 import ClassAssignmentSubmission from "../models/ClassAssignmentSubmission.js";
 import { broadcastToUser } from "../websocket/codeRunner.js";
 import { analyzeComplexity } from "../utils/complexityAnalyzer.js";
+import { normalizeOutput, normalizeTestCaseList, validateTestCases } from "../utils/javaAssignmentValidation.js";
 
 function sanitizeMcqsForStudent(mcqs = []) {
   return mcqs.map((q, index) => ({
@@ -19,13 +20,15 @@ function sanitizeMcqsForStudent(mcqs = []) {
 }
 
 function sanitizeCodingTasksForStudent(tasks = []) {
-  return tasks.map((t) => ({
-    id: t.id,
-    problemStatement: t.problemStatement,
-    inputFormat: t.inputFormat,
-    outputFormat: t.outputFormat,
-    sampleTestCases: t.sampleTestCases,
-    expectedConcepts: t.expectedConcepts,
+  return tasks.map((t, index) => ({
+    id: t.id || String(index + 1),
+    question: t.question || t.problemStatement || "",
+    problemStatement: t.problemStatement || t.question || "",
+    constraints: Array.isArray(t.constraints) ? t.constraints : [],
+    inputFormat: t.inputFormat || "",
+    outputFormat: t.outputFormat || "",
+    sampleTestCases: Array.isArray(t.sampleTestCases) ? t.sampleTestCases : [],
+    expectedConcepts: Array.isArray(t.expectedConcepts) ? t.expectedConcepts : [],
   }));
 }
 
@@ -52,6 +55,112 @@ function normalizeCodingSubmissions(raw = []) {
       spaceComplexity: String(item?.complexityAnalysis?.spaceComplexity || ""),
     },
   }));
+}
+
+function getRagApiBaseUrl() {
+  return (process.env.RAG_API_URL || process.env.RAG_API_BASE || "http://localhost:5001").replace(/\/$/, "");
+}
+
+function normalizeCodingTaskForStorage(task, index = 0) {
+  return {
+    id: String(task?.id || index + 1),
+    question: String(task?.question || task?.problemStatement || "").trim(),
+    problemStatement: String(task?.problemStatement || task?.question || "").trim(),
+    constraints: Array.isArray(task?.constraints)
+      ? task.constraints.map((constraint) => String(constraint || "").trim()).filter(Boolean)
+      : [],
+    inputFormat: String(task?.inputFormat || "").trim(),
+    outputFormat: String(task?.outputFormat || "").trim(),
+    referenceSolution: String(task?.referenceSolution || "").trim(),
+    sampleTestCases: normalizeTestCaseList(task?.sampleTestCases),
+    hiddenTestCases: normalizeTestCaseList(task?.hiddenTestCases),
+    expectedConcepts: Array.isArray(task?.expectedConcepts)
+      ? task.expectedConcepts.map((concept) => String(concept || "").trim()).filter(Boolean)
+      : [],
+  };
+}
+
+async function requestGeneratedTestCases(task, index = 0) {
+  const response = await fetch(`${getRagApiBaseUrl()}/api/generate-test-cases`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      question: task?.question || task?.problemStatement || "",
+      problemStatement: task?.problemStatement || task?.question || "",
+      constraints: Array.isArray(task?.constraints) ? task.constraints : [],
+      inputFormat: task?.inputFormat || "",
+      outputFormat: task?.outputFormat || "",
+      expectedConcepts: Array.isArray(task?.expectedConcepts) ? task.expectedConcepts : [],
+      taskId: task?.id || String(index + 1),
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload?.success) {
+    throw new Error(payload?.error || payload?.message || `Test case generation failed (${response.status})`);
+  }
+
+  return payload.data || payload.task || payload;
+}
+
+async function prepareValidatedCodingTasks(tasks = []) {
+  const normalizedTasks = Array.isArray(tasks) ? tasks : [];
+  const validatedTasks = [];
+
+  for (let index = 0; index < normalizedTasks.length; index += 1) {
+    const originalTask = normalizeCodingTaskForStorage(normalizedTasks[index], index);
+    const existingCases = [...originalTask.sampleTestCases, ...originalTask.hiddenTestCases];
+    const canReuseExisting =
+      originalTask.referenceSolution &&
+      originalTask.sampleTestCases.length >= 1 &&
+      originalTask.hiddenTestCases.length >= 3;
+
+    if (canReuseExisting) {
+      const validation = await validateTestCases(originalTask.referenceSolution, existingCases);
+      if (validation.valid) {
+        validatedTasks.push({
+          ...originalTask,
+          sampleTestCases: originalTask.sampleTestCases,
+          hiddenTestCases: originalTask.hiddenTestCases,
+        });
+        continue;
+      }
+    }
+
+    let lastError = "";
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        const generatedTask = normalizeCodingTaskForStorage(
+          await requestGeneratedTestCases(originalTask, index),
+          index
+        );
+        const generatedCases = [...generatedTask.sampleTestCases, ...generatedTask.hiddenTestCases];
+        const validation = await validateTestCases(generatedTask.referenceSolution, generatedCases);
+
+        if (
+          validation.valid &&
+          generatedTask.sampleTestCases.length >= 2 &&
+          generatedTask.hiddenTestCases.length >= 5
+        ) {
+          validatedTasks.push(generatedTask);
+          lastError = "";
+          break;
+        }
+
+        lastError = validation.error || "Generated test cases failed validation";
+      } catch (error) {
+        lastError = String(error?.message || error);
+      }
+
+      if (attempt === 3) {
+        throw new Error(
+          `Unable to validate coding task ${index + 1} after 3 attempts${lastError ? `: ${lastError}` : ""}`
+        );
+      }
+    }
+  }
+
+  return validatedTasks;
 }
 
 async function runJavaCodeAgainstInput(codeSnippet, input = "", timeoutMs = 8000) {
@@ -119,87 +228,52 @@ async function runJavaCodeAgainstInput(codeSnippet, input = "", timeoutMs = 8000
 
 async function evaluateCodingTaskSubmission(task, submission) {
   const hiddenCases = Array.isArray(task?.hiddenTestCases) ? task.hiddenTestCases : [];
-  const sampleCases = Array.isArray(task?.sampleTestCases) ? task.sampleTestCases : [];
-  const allCases = hiddenCases.length > 0 ? hiddenCases : sampleCases;
+  const allCases = hiddenCases;
 
   if (!submission?.codeSnippet || allCases.length === 0) {
     return {
       passed: 0,
       total: allCases.length,
       scoreOutOfTen: 0,
-      executionNotes: "No runnable code or no test cases",
+      executionNotes: "No runnable code or no hidden test cases",
+      testCaseResults: [],
     };
   }
 
   let passed = 0;
-  for (const tc of allCases) {
-    let run = await runJavaCodeAgainstInput(submission.codeSnippet, tc?.input || "");
-    const expected = String(tc?.output || "").trim();
-    let actual = String(run?.output || "").trim();
-    
-    // We want to pass the test if the output matches the expected output,
-    // ignoring any prompts like "Enter name:"
-    let aLower = actual.toLowerCase().replace(/\s+/g, "");
-    let eLower = expected.toLowerCase().replace(/\s+/g, "");
+  const testCaseResults = [];
 
-    let isCorrect = false;
+  for (let idx = 0; idx < allCases.length; idx += 1) {
+    const tc = allCases[idx];
+    const run = await runJavaCodeAgainstInput(submission.codeSnippet, tc?.input || "");
+    const expected = normalizeOutput(tc?.output || "");
+    const actual = normalizeOutput(run?.output || "");
+    const testPassed = run?.success && actual === expected;
 
-    // Check match
-    const checkMatch = (actLines, expLines, actLower, expLower) => {
-      if (actLower === expLower || actLower.includes(expLower)) return true;
-      if (expLines.length > 0) {
-        let matchCount = 0;
-        for (const eLine of expLines) {
-           for (const aLine of actLines) {
-              if (aLine === eLine) {
-                 matchCount++;
-                 break;
-              } else if (eLine.includes(':') && aLine.includes(':')) {
-                 if (eLine.split(':')[0].trim().toLowerCase() === aLine.split(':')[0].trim().toLowerCase()) {
-                    matchCount++;
-                    break;
-                 }
-              } else if (eLine.includes('=') && aLine.includes('=')) {
-                 if (eLine.split('=')[0].trim().toLowerCase() === aLine.split('=')[0].trim().toLowerCase()) {
-                    matchCount++;
-                    break;
-                 }
-              }
-           }
-        }
-        if (matchCount === expLines.length) return true;
-      }
-      return false;
-    };
-
-    let actualLines = actual.split('\n').map(l => l.trim()).filter(Boolean);
-    const expectedLines = expected.split('\n').map(l => l.trim()).filter(Boolean);
-
-    isCorrect = checkMatch(actualLines, expectedLines, aLower, eLower);
-
-    // Fallback: If the student code threw an exception (e.g. NoSuchElementException)
-    // or failed to match because they used input.nextLine() instead of input.next()
-    // for space-separated inputs, we try replacing spaces with newlines.
-    if (!isCorrect && String(tc?.input || "").includes(" ")) {
-       const splitInput = String(tc?.input || "").replace(/ /g, '\n');
-       const fallbackRun = await runJavaCodeAgainstInput(submission.codeSnippet, splitInput);
-       const fbActual = String(fallbackRun?.output || "").trim();
-       const fbALower = fbActual.toLowerCase().replace(/\s+/g, "");
-       const fbActualLines = fbActual.split('\n').map(l => l.trim()).filter(Boolean);
-       if (checkMatch(fbActualLines, expectedLines, fbALower, eLower)) {
-           isCorrect = true;
-           run = fallbackRun;
-       }
-    }
-
-    if (isCorrect) {
+    if (testPassed) {
       passed += 1;
     }
+
+    testCaseResults.push({
+      index: idx,
+      input: tc?.input || "",
+      expectedOutput: tc?.output || "",
+      actualOutput: run?.output || "",
+      passed: testPassed,
+      error: run?.error || "",
+    });
   }
 
   const scoreOutOfTen = allCases.length > 0 ? Math.round((passed / allCases.length) * 1000) / 100 : 0;
-  return { passed, total: allCases.length, scoreOutOfTen, executionNotes: "" };
+  return {
+    passed,
+    total: allCases.length,
+    scoreOutOfTen,
+    executionNotes: "",
+    testCaseResults,
+  };
 }
+
 
 async function requestAiCodeAnalysis(task, codeSnippet) {
   const ragBase = (process.env.RAG_API_URL || process.env.RAG_API_BASE || "http://localhost:5001").replace(/\/$/, "");
@@ -368,6 +442,8 @@ export const createAssignment = async (req, res) => {
     }
 
     const st = status === "published" ? "published" : "draft";
+    const validatedCodingTasks =
+      assignmentType === "coding" ? await prepareValidatedCodingTasks(Array.isArray(codingTasks) ? codingTasks : []) : [];
     const doc = await ClassAssignment.create({
       classId: cls._id,
       instructorId: new mongoose.Types.ObjectId(instructorId),
@@ -380,7 +456,7 @@ export const createAssignment = async (req, res) => {
       topics: Array.isArray(topics) ? topics.map(String) : [],
       assignmentType: ["mcq", "coding"].includes(assignmentType) ? assignmentType : "mcq",
       mcqs: Array.isArray(mcqs) ? mcqs : [],
-      codingTasks: Array.isArray(codingTasks) ? codingTasks : [],
+      codingTasks: validatedCodingTasks,
       points: typeof points === "number" ? points : undefined,
       ragMeta: ragMeta ?? null,
     });
@@ -427,8 +503,13 @@ export const updateAssignment = async (req, res) => {
     if (b.topics !== undefined) doc.topics = Array.isArray(b.topics) ? b.topics.map(String) : [];
     if (b.assignmentType !== undefined) doc.assignmentType = ["mcq", "coding"].includes(b.assignmentType) ? b.assignmentType : "mcq";
     if (b.mcqs !== undefined) doc.mcqs = Array.isArray(b.mcqs) ? b.mcqs : [];
-    if (b.codingTasks !== undefined) doc.codingTasks = Array.isArray(b.codingTasks) ? b.codingTasks : [];
-    if (b.points !== undefined) doc.points = Number(b.points) || (doc.assignmentType === 'mcq' ? doc.mcqs?.length : doc.codingTasks?.length * 10) || 0;
+    if (b.codingTasks !== undefined || doc.assignmentType === "coding") {
+      const nextCodingTasks = b.codingTasks !== undefined ? b.codingTasks : doc.codingTasks;
+      doc.codingTasks = doc.assignmentType === "coding"
+        ? await prepareValidatedCodingTasks(Array.isArray(nextCodingTasks) ? nextCodingTasks : [])
+        : [];
+    }
+    if (b.points !== undefined) doc.points = Number(b.points) || (doc.assignmentType === "mcq" ? doc.mcqs?.length : doc.codingTasks?.length * 10) || 0;
     if (b.ragMeta !== undefined) doc.ragMeta = b.ragMeta;
 
     await doc.save();
@@ -685,6 +766,7 @@ export const submitAssignmentForStudent = async (req, res) => {
           ...submitted,
           testCasesPassed: execution.passed,
           totalTestCases: execution.total,
+          testCaseResults: execution.testCaseResults || [],
           aiCodeAnalysis: {
             logic: String(aiAnalysis?.logic || ""),
             quality: String(aiAnalysis?.quality || ""),
@@ -878,6 +960,14 @@ export const getAssignmentSubmissionsForInstructor = async (req, res) => {
             codeSnippet: cs.codeSnippet,
             testCasesPassed: cs.testCasesPassed,
             totalTestCases: cs.totalTestCases,
+            testCaseResults: (cs.testCaseResults || []).map((tcr) => ({
+              index: tcr.index,
+              input: tcr.input,
+              expectedOutput: tcr.expectedOutput,
+              actualOutput: tcr.actualOutput,
+              passed: tcr.passed,
+              error: tcr.error,
+            })),
             aiCodeAnalysis: cs.aiCodeAnalysis,
             complexityAnalysis: cs.complexityAnalysis
           })),

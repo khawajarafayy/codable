@@ -6,6 +6,9 @@ from flask_cors import CORS
 import os
 import sys
 import re
+import subprocess
+import tempfile
+import json
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -63,6 +66,199 @@ def get_pregenerated_content(topic_id):
             print(f"   ⚠️ Error loading pre-generated content: {e}")
     
     return None
+
+
+def normalize_output(text):
+    if not isinstance(text, str):
+        return ""
+    return " ".join(
+        line.strip()
+        for line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+        if line.strip()
+    ).strip()
+
+
+def strip_prompts_from_output(output):
+    """Remove common prompt patterns that shouldn't be in test output"""
+    if not isinstance(output, str):
+        return ""
+    
+    # Remove common prompt patterns
+    text = output
+    # Common prompt prefixes to remove
+    prompts = [
+        r"Enter\s+.*?:\s*",
+        r"Please\s+.*?:\s*",
+        r"Input\s+.*?:\s*",
+        r"Enter an? .*?:\s*",
+        r"Type\s+.*?:\s*",
+        r"\(e\.g\.,.*?\):\s*",
+    ]
+    
+    for prompt in prompts:
+        text = re.sub(prompt, "", text, flags=re.IGNORECASE)
+    
+    return text.strip()
+
+
+def _normalize_test_cases(test_cases):
+    normalized = []
+    for test_case in test_cases or []:
+        normalized.append({
+            "input": str((test_case or {}).get("input", "")),
+            "output": str((test_case or {}).get("output", "")),
+        })
+    return normalized
+
+
+def _normalize_coding_task(task, fallback_id):
+    task = task or {}
+    question = str(task.get("question") or task.get("problemStatement") or "").strip()
+    constraints = task.get("constraints") or []
+    if isinstance(constraints, str):
+        constraints = [constraints]
+    return {
+        "id": str(task.get("id") or fallback_id),
+        "question": question,
+        "problemStatement": question,
+        "constraints": [str(item).strip() for item in constraints if str(item).strip()],
+        "inputFormat": str(task.get("inputFormat") or "").strip(),
+        "outputFormat": str(task.get("outputFormat") or "").strip(),
+        "referenceSolution": str(task.get("referenceSolution") or "").strip(),
+        "sampleTestCases": _normalize_test_cases(task.get("sampleTestCases") or []),
+        "hiddenTestCases": _normalize_test_cases(task.get("hiddenTestCases") or []),
+        "expectedConcepts": [str(item).strip() for item in (task.get("expectedConcepts") or []) if str(item).strip()],
+    }
+
+
+def _run_java_code_against_input(code_snippet, input_text="", timeout_seconds=8):
+    temp_dir = tempfile.mkdtemp(prefix="codable-testcase-")
+    class_match = re.search(r"public\s+class\s+(\w+)", str(code_snippet or ""))
+    class_name = class_match.group(1) if class_match else "Main"
+    source_file = os.path.join(temp_dir, f"{class_name}.java")
+
+    try:
+        with open(source_file, "w", encoding="utf-8") as handle:
+            handle.write(str(code_snippet or ""))
+
+        compile_result = subprocess.run(
+            ["javac", source_file],
+            cwd=temp_dir,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+        )
+        if compile_result.returncode != 0:
+            return {"success": False, "output": "", "error": compile_result.stderr or "Compilation failed"}
+
+        run_result = subprocess.run(
+            ["java", "-cp", temp_dir, class_name],
+            cwd=temp_dir,
+            input=str(input_text or ""),
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+        )
+        return {
+            "success": run_result.returncode == 0,
+            "output": (run_result.stdout or "").strip(),
+            "error": (run_result.stderr or "").strip(),
+        }
+    except subprocess.TimeoutExpired:
+        return {"success": False, "output": "", "error": "Execution timed out"}
+    except Exception as error:
+        return {"success": False, "output": "", "error": str(error)}
+    finally:
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def validate_test_cases(reference_solution, test_cases, timeout_seconds=8):
+    normalized_reference = str(reference_solution or "").strip()
+    normalized_cases = _normalize_test_cases(test_cases)
+
+    if not normalized_reference:
+        return {"valid": False, "passed": 0, "total": len(normalized_cases), "failures": [{"index": -1, "error": "Reference solution is required"}], "error": "Reference solution is required"}
+
+    if not normalized_cases:
+        return {"valid": False, "passed": 0, "total": 0, "failures": [{"index": -1, "error": "At least one test case is required"}], "error": "At least one test case is required"}
+
+    failures = []
+    passed = 0
+    for index, test_case in enumerate(normalized_cases):
+        run_result = _run_java_code_against_input(normalized_reference, test_case["input"], timeout_seconds=timeout_seconds)
+        if not run_result["success"]:
+            failures.append({"index": index, "input": test_case["input"], "expected": test_case["output"], "actual": run_result.get("output", ""), "error": run_result.get("error", "Execution failed")})
+            continue
+
+        expected = normalize_output(test_case["output"])
+        actual = normalize_output(run_result.get("output", ""))
+        
+        # Also try comparing with prompts stripped (more lenient)
+        expected_no_prompts = strip_prompts_from_output(expected)
+        actual_no_prompts = strip_prompts_from_output(actual)
+        
+        # Pass if either strict or lenient comparison matches
+        if expected != actual and expected_no_prompts != actual_no_prompts:
+            failures.append({"index": index, "input": test_case["input"], "expected": test_case["output"], "actual": run_result.get("output", ""), "normalizedExpected": expected, "normalizedActual": actual, "error": "Output mismatch"})
+            continue
+
+        passed += 1
+
+    return {"valid": len(failures) == 0, "passed": passed, "total": len(normalized_cases), "failures": failures, "error": "" if not failures else "One or more test cases failed validation"}
+
+
+def validate_generated_coding_tasks(tasks, min_sample_cases=2, min_hidden_cases=5, timeout_seconds=8):
+    normalized_tasks = []
+    for index, task in enumerate(tasks or []):
+        normalized_task = _normalize_coding_task(task, index + 1)
+        print(f"🔍 Validating Task {index + 1}...")
+        if not normalized_task["referenceSolution"]:
+            print(f"❌ Task {index + 1}: Missing reference solution")
+            return {"valid": False, "tasks": [], "error": f"Task {index + 1} is missing a reference solution"}
+        if len(normalized_task["sampleTestCases"]) < min_sample_cases:
+            print(f"❌ Task {index + 1}: Not enough sample test cases (found {len(normalized_task['sampleTestCases'])}, need {min_sample_cases})")
+            return {"valid": False, "tasks": [], "error": f"Task {index + 1} must include at least {min_sample_cases} sample test cases"}
+        if len(normalized_task["hiddenTestCases"]) < min_hidden_cases:
+            print(f"❌ Task {index + 1}: Not enough hidden test cases (found {len(normalized_task['hiddenTestCases'])}, need {min_hidden_cases})")
+            return {"valid": False, "tasks": [], "error": f"Task {index + 1} must include at least {min_hidden_cases} hidden test cases"}
+
+        combined_cases = normalized_task["sampleTestCases"] + normalized_task["hiddenTestCases"]
+        print(f"   Running validation on {len(combined_cases)} test cases (reference solution length: {len(normalized_task['referenceSolution'])} chars)...")
+        validation = validate_test_cases(normalized_task["referenceSolution"], combined_cases, timeout_seconds=timeout_seconds)
+        
+        if not validation["valid"]:
+            # Extract detailed failure info
+            failures = validation.get("failures", [])
+            print(f"   ❌ Validation failed! {len(failures)} test cases failed:")
+            
+            failure_details = []
+            for failure in failures:
+                if failure.get("error"):
+                    print(f"      • Test {failure.get('index', '?')}: {failure.get('error')}")
+                    print(f"        Input: {failure.get('input', '')[:100]}")
+                    print(f"        Expected: {failure.get('expected', '')[:100]}")
+                    print(f"        Got: {failure.get('actual', '')[:100]}")
+                    failure_details.append(
+                        f"Test case {failure.get('index', '?')}: {failure.get('error')} "
+                        f"(input: {failure.get('input', '')[:50]}..., expected: {failure.get('expected', '')[:50]}..., got: {failure.get('actual', '')[:50]}...)"
+                    )
+            
+            detailed_error = f"Task {index + 1} failed validation:\n" + "\n".join(failure_details[:3])  # Show first 3 failures
+            return {
+                "valid": False,
+                "tasks": [],
+                "error": detailed_error,
+                "failureCount": len(failures),
+                "details": validation,
+            }
+        
+        print(f"   ✅ Task {index + 1} validation passed!")
+
+        normalized_tasks.append(normalized_task)
+
+    print(f"✅ All {len(normalized_tasks)} tasks validated successfully!")
+    return {"valid": True, "tasks": normalized_tasks, "error": ""}
 
 
 # Chapter subtopics structure - Detailed topic definitions
@@ -3208,23 +3404,7 @@ def _parse_coding_assignment_json(response_text, num_tasks, _json):
         tasks = parsed.get("codingTasks") or parsed.get("tasks") or []
         normalized = []
         for i, task in enumerate(tasks[:num_tasks]):
-            sample = task.get("sampleTestCases") or []
-            hidden = task.get("hiddenTestCases") or []
-            normalized.append({
-                "id": str(task.get("id", i + 1)),
-                "problemStatement": str(task.get("problemStatement", "")).strip(),
-                "inputFormat": str(task.get("inputFormat", "")).strip(),
-                "outputFormat": str(task.get("outputFormat", "")).strip(),
-                "sampleTestCases": [
-                    {"input": str(tc.get("input", "")), "output": str(tc.get("output", ""))}
-                    for tc in sample
-                ],
-                "hiddenTestCases": [
-                    {"input": str(tc.get("input", "")), "output": str(tc.get("output", ""))}
-                    for tc in hidden
-                ],
-                "expectedConcepts": [str(c) for c in (task.get("expectedConcepts") or [])][:10],
-            })
+            normalized.append(_normalize_coding_task(task, i + 1))
         return normalized if normalized else None
     except Exception as e:
         print(f"⚠️ Coding assignment JSON parse failed: {e}")
@@ -3264,10 +3444,7 @@ def generate_instructor_coding_assignment(num_tasks, difficulty, topics, instruc
     instructions = str(instructions or "").strip()
 
     if not GROQ_API_KEY and not MISTRAL_API_KEY:
-        return {
-            "codingTasks": _fallback_coding_tasks(topics, difficulty, num_tasks),
-            "meta": {"source": "fallback-local", "retrieved_chars": len(book_context)},
-        }, None
+        return None, "No AI provider configured for coding assignment generation"
 
     from langchain_core.prompts import ChatPromptTemplate
     prompt_template = """You are an expert Java instructor. Create EXACTLY {num_tasks} coding tasks.
@@ -3279,17 +3456,55 @@ ADDITIONAL INSTRUCTIONS: {instructions}
 RELEVANT BOOK EXCERPTS (RAG context):
 {book_context}
 
-Rules:
-- Each task must be solvable in Java using stdin/stdout.
-- Include realistic sample and hidden test cases.
-- Return ONLY valid JSON (no markdown), exactly in this shape:
+⚠️ CRITICAL RULES - MUST FOLLOW EXACTLY - NO EXCEPTIONS:
+
+1. Each task must include: question, constraints, problemStatement, inputFormat, outputFormat, referenceSolution, sampleTestCases, hiddenTestCases, expectedConcepts.
+
+2. THE REFERENCE SOLUTION:
+   - MUST be valid, deterministic Java code
+   - MUST ONLY read input and produce output (nothing else)
+   - MUST NOT have ANY prompts, print statements before reading input, or user messages
+   - MUST NOT have: System.out.println("Enter..."), System.out.println("Please..."), or any prompts
+   - Example WRONG: System.out.println("Enter amount: "); int x = sc.nextInt();
+   - Example RIGHT: int x = sc.nextInt(); System.out.println(result);
+   - NO println() calls except for the final result output
+   - Input via Scanner, Output via println (results only)
+
+3. Test Cases:
+   - For each test case, determine ONLY the console output (not prompts)
+   - Example: If reference reads 11.56, output should be "numberOfOneDollars: 11..." NOT "Enter amount: numberOfOneDollars: 11..."
+   - Test ONLY the computed results, never include prompt text
+
+4. NEVER include in referenceSolution:
+   - System.currentTimeMillis(), Random, Math.random(), System.nanoTime()
+   - Any println() that prints a prompt/message (only print results)
+   - Any System.out.println() before reading input
+   - Non-deterministic operations
+
+5. Pure functions only: input → computation → output (same input = same output)
+
+6. Each task: AT LEAST 2 sample test cases + 5 hidden test cases (7+ total)
+
+7. Include edge cases: 0, empty input, negative numbers, maximum constraint values
+
+8. VERIFY BEFORE FINALIZING:
+   - [ ] Reference solution has NO prompt println() statements
+   - [ ] Reference solution ONLY outputs results
+   - [ ] I traced through EACH test case and confirmed output matches
+   - [ ] Test outputs do NOT include prompts, only computed results
+   - [ ] No dynamic/random functions used
+
+Return ONLY valid JSON (no markdown), exactly in this shape:
 {{
   "codingTasks": [
     {{
       "id": "1",
+      "question": "...",
+      "constraints": ["..."],
       "problemStatement": "...",
       "inputFormat": "...",
       "outputFormat": "...",
+      "referenceSolution": "public class Main {{ ... }}",
       "sampleTestCases": [{{"input":"...", "output":"..."}}],
       "hiddenTestCases": [{{"input":"...", "output":"..."}}],
       "expectedConcepts": ["...", "..."]
@@ -3306,47 +3521,76 @@ Rules:
         "book_context": book_context[:7000],
     }
     providers = []
+    last_error = None
 
-    if GROQ_API_KEY:
-        try:
-            from langchain_groq import ChatGroq
-            model = ChatGroq(
-                model="llama-3.3-70b-versatile",
-                groq_api_key=GROQ_API_KEY,
-                temperature=0.25,
-                max_tokens=8192,
-            )
-            result = (prompt | model).invoke(invoke_args)
-            parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
-            providers.append("groq")
-            if parsed:
-                return {"codingTasks": parsed, "meta": {"source": "groq-rag", "providers": providers}}, None
-        except Exception as e:
-            print(f"⚠️ Groq coding assignment failed: {e}")
-            providers.append("groq:error")
+    for attempt in range(3):
+        if GROQ_API_KEY:
+            try:
+                from langchain_groq import ChatGroq
+                model = ChatGroq(
+                    model="llama-3.3-70b-versatile",
+                    groq_api_key=GROQ_API_KEY,
+                    temperature=0.25,
+                    max_tokens=8192,
+                )
+                result = (prompt | model).invoke(invoke_args)
+                parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
+                providers.append("groq")
+                if parsed:
+                    # Development mode: skip validation if requested
+                    if os.getenv("SKIP_ASSIGNMENT_VALIDATION") == "true":
+                        print(f"⚠️ DEVELOPMENT MODE: Skipping validation (SKIP_ASSIGNMENT_VALIDATION=true)")
+                        return {
+                            "codingTasks": parsed,
+                            "meta": {"source": "groq-rag", "providers": providers, "attempts": attempt + 1, "validationSkipped": True},
+                        }, None
+                    
+                    validation = validate_generated_coding_tasks(parsed)
+                    if validation["valid"]:
+                        return {
+                            "codingTasks": validation["tasks"],
+                            "meta": {"source": "groq-rag", "providers": providers, "attempts": attempt + 1},
+                        }, None
+                    last_error = validation.get("error")
+            except Exception as e:
+                print(f"⚠️ Groq coding assignment failed: {e}")
+                providers.append("groq:error")
+                last_error = str(e)
 
-    if MISTRAL_API_KEY:
-        try:
-            from langchain_mistralai import ChatMistralAI
-            model = ChatMistralAI(
-                model="mistral-small-latest",
-                mistral_api_key=MISTRAL_API_KEY,
-                temperature=0.2,
-                max_tokens=8192,
-            )
-            result = (prompt | model).invoke(invoke_args)
-            parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
-            providers.append("mistral")
-            if parsed:
-                return {"codingTasks": parsed, "meta": {"source": "mistral-rag", "providers": providers}}, None
-        except Exception as e:
-            print(f"⚠️ Mistral coding assignment failed: {e}")
-            providers.append("mistral:error")
+        if MISTRAL_API_KEY:
+            try:
+                from langchain_mistralai import ChatMistralAI
+                model = ChatMistralAI(
+                    model="mistral-small-latest",
+                    mistral_api_key=MISTRAL_API_KEY,
+                    temperature=0.2,
+                    max_tokens=8192,
+                )
+                result = (prompt | model).invoke(invoke_args)
+                parsed = _parse_coding_assignment_json(result.content, num_tasks, _json)
+                providers.append("mistral")
+                if parsed:
+                    # Development mode: skip validation if requested
+                    if os.getenv("SKIP_ASSIGNMENT_VALIDATION") == "true":
+                        print(f"⚠️ DEVELOPMENT MODE: Skipping validation (SKIP_ASSIGNMENT_VALIDATION=true)")
+                        return {
+                            "codingTasks": parsed,
+                            "meta": {"source": "mistral-rag", "providers": providers, "attempts": attempt + 1, "validationSkipped": True},
+                        }, None
+                    
+                    validation = validate_generated_coding_tasks(parsed)
+                    if validation["valid"]:
+                        return {
+                            "codingTasks": validation["tasks"],
+                            "meta": {"source": "mistral-rag", "providers": providers, "attempts": attempt + 1},
+                        }, None
+                    last_error = validation.get("error")
+            except Exception as e:
+                print(f"⚠️ Mistral coding assignment failed: {e}")
+                providers.append("mistral:error")
+                last_error = str(e)
 
-    return {
-        "codingTasks": _fallback_coding_tasks(topics, difficulty, num_tasks),
-        "meta": {"source": "fallback-local", "providers": providers, "retrieved_chars": len(book_context)},
-    }, None
+    return None, last_error or "Failed to generate validated coding assignment"
 
 
 @app.route('/api/generate-mcq-assignment', methods=['POST'])
@@ -3425,6 +3669,152 @@ def generate_coding_assignment():
         })
     except Exception as e:
         print(f"❌ generate_coding_assignment: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/generate-test-cases', methods=['POST'])
+def generate_test_cases():
+    try:
+        data = request.json or {}
+        problem_statement = str(data.get("problemStatement") or data.get("question") or "").strip()
+        constraints = data.get("constraints") or []
+        input_format = str(data.get("inputFormat") or "").strip()
+        output_format = str(data.get("outputFormat") or "").strip()
+        expected_concepts = data.get("expectedConcepts") or []
+        difficulty = (data.get("difficulty") or "M").upper()
+
+        if not problem_statement:
+            return jsonify({"success": False, "error": "problemStatement is required"}), 400
+        if not GROQ_API_KEY and not MISTRAL_API_KEY:
+            return jsonify({"success": False, "error": "No AI provider configured for test case generation"}), 400
+
+        from langchain_core.prompts import ChatPromptTemplate
+
+        prompt_template = """You are an expert Java instructor. Create EXACTLY ONE coding task for the given problem statement.
+
+PROBLEM STATEMENT:
+{problem_statement}
+
+CONSTRAINTS:
+{constraints}
+
+INPUT FORMAT:
+{input_format}
+
+OUTPUT FORMAT:
+{output_format}
+
+EXPECTED CONCEPTS:
+{expected_concepts}
+
+DIFFICULTY: {difficulty_prompt}
+
+⚠️ CRITICAL RULES - MUST FOLLOW EXACTLY - NO EXCEPTIONS:
+
+1. Return ONLY valid JSON (no markdown).
+2. Include: question, constraints, problemStatement, inputFormat, outputFormat, referenceSolution, sampleTestCases, hiddenTestCases, expectedConcepts.
+
+3. THE REFERENCE SOLUTION:
+   - MUST be valid, deterministic Java code
+   - MUST NOT include ANY prompts or user messages
+   - NO System.out.println("Enter..."), NO System.out.println("Please...")
+   - ONLY output the computed results
+   - Read input using Scanner, output ONLY results
+   - Example WRONG: System.out.println("Enter number: "); int x = sc.nextInt(); System.out.println(x);
+   - Example RIGHT: int x = sc.nextInt(); System.out.println(x);
+
+4. FOR EACH TEST CASE:
+   - Determine what the reference solution OUTPUTS (not what prompts it shows)
+   - If solution reads "11.56" and computes "numberOfOneDollars: 11", the output is ONLY "numberOfOneDollars: 11"
+   - Do NOT include "Enter amount: " in the output - that's a prompt, not output
+   - Test cases must match ONLY the computed result, never include prompts
+
+5. NEVER use:
+   - System.currentTimeMillis(), Random, Math.random(), System.nanoTime()
+   - Any println() for prompts (only print results)
+   - Any System.out.println() before reading input
+
+6. Pure functions: input → computation → output (deterministic)
+
+7. Provide AT LEAST 2 sample test cases and 5 hidden test cases (minimum 7 total).
+
+8. Include edge cases: 0, empty input, negative numbers, maximum constraint values.
+
+9. VERIFICATION BEFORE GENERATING JSON:
+   - [ ] Reference solution has NO prompt println() statements
+   - [ ] Reference solution ONLY outputs computed results
+   - [ ] I traced EACH test case input through reference solution
+   - [ ] Test case "output" field ONLY contains the computed result (no prompts)
+   - [ ] Output matches what reference solution would print (without prompts)
+
+JSON format:
+{{
+  "codingTasks": [
+    {{
+      "id": "1",
+      "question": "...",
+      "constraints": ["..."],
+      "problemStatement": "...",
+      "inputFormat": "...",
+      "outputFormat": "...",
+      "referenceSolution": "public class Main {{ ... }}",
+      "sampleTestCases": [{{"input":"...", "output":"..."}}],
+      "hiddenTestCases": [{{"input":"...", "output":"..."}}],
+      "expectedConcepts": ["...", "..."]
+    }}
+  ]
+}}
+"""
+        prompt = ChatPromptTemplate.from_template(prompt_template)
+        invoke_args = {
+            "problem_statement": problem_statement,
+            "constraints": ", ".join([str(item) for item in constraints]) if isinstance(constraints, list) else str(constraints),
+            "input_format": input_format or "Not provided",
+            "output_format": output_format or "Not provided",
+            "expected_concepts": ", ".join([str(item) for item in expected_concepts]) if isinstance(expected_concepts, list) else str(expected_concepts),
+            "difficulty_prompt": _difficulty_lmh_to_prompt(difficulty if difficulty in ("L", "M", "H") else "M"),
+        }
+
+        last_error = None
+        for attempt in range(3):
+            for provider_name, model_factory in (
+                ("groq", lambda: __import__("langchain_groq", fromlist=["ChatGroq"]).ChatGroq(
+                    model="llama-3.3-70b-versatile",
+                    groq_api_key=GROQ_API_KEY,
+                    temperature=0.25,
+                    max_tokens=8192,
+                )),
+                ("mistral", lambda: __import__("langchain_mistralai", fromlist=["ChatMistralAI"]).ChatMistralAI(
+                    model="mistral-small-latest",
+                    mistral_api_key=MISTRAL_API_KEY,
+                    temperature=0.2,
+                    max_tokens=8192,
+                )),
+            ):
+                if provider_name == "groq" and not GROQ_API_KEY:
+                    continue
+                if provider_name == "mistral" and not MISTRAL_API_KEY:
+                    continue
+
+                try:
+                    result = (prompt | model_factory()).invoke(invoke_args)
+                    parsed = _parse_coding_assignment_json(result.content, 1, json)
+                    if parsed:
+                        validation = validate_generated_coding_tasks(parsed, min_sample_cases=2, min_hidden_cases=5)
+                        if validation["valid"]:
+                            return jsonify({
+                                "success": True,
+                                "data": validation["tasks"][0],
+                                "meta": {"source": f"{provider_name}-rag", "attempts": attempt + 1},
+                            })
+                        last_error = validation.get("error")
+                except Exception as error:
+                    last_error = str(error)
+                    print(f"⚠️ generate_test_cases {provider_name} failed: {error}")
+
+        return jsonify({"success": False, "error": last_error or "Failed to generate validated test cases"}), 400
+    except Exception as e:
+        print(f"❌ generate_test_cases: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 

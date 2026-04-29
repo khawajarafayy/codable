@@ -31,9 +31,12 @@ const codingTestCaseSchema = new mongoose.Schema(
 const codingTaskSchema = new mongoose.Schema(
   {
     id: { type: String, default: "" },
+    question: { type: String, default: "" },
     problemStatement: { type: String, required: true },
+    constraints: { type: [String], default: [] },
     inputFormat: { type: String, default: "" },
     outputFormat: { type: String, default: "" },
+    referenceSolution: { type: String, default: "" },
     sampleTestCases: { type: [codingTestCaseSchema], default: [] },
     hiddenTestCases: { type: [codingTestCaseSchema], default: [] },
     expectedConcepts: { type: [String], default: [] },
@@ -76,11 +79,12 @@ const classAssignmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-classAssignmentSchema.pre("save", function () {
+classAssignmentSchema.pre("save", function() {
+  // Set points based on task count if not already set
   if (!this.points || this.points === 0) {
-    if (this.assignmentType === "coding" && this.codingTasks?.length) {
+    if (this.assignmentType === "coding" && this.codingTasks && this.codingTasks.length) {
       this.points = this.codingTasks.length * 10;
-    } else if (this.mcqs?.length) {
+    } else if (this.mcqs && this.mcqs.length) {
       this.points = this.mcqs.length;
     }
   }

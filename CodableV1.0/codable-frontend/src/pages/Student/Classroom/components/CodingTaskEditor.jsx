@@ -10,6 +10,15 @@ const JAVA_TEMPLATE = `public class Main {
 }
 `;
 
+function resolveCompilerWsUrl() {
+  const explicit = import.meta.env.VITE_WS_URL;
+  if (explicit && String(explicit).trim()) {
+    return String(explicit).trim().replace(/\/$/, "");
+  }
+  const api = import.meta.env.VITE_API_URL || import.meta.env.VITE_APP_URL || "http://localhost:3000";
+  return String(api).replace(/\/$/, "").replace(/^http/, "ws") + "/ws/compiler";
+}
+
 export default function CodingTaskEditor({ assignment, onSubmitCodingAssignment }) {
   const tasks = Array.isArray(assignment?.codingTasks) ? assignment.codingTasks : [];
   const [activeTaskIdx, setActiveTaskIdx] = useState(0);
@@ -26,9 +35,18 @@ export default function CodingTaskEditor({ assignment, onSubmitCodingAssignment 
   const activeTask = tasks[activeTaskIdx];
   const activeTaskId = String(activeTask?.id || "");
   const activeCode = codeByTaskId[activeTaskId] || JAVA_TEMPLATE;
-  const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   const sampleCases = useMemo(() => (Array.isArray(activeTask?.sampleTestCases) ? activeTask.sampleTestCases : []), [activeTask]);
+
+  /** Join sample inputs (typical stdin for one run). Lets Scanner-based solutions run without hanging. */
+  const stdinFromSamples = useMemo(() => {
+    if (!sampleCases.length) return "";
+    return sampleCases
+      .map((c) => (c && c.input != null ? String(c.input) : ""))
+      .join("\n")
+      .replace(/\r\n/g, "\n")
+      .trimEnd();
+  }, [sampleCases]);
 
   useEffect(() => {
     return () => {
@@ -49,17 +67,38 @@ export default function CodingTaskEditor({ assignment, onSubmitCodingAssignment 
     if (running) return;
     setOutput("Connecting to compiler...\n");
     setRunning(true);
-    const wsBase = String(apiBase || "http://localhost:3000").replace(/\/$/, "").replace(/^http/, "ws");
-    const ws = new WebSocket(`${wsBase}/ws/compiler`);
+    const wsUrl = resolveCompilerWsUrl();
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      setOutput("Compiling and running...\n");
-      ws.send(JSON.stringify({ type: "run", code: activeCode }));
+      let banner = "Compiling and running...\n";
+      if (stdinFromSamples) {
+        banner += "(Sending sample test input into stdin, then closing stdin so the program can finish.)\n";
+      } else {
+        banner +=
+          "(If your program uses Scanner/System.in, type each line in the input bar below and press Enter.)\n";
+      }
+      setOutput(banner);
+      const payload = {
+        type: "run",
+        code: activeCode,
+        ...(stdinFromSamples ? { input: stdinFromSamples, closeStdin: true } : {}),
+      };
+      ws.send(JSON.stringify(payload));
     };
 
     ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
+      let msg;
+      try {
+        msg = JSON.parse(event.data);
+      } catch {
+        setOutput((prev) => prev + `\n[ERROR] Invalid message from compiler.\n`);
+        return;
+      }
+      if (msg.type === "complexity") {
+        setOutput((prev) => prev.replace(/^Compiling and running\.\.\.\n/m, "Compiled. Running...\n"));
+      }
       if (msg.type === "output") {
         setOutput((prev) => prev + String(msg.data || ""));
       }
@@ -195,15 +234,17 @@ export default function CodingTaskEditor({ assignment, onSubmitCodingAssignment 
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={running ? handleStop : handleRun}
-          disabled={!running && !activeTask}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white disabled:opacity-50"
-        >
-          {running ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          {running ? "Stop" : "Run Code"}
-        </button>
+        {false && (
+          <button
+            type="button"
+            onClick={running ? handleStop : handleRun}
+            disabled={!running && !activeTask}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-400 text-white disabled:opacity-50"
+          >
+            {running ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {running ? "Stop" : "Run Code"}
+          </button>
+        )}
         <button
           type="button"
           onClick={handleSubmit}

@@ -137,8 +137,18 @@ export function startWebSocketServer(server) {
     let userTempDir = null;
     let executionStartTime = null;
     let memoryMonitorInterval = null;
+    let javaRunTimer = null;
     let peakMemory = 0;
     let pendingInputs = [];
+
+    const JAVA_RUN_TIMEOUT_MS = Number.parseInt(process.env.JAVA_RUN_TIMEOUT_MS || '', 10) || 30_000;
+
+    function clearJavaRunTimer() {
+      if (javaRunTimer) {
+        clearTimeout(javaRunTimer);
+        javaRunTimer = null;
+      }
+    }
 
     ws.on('message', async (message) => {
       try {
@@ -206,17 +216,49 @@ export function startWebSocketServer(server) {
               console.log('\n🚀 Java process started with PID:', javaProcess.pid, 'Class:', className);
             }
 
+            clearJavaRunTimer();
+            javaRunTimer = setTimeout(() => {
+              javaRunTimer = null;
+              if (!javaProcess) return;
+              try {
+                ws.send(JSON.stringify({
+                  type: 'error',
+                  data: `Execution timed out after ${JAVA_RUN_TIMEOUT_MS / 1000}s (program may be waiting for input or stuck in a loop).`,
+                }));
+              } catch (_) {
+                /* socket may be closing */
+              }
+              javaProcess.kill('SIGKILL');
+            }, JAVA_RUN_TIMEOUT_MS);
+
             // If frontend sent input before java process was ready, flush now.
             if (Array.isArray(pendingInputs) && pendingInputs.length > 0) {
               pendingInputs.forEach((chunk) => {
-                javaProcess.stdin.write(chunk);
+                try {
+                  if (javaProcess.stdin?.writable) javaProcess.stdin.write(chunk);
+                } catch (_) {
+                  /* stdin closed */
+                }
               });
               pendingInputs = [];
             }
 
             // Support non-interactive runs by accepting "input" in the run payload.
             if (typeof data.input === 'string' && data.input.length > 0) {
-              javaProcess.stdin.write(data.input.endsWith('\n') ? data.input : `${data.input}\n`);
+              try {
+                javaProcess.stdin.write(data.input.endsWith('\n') ? data.input : `${data.input}\n`);
+              } catch (_) {
+                /* stdin closed */
+              }
+            }
+
+            // Close stdin for batch runs so programs that read until EOF don't hang.
+            if (data.closeStdin && javaProcess.stdin?.writable) {
+              try {
+                javaProcess.stdin.end();
+              } catch (_) {
+                /* ignore */
+              }
             }
 
             // Monitor memory usage in the background with low overhead.
@@ -241,6 +283,7 @@ export function startWebSocketServer(server) {
             });
 
             javaProcess.on('close', (exitCode) => {
+              clearJavaRunTimer();
               // Stop memory monitoring
               if (memoryMonitorInterval) {
                 clearInterval(memoryMonitorInterval);
@@ -285,7 +328,13 @@ export function startWebSocketServer(server) {
         }
 
         if (data.type === 'input' && javaProcess) {
-          javaProcess.stdin.write(data.data + '\n');
+          try {
+            if (javaProcess.stdin?.writable) {
+              javaProcess.stdin.write(data.data + '\n');
+            }
+          } catch (_) {
+            /* stdin closed */
+          }
         } else if (data.type === 'input' && !javaProcess) {
           // Queue input until compiler + java process are ready.
           pendingInputs.push((data.data || '') + '\n');
@@ -303,6 +352,7 @@ export function startWebSocketServer(server) {
     ws.on('close', cleanup);
 
     function cleanup() {
+      clearJavaRunTimer();
       if (memoryMonitorInterval) {
         clearInterval(memoryMonitorInterval);
         memoryMonitorInterval = null;

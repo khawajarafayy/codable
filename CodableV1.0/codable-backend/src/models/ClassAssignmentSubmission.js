@@ -11,12 +11,25 @@ const questionAttemptSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const testCaseResultSchema = new mongoose.Schema(
+  {
+    index: { type: Number, required: true },
+    input: { type: String, default: "" },
+    expectedOutput: { type: String, default: "" },
+    actualOutput: { type: String, default: "" },
+    passed: { type: Boolean, default: false },
+    error: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const codingTaskSubmissionSchema = new mongoose.Schema(
   {
     taskId: { type: String, required: true },
     codeSnippet: { type: String, default: "" },
     testCasesPassed: { type: Number, default: 0 },
     totalTestCases: { type: Number, default: 0 },
+    testCaseResults: { type: [testCaseResultSchema], default: [] },
     aiCodeAnalysis: {
       logic: { type: String, default: "" },
       quality: { type: String, default: "" },

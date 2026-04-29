@@ -83,6 +83,8 @@ export default function Assignments() {
   const [reportData, setReportData] = useState(null);
   const [submissionNotice, setSubmissionNotice] = useState("");
   const [previewingSubmission, setPreviewingSubmission] = useState(null);
+  const [testCaseGenerationState, setTestCaseGenerationState] = useState({}); // { taskIdx: "generating"|"done"|"error" }
+  const [testCaseGenerationError, setTestCaseGenerationError] = useState({}); // { taskIdx: error message }
   const previousSubmissionCountsRef = useRef({});
 
   const fetchAssignmentsFromApi = useCallback(async () => {
@@ -262,6 +264,11 @@ export default function Assignments() {
             problemStatement: "",
             inputFormat: "",
             outputFormat: "",
+            constraints: [],
+            expectedConcepts: [],
+            sampleTestCases: [],
+            hiddenTestCases: [],
+            referenceSolution: "",
           }
         );
       });
@@ -272,6 +279,65 @@ export default function Assignments() {
   const resolveClassName = (classId, fallback) => {
     const c = instructorClasses.find((x) => x._id === classId);
     return c?.className || fallback || "Class";
+  };
+
+  const handleGenerateTestCasesForTask = async (taskIdx) => {
+    const task = manualCodingTasks[taskIdx];
+    if (!task || !task.problemStatement.trim()) {
+      setTestCaseGenerationError((prev) => ({
+        ...prev,
+        [taskIdx]: "Problem statement is required",
+      }));
+      return;
+    }
+
+    setTestCaseGenerationState((prev) => ({ ...prev, [taskIdx]: "generating" }));
+    setTestCaseGenerationError((prev) => ({ ...prev, [taskIdx]: "" }));
+
+    try {
+      const res = await fetch(`${RAG_API_BASE}/api/generate-test-cases`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problemStatement: task.problemStatement,
+          inputFormat: task.inputFormat || "",
+          outputFormat: task.outputFormat || "",
+          constraints: task.constraints || [],
+          expectedConcepts: task.expectedConcepts || [],
+          difficulty: ragDifficulty || "M",
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.success || !data.data) {
+        throw new Error(data.error || `Test case generation failed (${res.status})`);
+      }
+
+      const generatedTask = data.data;
+      setManualCodingTasks((prev) =>
+        prev.map((t, i) =>
+          i === taskIdx
+            ? {
+                ...t,
+                sampleTestCases: generatedTask.sampleTestCases || [],
+                hiddenTestCases: generatedTask.hiddenTestCases || [],
+                referenceSolution: generatedTask.referenceSolution || "",
+                expectedConcepts: generatedTask.expectedConcepts || [],
+                constraints: generatedTask.constraints || [],
+              }
+            : t
+        )
+      );
+
+      setTestCaseGenerationState((prev) => ({ ...prev, [taskIdx]: "done" }));
+    } catch (err) {
+      setTestCaseGenerationError((prev) => ({
+        ...prev,
+        [taskIdx]: err.message || "Failed to generate test cases",
+      }));
+      setTestCaseGenerationState((prev) => ({ ...prev, [taskIdx]: "error" }));
+    }
   };
 
   const handleGenerateRagAssignment = async () => {
@@ -1016,6 +1082,48 @@ export default function Assignments() {
                             }
                             className="w-full px-3 py-2 rounded-lg bg-[#0b0d11] border border-white/10 text-[#fdfdff]"
                           />
+                          
+                          {/* Test case generation section */}
+                          <div className="flex items-center gap-2 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => handleGenerateTestCasesForTask(idx)}
+                              disabled={
+                                testCaseGenerationState[idx] === "generating" ||
+                                !task.problemStatement.trim()
+                              }
+                              className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 disabled:opacity-50 text-blue-200 rounded-lg border border-blue-500/30 text-sm font-medium"
+                            >
+                              {testCaseGenerationState[idx] === "generating" && (
+                                <Loader className="w-4 h-4 animate-spin" />
+                              )}
+                              {testCaseGenerationState[idx] === "done" && (
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                              )}
+                              {testCaseGenerationState[idx] !== "generating" &&
+                                testCaseGenerationState[idx] !== "done" && (
+                                  <Sparkles className="w-4 h-4" />
+                                )}
+                              {testCaseGenerationState[idx] === "generating"
+                                ? "Generating..."
+                                : testCaseGenerationState[idx] === "done"
+                                ? "Test Cases Generated"
+                                : "Generate Test Cases"}
+                            </button>
+                          </div>
+
+                          {testCaseGenerationError[idx] && (
+                            <div className="flex items-start gap-2 p-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-xs text-rose-200">
+                              <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
+                              <span>{testCaseGenerationError[idx]}</span>
+                            </div>
+                          )}
+
+                          {task.sampleTestCases && task.sampleTestCases.length > 0 && (
+                            <div className="text-xs text-green-400 p-2 rounded-lg bg-green-500/10">
+                              ✓ Generated: {task.sampleTestCases.length} sample cases, {task.hiddenTestCases?.length || 0} hidden cases
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

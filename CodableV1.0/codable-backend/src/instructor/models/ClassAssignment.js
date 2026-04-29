@@ -31,6 +31,7 @@ const codingTestCaseSchema = new mongoose.Schema(
 const codingTaskSchema = new mongoose.Schema(
   {
     id: { type: String, default: "" },
+    type: { type: String, enum: ["input-output", "logic-based"], default: "input-output" },
     question: { type: String, default: "" },
     problemStatement: { type: String, required: true },
     constraints: { type: [String], default: [] },

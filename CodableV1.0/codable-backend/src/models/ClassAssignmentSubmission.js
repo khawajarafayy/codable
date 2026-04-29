@@ -26,6 +26,7 @@ const testCaseResultSchema = new mongoose.Schema(
 const codingTaskSubmissionSchema = new mongoose.Schema(
   {
     taskId: { type: String, required: true },
+    taskType: { type: String, enum: ["input-output", "logic-based"], default: "input-output" },
     codeSnippet: { type: String, default: "" },
     testCasesPassed: { type: Number, default: 0 },
     totalTestCases: { type: Number, default: 0 },

@@ -9,7 +9,7 @@ import User from "../models/User.js";
 import ClassAssignmentSubmission from "../models/ClassAssignmentSubmission.js";
 import { broadcastToUser } from "../websocket/codeRunner.js";
 import { analyzeComplexity } from "../utils/complexityAnalyzer.js";
-import { normalizeOutput, normalizeTestCaseList, validateTestCases } from "../utils/javaAssignmentValidation.js";
+import { normalizeOutput, normalizeTestCaseList } from "../utils/javaAssignmentValidation.js";
 
 function sanitizeMcqsForStudent(mcqs = []) {
   return mcqs.map((q, index) => ({
@@ -22,6 +22,7 @@ function sanitizeMcqsForStudent(mcqs = []) {
 function sanitizeCodingTasksForStudent(tasks = []) {
   return tasks.map((t, index) => ({
     id: t.id || String(index + 1),
+    type: t.type === "logic-based" ? "logic-based" : "input-output",
     question: t.question || t.problemStatement || "",
     problemStatement: t.problemStatement || t.question || "",
     constraints: Array.isArray(t.constraints) ? t.constraints : [],
@@ -41,6 +42,7 @@ function normalizeCodingSubmissions(raw = []) {
   if (!Array.isArray(raw)) return [];
   return raw.map((item, index) => ({
     taskId: String(item?.taskId || item?.id || index + 1),
+    taskType: item?.taskType === "logic-based" ? "logic-based" : "input-output",
     codeSnippet: String(item?.codeSnippet || item?.code || ""),
     testCasesPassed: Number(item?.testCasesPassed || 0),
     totalTestCases: Number(item?.totalTestCases || 0),
@@ -61,9 +63,34 @@ function getRagApiBaseUrl() {
   return (process.env.RAG_API_URL || process.env.RAG_API_BASE || "http://localhost:5001").replace(/\/$/, "");
 }
 
+function inferCodingTaskType(task) {
+  if (task?.type === "input-output" || task?.type === "logic-based") {
+    return task.type;
+  }
+  const prompt = String(task?.problemStatement || task?.question || "").toLowerCase();
+  const inputFormat = String(task?.inputFormat || "").trim().toLowerCase();
+  const noInputSignal =
+    /\b(no|without)\s+(user\s+)?input\b|\binput\s+(is\s+)?not\s+required\b|\bno\s+stdin\b/.test(prompt) ||
+    /\b(no|without)\s+input\b|\binput\s+(is\s+)?not\s+required\b/.test(inputFormat);
+  if (noInputSignal) {
+    return "logic-based";
+  }
+  const hasDynamicInput =
+    (Boolean(inputFormat) && !/\b(no|without)\s+input\b|\binput\s+(is\s+)?not\s+required\b/.test(inputFormat)) ||
+    /\bstdin|scanner|read\s+input|take\s+input|accept\s+input|for each test case\b/.test(prompt);
+  const logicBasedSignal =
+    /\bprint|display|pattern|oop|class|constructor|method|inheritance|encapsulation|interface|override|define\b/.test(prompt);
+  if (logicBasedSignal && !hasDynamicInput) {
+    return "logic-based";
+  }
+  return hasDynamicInput ? "input-output" : "logic-based";
+}
+
 function normalizeCodingTaskForStorage(task, index = 0) {
+  const taskType = inferCodingTaskType(task);
   return {
     id: String(task?.id || index + 1),
+    type: taskType,
     question: String(task?.question || task?.problemStatement || "").trim(),
     problemStatement: String(task?.problemStatement || task?.question || "").trim(),
     constraints: Array.isArray(task?.constraints)
@@ -91,6 +118,7 @@ async function requestGeneratedTestCases(task, index = 0) {
       inputFormat: task?.inputFormat || "",
       outputFormat: task?.outputFormat || "",
       expectedConcepts: Array.isArray(task?.expectedConcepts) ? task.expectedConcepts : [],
+      type: task?.type || "input-output",
       taskId: task?.id || String(index + 1),
     }),
   });
@@ -105,62 +133,46 @@ async function requestGeneratedTestCases(task, index = 0) {
 
 async function prepareValidatedCodingTasks(tasks = []) {
   const normalizedTasks = Array.isArray(tasks) ? tasks : [];
-  const validatedTasks = [];
+  const preparedTasks = [];
 
   for (let index = 0; index < normalizedTasks.length; index += 1) {
     const originalTask = normalizeCodingTaskForStorage(normalizedTasks[index], index);
-    const existingCases = [...originalTask.sampleTestCases, ...originalTask.hiddenTestCases];
-    const canReuseExisting =
-      originalTask.referenceSolution &&
-      originalTask.sampleTestCases.length >= 1 &&
-      originalTask.hiddenTestCases.length >= 3;
-
-    if (canReuseExisting) {
-      const validation = await validateTestCases(originalTask.referenceSolution, existingCases);
-      if (validation.valid) {
-        validatedTasks.push({
-          ...originalTask,
-          sampleTestCases: originalTask.sampleTestCases,
-          hiddenTestCases: originalTask.hiddenTestCases,
-        });
-        continue;
-      }
+    if (originalTask.type === "logic-based") {
+      preparedTasks.push({
+        ...originalTask,
+        sampleTestCases: [],
+        hiddenTestCases: [],
+      });
+      continue;
+    }
+    const hasProvidedCases =
+      originalTask.sampleTestCases.length > 0 || originalTask.hiddenTestCases.length > 0;
+    if (hasProvidedCases) {
+      preparedTasks.push(originalTask);
+      continue;
     }
 
-    let lastError = "";
-    for (let attempt = 1; attempt <= 3; attempt += 1) {
-      try {
-        const generatedTask = normalizeCodingTaskForStorage(
-          await requestGeneratedTestCases(originalTask, index),
-          index
-        );
-        const generatedCases = [...generatedTask.sampleTestCases, ...generatedTask.hiddenTestCases];
-        const validation = await validateTestCases(generatedTask.referenceSolution, generatedCases);
-
-        if (
-          validation.valid &&
-          generatedTask.sampleTestCases.length >= 2 &&
-          generatedTask.hiddenTestCases.length >= 5
-        ) {
-          validatedTasks.push(generatedTask);
-          lastError = "";
-          break;
-        }
-
-        lastError = validation.error || "Generated test cases failed validation";
-      } catch (error) {
-        lastError = String(error?.message || error);
-      }
-
-      if (attempt === 3) {
-        throw new Error(
-          `Unable to validate coding task ${index + 1} after 3 attempts${lastError ? `: ${lastError}` : ""}`
-        );
-      }
+    try {
+      const generatedTask = normalizeCodingTaskForStorage(
+        await requestGeneratedTestCases(originalTask, index),
+        index
+      );
+      preparedTasks.push(generatedTask);
+    } catch (error) {
+      console.warn(
+        `prepareValidatedCodingTasks: task ${index + 1} test-case generation failed; saving without test cases. ${
+          String(error?.message || error)
+        }`
+      );
+      preparedTasks.push({
+        ...originalTask,
+        sampleTestCases: [],
+        hiddenTestCases: [],
+      });
     }
   }
 
-  return validatedTasks;
+  return preparedTasks;
 }
 
 async function runJavaCodeAgainstInput(codeSnippet, input = "", timeoutMs = 8000) {
@@ -227,6 +239,16 @@ async function runJavaCodeAgainstInput(codeSnippet, input = "", timeoutMs = 8000
 }
 
 async function evaluateCodingTaskSubmission(task, submission) {
+  const taskType = task?.type === "logic-based" ? "logic-based" : "input-output";
+  if (taskType === "logic-based") {
+    return {
+      passed: 0,
+      total: 0,
+      scoreOutOfTen: 0,
+      executionNotes: "Logic-based task: test case execution skipped",
+      testCaseResults: [],
+    };
+  }
   const hiddenCases = Array.isArray(task?.hiddenTestCases) ? task.hiddenTestCases : [];
   const allCases = hiddenCases;
 
@@ -283,6 +305,7 @@ async function requestAiCodeAnalysis(task, codeSnippet) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         problemStatement: task?.problemStatement || "",
+        type: task?.type || "input-output",
         inputFormat: task?.inputFormat || "",
         outputFormat: task?.outputFormat || "",
         expectedConcepts: task?.expectedConcepts || [],
@@ -302,6 +325,122 @@ async function requestAiCodeAnalysis(task, codeSnippet) {
       score: 0,
     };
   }
+}
+
+function clampScore(score) {
+  const n = Number(score || 0);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(10, Math.round(n * 100) / 100));
+}
+
+function isAnalysisFailureText(text) {
+  const value = String(text || "").trim().toLowerCase();
+  if (!value) return true;
+  return (
+    value.includes("analysis failed") ||
+    value.includes("ai analysis unavailable") ||
+    value.includes("could not be fully evaluated") ||
+    value.includes("assessment unavailable")
+  );
+}
+
+function evaluateCodeQuality(task, codeSnippet) {
+  const code = String(codeSnippet || "");
+  const compact = code.replace(/\s+/g, " ").trim();
+  if (!compact) {
+    return {
+      score: 0,
+      logic: "No code submitted.",
+      quality: "Submission is empty.",
+      structure: "Expected Java class and method structure was not found.",
+    };
+  }
+
+  const hasClass = /class\s+\w+/.test(code);
+  const hasMethod = /(public|private|protected)?\s*(static\s+)?\w+\s+\w+\s*\([^)]*\)\s*\{/.test(code);
+  const hasLoop = /\b(for|while|do)\b/.test(code);
+  const hasCondition = /\bif\s*\(/.test(code);
+  const hasOopConstruct = /\b(class|interface|extends|implements|new)\b/.test(code);
+  const lines = code.split(/\r?\n/).filter((line) => line.trim().length > 0).length;
+  const taskType = task?.type === "logic-based" ? "logic-based" : "input-output";
+
+  let score = 0;
+  if (hasClass) score += 2.5;
+  if (hasMethod) score += 2.5;
+  if (hasLoop || hasCondition) score += 2;
+  if (lines >= 8) score += 1.5;
+  if (taskType === "logic-based" && hasOopConstruct) score += 1.5;
+
+  return {
+    score: clampScore(score),
+    logic: hasLoop || hasCondition || hasOopConstruct
+      ? "Contains meaningful logic constructs."
+      : "Logic appears minimal; add clearer computational structure.",
+    quality: lines >= 8
+      ? "Code has reasonable structure and readability."
+      : "Code is short; consider improving clarity and decomposition.",
+    structure: hasClass && hasMethod
+      ? "Core Java structure detected (class and method blocks)."
+      : "Expected class/method structure is incomplete.",
+  };
+}
+
+function evaluateTaskLogicHeuristics(task, codeSnippet) {
+  const prompt = String(task?.problemStatement || task?.question || "").toLowerCase();
+  const code = String(codeSnippet || "");
+  const compact = code.replace(/\s+/g, " ").trim();
+  if (!compact) {
+    return {
+      score: 0,
+      logic: "No solution logic found because the submission is empty.",
+      quality: "Provide a complete solution with clear implementation steps.",
+      structure: "Expected Java class and method blocks are missing.",
+    };
+  }
+
+  const hasLoop = /\b(for|while|do)\b/.test(code);
+  const hasArithmetic = /[+\-*/%]/.test(code);
+  const printsConstant = /System\.out\.println\s*\(\s*["']?\d+["']?\s*\)/.test(code);
+  const hasScanner = /\bScanner\b/.test(code);
+  const hasClass = /\bclass\s+\w+/.test(code);
+  const hasMain = /\bpublic\s+static\s+void\s+main\s*\(/.test(code);
+
+  // Basic semantic checks for common introductory prompts.
+  let semanticScore = 6;
+  let semanticNote = "Solution intent looks partially aligned with the prompt.";
+  if (prompt.includes("sum") && prompt.includes("first") && prompt.includes("ten")) {
+    const hasSumVariable = /\b(sum|total)\b/i.test(code);
+    const hasTenBound = /\b<=?\s*10\b|\b10\b/.test(code);
+    if (hasLoop && hasArithmetic && (hasSumVariable || hasTenBound)) {
+      semanticScore = 9;
+      semanticNote = "Code appears to compute the required sum using program logic.";
+    } else if (printsConstant) {
+      semanticScore = 3;
+      semanticNote = "Code prints a hardcoded answer instead of computing the sum.";
+    } else {
+      semanticScore = 5;
+      semanticNote = "Code does not clearly show the expected summation logic.";
+    }
+  }
+
+  let structureScore = 0;
+  if (hasClass) structureScore += 2;
+  if (hasMain) structureScore += 2;
+  if (hasLoop) structureScore += 2;
+  if (hasArithmetic) structureScore += 2;
+  if (!hasScanner) structureScore += 1; // no-input tasks should avoid unnecessary input handling
+  const score = clampScore((semanticScore * 0.7) + (structureScore * 0.3));
+
+  return {
+    score,
+    logic: semanticNote,
+    quality: printsConstant
+      ? "Avoid hardcoded outputs; implement the logic so similar prompts can be solved correctly."
+      : "Code quality is acceptable; improve naming and decomposition for better readability.",
+    structure: hasClass && hasMain
+      ? "Java class and main method structure are present."
+      : "Java entry-point structure is incomplete.",
+  };
 }
 
 /** All assignments across classes owned by this instructor */
@@ -748,8 +887,10 @@ export const submitAssignmentForStudent = async (req, res) => {
 
       for (const task of assignment.codingTasks) {
         const taskId = String(task.id || "");
+        const taskType = task?.type === "logic-based" ? "logic-based" : "input-output";
         const submitted = submittedByTaskId[taskId] || {
           taskId,
+          taskType,
           codeSnippet: "",
           testCasesPassed: 0,
           totalTestCases: 0,
@@ -758,19 +899,47 @@ export const submitAssignmentForStudent = async (req, res) => {
         };
         const execution = await evaluateCodingTaskSubmission(task, submitted);
         const aiAnalysis = await requestAiCodeAnalysis(task, submitted.codeSnippet);
+        const qualityAnalysis = evaluateCodeQuality(task, submitted.codeSnippet);
+        const localLogicAnalysis = evaluateTaskLogicHeuristics(task, submitted.codeSnippet);
         const complexity = analyzeComplexity(submitted.codeSnippet || "");
-
-        const taskScore = Number(aiAnalysis?.score || execution.scoreOutOfTen || 0);
+        const aiUnavailable =
+          !Number(aiAnalysis?.score) ||
+          isAnalysisFailureText(aiAnalysis?.logic) ||
+          isAnalysisFailureText(aiAnalysis?.quality) ||
+          isAnalysisFailureText(aiAnalysis?.structure);
+        const aiScore = aiUnavailable ? clampScore(localLogicAnalysis.score) : clampScore(aiAnalysis?.score || 0);
+        const qualityScore = clampScore(qualityAnalysis?.score || 0);
+        const executionScore = clampScore(execution.scoreOutOfTen || 0);
+        const hasRunnableTests = execution.total > 0;
+        const taskScore =
+          taskType === "logic-based"
+            ? clampScore(aiScore * 0.7 + qualityScore * 0.3)
+            : hasRunnableTests
+              ? clampScore(executionScore * 0.7 + qualityScore * 0.2 + aiScore * 0.1)
+              : clampScore(aiScore * 0.6 + qualityScore * 0.4);
         score += taskScore;
         codingSubmissions.push({
           ...submitted,
+          taskType,
           testCasesPassed: execution.passed,
           totalTestCases: execution.total,
           testCaseResults: execution.testCaseResults || [],
           aiCodeAnalysis: {
-            logic: String(aiAnalysis?.logic || ""),
-            quality: String(aiAnalysis?.quality || ""),
-            structure: String(aiAnalysis?.structure || ""),
+            logic: String(
+              aiUnavailable
+                ? localLogicAnalysis.logic
+                : (aiAnalysis?.logic || localLogicAnalysis.logic || qualityAnalysis.logic || "")
+            ),
+            quality: String(
+              aiUnavailable
+                ? localLogicAnalysis.quality
+                : (aiAnalysis?.quality || localLogicAnalysis.quality || qualityAnalysis.quality || "")
+            ),
+            structure: String(
+              aiUnavailable
+                ? localLogicAnalysis.structure
+                : (aiAnalysis?.structure || localLogicAnalysis.structure || qualityAnalysis.structure || "")
+            ),
             score: taskScore,
           },
           complexityAnalysis: {

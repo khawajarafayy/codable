@@ -3826,6 +3826,9 @@ def analyze_code_assignment():
         code_snippet = str(data.get("codeSnippet") or "")
         problem = str(data.get("problemStatement") or "")
         expected_concepts = data.get("expectedConcepts") or []
+        task_type = str(data.get("type") or "input-output")
+        input_format = str(data.get("inputFormat") or "")
+        output_format = str(data.get("outputFormat") or "")
 
         if not code_snippet.strip():
             return jsonify({"success": False, "error": "codeSnippet is required"}), 400
@@ -3843,23 +3846,41 @@ def analyze_code_assignment():
 
         from langchain_core.prompts import ChatPromptTemplate
         import json as _json
+        import re as _re
 
         prompt = ChatPromptTemplate.from_template(
-            """Evaluate this Java solution and return ONLY valid JSON:
+            """Evaluate this Java solution and return ONLY valid JSON with NO markdown:
 {{"logic":"...","quality":"...","structure":"...","score":0-10}}
 
 Problem:
 {problem}
+
+Task type:
+{task_type}
+
+Input format:
+{input_format}
+
+Output format:
+{output_format}
 
 Expected concepts:
 {concepts}
 
 Code:
 {code}
+
+Scoring guidance:
+- Give low score when answer is hardcoded instead of computed.
+- For logic-based tasks, prioritize algorithm/structure correctness.
+- For input-output tasks, prioritize correctness vs required input/output behavior.
 """
         )
         invoke_args = {
             "problem": problem[:2500],
+            "task_type": task_type[:100],
+            "input_format": input_format[:1000],
+            "output_format": output_format[:1000],
             "concepts": ", ".join([str(c) for c in expected_concepts][:20]),
             "code": code_snippet[:9000],
         }
@@ -3874,13 +3895,40 @@ Code:
             model = ChatMistralAI(model="mistral-small-latest", mistral_api_key=MISTRAL_API_KEY, temperature=0.2, max_tokens=1024)
             content = (prompt | model).invoke(invoke_args).content
 
-        text = str(content or "").strip()
-        if text.startswith("```"):
-            parts = text.split("```")
-            text = parts[1] if len(parts) > 1 else text
-            if text.startswith("json"):
-                text = text[4:]
-        parsed = _json.loads(text.strip())
+        def _extract_json_object(raw_text: str):
+            txt = str(raw_text or "").strip()
+            if not txt:
+                return None
+            if txt.startswith("```"):
+                parts = txt.split("```")
+                txt = parts[1] if len(parts) > 1 else txt
+                if txt.startswith("json"):
+                    txt = txt[4:]
+            txt = txt.strip()
+            try:
+                return _json.loads(txt)
+            except Exception:
+                pass
+
+            # Try to parse the first JSON object in the response.
+            match = _re.search(r'\{[\s\S]*\}', txt)
+            if match:
+                try:
+                    return _json.loads(match.group(0))
+                except Exception:
+                    return None
+            return None
+
+        parsed = _extract_json_object(content)
+        if not parsed:
+            raise ValueError("Model output is not valid JSON")
+
+        score_raw = parsed.get("score", 0)
+        try:
+            score_value = float(score_raw)
+        except Exception:
+            score_value = 0.0
+        score_value = max(0, min(10, round(score_value, 2)))
 
         return jsonify({
             "success": True,
@@ -3888,7 +3936,7 @@ Code:
                 "logic": str(parsed.get("logic", "")),
                 "quality": str(parsed.get("quality", "")),
                 "structure": str(parsed.get("structure", "")),
-                "score": max(0, min(10, int(parsed.get("score", 0)))),
+                "score": score_value,
             },
         })
     except Exception as e:
@@ -3896,9 +3944,9 @@ Code:
         return jsonify({
             "success": True,
             "analysis": {
-                "logic": "Automatic AI analysis failed.",
-                "quality": "Automatic AI analysis failed.",
-                "structure": "Automatic AI analysis failed.",
+                "logic": "Automatic AI analysis failed; fallback evaluator should be used.",
+                "quality": "Automatic AI analysis failed; fallback evaluator should be used.",
+                "structure": "Automatic AI analysis failed; fallback evaluator should be used.",
                 "score": 0,
             },
         })

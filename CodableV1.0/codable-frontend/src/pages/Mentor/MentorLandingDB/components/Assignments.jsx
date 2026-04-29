@@ -21,6 +21,22 @@ import { useAuth } from "../../../../context/AuthContext";
 
 const RAG_API_BASE = (import.meta.env.VITE_RAG_API_URL ?? "http://localhost:5001").replace(/\/$/, "");
 
+function inferTaskType(task = {}) {
+  if (task?.type === "logic-based" || task?.type === "input-output") return task.type;
+  const prompt = String(task.problemStatement || "").toLowerCase();
+  const inputFormat = String(task.inputFormat || "").trim().toLowerCase();
+  const noInputSignal =
+    /\b(no|without)\s+(user\s+)?input\b|\binput\s+(is\s+)?not\s+required\b|\bno\s+stdin\b/.test(prompt) ||
+    /\b(no|without)\s+input\b|\binput\s+(is\s+)?not\s+required\b/.test(inputFormat);
+  if (noInputSignal) return "logic-based";
+  const hasInput =
+    (Boolean(inputFormat) && !/\b(no|without)\s+input\b|\binput\s+(is\s+)?not\s+required\b/.test(inputFormat)) ||
+    /\bstdin|scanner|read\s+input|take\s+input|accept\s+input|for each test case\b/.test(prompt);
+  const logicSignal = /\bprint|pattern|oop|class|method|constructor|inheritance|encapsulation\b/.test(prompt);
+  if (logicSignal && !hasInput) return "logic-based";
+  return hasInput ? "input-output" : "logic-based";
+}
+
 function mapAssignmentFromApi(row, classesById) {
   const cid = String(row.classId?._id ?? row.classId ?? "");
   const cls = classesById[cid];
@@ -283,6 +299,14 @@ export default function Assignments() {
 
   const handleGenerateTestCasesForTask = async (taskIdx) => {
     const task = manualCodingTasks[taskIdx];
+    if (inferTaskType(task) === "logic-based") {
+      setTestCaseGenerationError((prev) => ({
+        ...prev,
+        [taskIdx]: "Test cases are only generated for input-output tasks.",
+      }));
+      return;
+    }
+
     if (!task || !task.problemStatement.trim()) {
       setTestCaseGenerationError((prev) => ({
         ...prev,
@@ -371,6 +395,7 @@ export default function Assignments() {
           .map((ch) => ch.title);
         generatedCodingTasks = manualCodingTasks.map((t, idx) => ({
           id: String(idx + 1),
+          type: inferTaskType(t),
           problemStatement: String(t.problemStatement || "").trim(),
           inputFormat: String(t.inputFormat || "").trim(),
           outputFormat: String(t.outputFormat || "").trim(),
@@ -390,7 +415,20 @@ export default function Assignments() {
                 num_tasks: numTasks,
                 difficulty: ragDifficulty,
                 topics: selectedChapterIds.map(String),
-                instructions: codingInstructions.trim(),
+                topic_names: ragChapters
+                  .filter((ch) => selectedChapterIds.includes(ch.id))
+                  .map((ch) => ch.title),
+                instructions: [
+                  codingInstructions.trim(),
+                  "STRICT REQUIREMENTS:",
+                  "- Generate questions only from the selected topic names.",
+                  "- Do not introduce advanced or future topics outside the selected scope.",
+                  "- Difficulty must match the requested level.",
+                  "- Each task must include type: \"input-output\" or \"logic-based\".",
+                  "- Generate test cases only for input-output tasks.",
+                ]
+                  .filter(Boolean)
+                  .join("\n"),
               }
             : {
                 chapter_ids: selectedChapterIds,
@@ -404,7 +442,14 @@ export default function Assignments() {
         });
         const data = await res.json().catch(() => ({}));
         generatedMcqs = Array.isArray(data.mcqs) ? data.mcqs : [];
-        generatedCodingTasks = Array.isArray(data.codingTasks) ? data.codingTasks : [];
+        generatedCodingTasks = Array.isArray(data.codingTasks)
+          ? data.codingTasks.map((task) => ({
+              ...task,
+              type: inferTaskType(task),
+              sampleTestCases: inferTaskType(task) === "logic-based" ? [] : (task.sampleTestCases || []),
+              hiddenTestCases: inferTaskType(task) === "logic-based" ? [] : (task.hiddenTestCases || []),
+            }))
+          : [];
         const hasValid =
           ragAssignmentType === "coding" ? generatedCodingTasks.length > 0 : generatedMcqs.length > 0;
         if (!res.ok || !data.success || !hasValid) {
